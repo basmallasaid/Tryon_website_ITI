@@ -1,4 +1,8 @@
 @import "tailwindcss";
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #F4F3F5;
+}
 /* @import "./styles/theme.css";
 
 *, *::before, *::after {
