@@ -9,19 +9,72 @@ import { AuthProvider } from "./context/AuthContext"
 import Login from "./pages/Auth/Login"
 import Register from "./pages/Auth/Register"
 import AuthPage from "./pages/Auth/AuthPage"
+import Home from "./pages/home/Home"
+
+import TryOn from "./pages/tryOn/TryOn"
+
 import Navbar from "./components/Navbar"
+import { CircularProgress, Box } from '@mui/material';
+import { createBrowserRouter, RouterProvider } from 'react-router';
+import Layout from "./pages/Layout"
+import AdminLayout from "./pages/AdminLayout"
+import Dashboard from "./pages/admin/Dashboard"
+import Products from "./pages/admin/Products"
+
+
+const LoadingFallback = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '100vh',
+      bgcolor: '#0A0E17',
+    }}
+  >
+    <CircularProgress sx={{ color: '#00E5FF' }} />
+  </Box>
+);
+
+
+function AppContent() {
+
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Layout />,
+      children: [
+        { index: true, element: <Home /> },
+        { path: 'tryOn', element: <TryOn /> }
+      ]
+
+    },
+    {
+      path: '/admin',
+      element: <AdminLayout />,
+      children: [
+        { index: true, element: <Dashboard /> },
+        { path: 'products', element: <Products /> }
+
+      ]
+    }
+  ])
+  return (
+    <RouterProvider router={router} />
+
+  );
+}
+
 
 function App() {
 
   return (
-    <BrowserRouter>
       <AuthProvider>
-        {/* <Register/>
-        <Login/> */}
-        <Navbar/>
-        <AuthPage/>
+        {/* <Navbar />
+        <AuthPage /> */}
+
+        <AppContent/>
       </AuthProvider>
-    </BrowserRouter>
   )
 }
 
