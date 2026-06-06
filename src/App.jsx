@@ -9,6 +9,7 @@ import { AuthProvider } from "./context/AuthContext"
 import Login from "./pages/Auth/Login"
 import Register from "./pages/Auth/Register"
 import AuthPage from "./pages/Auth/AuthPage"
+import Navbar from "./components/Navbar"
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
       <AuthProvider>
         {/* <Register/>
         <Login/> */}
+        <Navbar/>
         <AuthPage/>
       </AuthProvider>
     </BrowserRouter>
