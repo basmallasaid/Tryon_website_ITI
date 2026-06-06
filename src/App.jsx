@@ -3,6 +3,7 @@
 // import viteLogo from './assets/vite.svg'
 // import heroImg from './assets/hero.png'
 // import './App.css'
+import { lazy, Suspense, useMemo, useEffect } from 'react';
 
 import { BrowserRouter } from "react-router-dom"
 import { AuthProvider } from "./context/AuthContext"
@@ -10,6 +11,7 @@ import Login from "./pages/Auth/Login"
 import Register from "./pages/Auth/Register"
 import AuthPage from "./pages/Auth/AuthPage"
 import Home from "./pages/home/Home"
+// const FurnitureDetail = lazy(() => import('./pages/FurnitureDetail'));
 
 import TryOn from "./pages/tryOn/TryOn"
 
@@ -60,8 +62,10 @@ function AppContent() {
     }
   ])
   return (
-    <RouterProvider router={router} />
+    <Suspense fallback={<LoadingFallback />}>
 
+      <RouterProvider router={router} />
+    </Suspense>
   );
 }
 
@@ -69,12 +73,12 @@ function AppContent() {
 function App() {
 
   return (
-      <AuthProvider>
-        {/* <Navbar />
+    <AuthProvider>
+      {/* <Navbar />
         <AuthPage /> */}
 
-        <AppContent/>
-      </AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 
