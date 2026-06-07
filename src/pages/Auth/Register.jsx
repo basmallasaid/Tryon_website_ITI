@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function RegisterForm({ isVisible, onRegister, toggleAuth, inModal }) {
+export default function RegisterForm({ isVisible, onRegister, toggleAuth, onGoogleLogin, inModal }) {
   return (
     <div className={`absolute right-0 top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ${
       isVisible ? "z-10 opacity-100" : "z-0 opacity-0"
@@ -24,7 +24,7 @@ export default function RegisterForm({ isVisible, onRegister, toggleAuth, inModa
             <div className="h-[1px] flex-1 bg-[#40B9FF] opacity-50"></div>
           </div>
 
-          <button type="button" className={`flex w-full items-center justify-center gap-3 rounded-xl border border-gray-300 font-bold text-black transition-all hover:bg-gray-50 ${inModal ? 'py-3' : 'py-4'}`}>
+          <button type="button" onClick={onGoogleLogin} className={`flex w-full items-center justify-center gap-3 rounded-xl border border-gray-300 font-bold text-black transition-all hover:bg-gray-50 ${inModal ? 'py-3' : 'py-4'}`}>
             <img src="/google.svg" alt="Google" className="h-5 w-5" />
             Continue with Google
           </button>

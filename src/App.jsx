@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthContext"
 import Login from "./pages/Auth/Login"
 import Register from "./pages/Auth/Register"
 import AuthPage from "./pages/Auth/AuthPage"
+import GoogleCallback from "./pages/Auth/GoogleCallback"
 import Home from "./pages/home/Home"
 // const FurnitureDetail = lazy(() => import('./pages/FurnitureDetail'));
 
@@ -47,7 +48,8 @@ function AppContent() {
       element: <Layout />,
       children: [
         { index: true, element: <Home /> },
-        { path: 'tryOn', element: <TryOn /> }
+        { path: 'tryOn', element: <TryOn /> },
+        { path: 'auth/callback', element: <GoogleCallback /> }
       ]
 
     },

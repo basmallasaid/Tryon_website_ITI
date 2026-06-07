@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { loginApi, registerApi, sendVerificationApi, forgotPasswordApi, otpVerifyApi, resetPasswordApi } from "../../api/authApi";
 import { getUserApi, updateProfileApi } from "../../api/userApi";
@@ -17,6 +17,35 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
 
     const handleForgot = () => setView("forgot");
     const handleBackToLogin = () => setView("login");
+
+    const handleGoogleLogin = () => {
+        if (window.googleAuthPopup && !window.googleAuthPopup.closed) {
+            window.googleAuthPopup.focus();
+            return;
+        }
+        const width = 500;
+        const height = 600;
+        const left = window.screenX + (window.innerWidth - width) / 2;
+        const top = window.screenY + (window.innerHeight - height) / 2;
+        window.googleAuthPopup = window.open(
+            "http://localhost:5000/api/auth/google",
+            "google-auth",
+            `width=${width},height=${height},left=${left},top=${top}`
+        );
+    };
+
+    useEffect(() => {
+        const handleMessage = (event) => {
+            if (event.origin !== window.origin) return;
+            if (event.data?.type !== "GOOGLE_AUTH_SUCCESS") return;
+            const userData = event.data.payload;
+            console.log("Google OAuth login successful", userData);
+            login(userData);
+            onClose?.();
+        };
+        window.addEventListener("message", handleMessage);
+        return () => window.removeEventListener("message", handleMessage);
+    }, [login, onClose]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -104,9 +133,9 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
         <div className={`flex ${inModal ? '' : 'min-h-screen'} items-center justify-center ${inModal ? '' : 'bg-gray-100 p-4'} font-sans`}>
             <div className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full ${inModal ? '' : 'max-w-6xl'} overflow-hidden rounded-[40px] bg-white shadow-2xl`}>
                 
-                <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} inModal={inModal} />
+                <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
                 
-                <Register isVisible={view === "register"} onRegister={handleRegister} toggleAuth={toggleAuth} inModal={inModal} />
+                <Register isVisible={view === "register"} onRegister={handleRegister} toggleAuth={toggleAuth} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
                 
                 <ForgotPassword isVisible={view === "forgot"} onForgot={handleForgotSubmit} onBackToLogin={handleBackToLogin} inModal={inModal} />
                 

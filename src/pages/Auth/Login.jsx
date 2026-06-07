@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function LoginForm({ isVisible, onLogin, onForgot, inModal }) {
+export default function LoginForm({ isVisible, onLogin, onForgot, onGoogleLogin, inModal }) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -42,7 +42,7 @@ export default function LoginForm({ isVisible, onLogin, onForgot, inModal }) {
             <div className="h-[1px] flex-1 bg-[#40B9FF] opacity-50"></div>
           </div>
 
-          <button type="button" className={`flex w-full items-center justify-center gap-3 rounded-xl border border-gray-300 font-bold text-black transition-all hover:bg-gray-50 ${inModal ? 'py-3' : 'py-4'}`}>
+          <button type="button" onClick={onGoogleLogin} className={`flex w-full items-center justify-center gap-3 rounded-xl border border-gray-300 font-bold text-black transition-all hover:bg-gray-50 ${inModal ? 'py-3' : 'py-4'}`}>
             <img src="/google.svg" alt="Google" className="h-5 w-5" />
             Continue with Google
           </button>
