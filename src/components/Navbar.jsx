@@ -1,17 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Globe, ChevronDown, Check, Menu, X } from 'lucide-react';
 import Button from './Button';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = ({ onOpenAuth }) => {
+  const location = useLocation();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [language, setLanguage] = useState('English');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [activeLink, setActiveLink] = useState(location.pathname || '/');
+
+  useEffect(() => {
+    setActiveLink(location.pathname || '/');
+  }, [location.pathname]);
 
   const navLinks = [
     { name: 'Features', active: true },
     { name: 'Try-On', active: false, path: '/tryOn' },
     { name: 'Recycle', active: false, path: '/recycle' },
+    {name: 'Stores', active: false, path: '/stores' },
     { name: 'Pricing', active: false },
     { name: 'About', active: false },
   ];
@@ -25,12 +32,18 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* Navigation Links (Desktop) */}
       <div className="hidden min-[1000px]:flex items-center gap-10 max-[1200px]:gap-6">
-        {navLinks.map(link =>
-          link.path ? (
+        {navLinks.map(link => {
+          const isActive = link.path ? activeLink === link.path : activeLink === link.name;
+          const activeClasses = isActive
+            ? 'text-text-primary border-b-2 border-brand-secondary pb-1'
+            : 'text-text-secondary hover:text-text-primary';
+
+          return link.path ? (
             <Link
               key={link.name}
               to={link.path}
-              className="text-[15px] font-normal text-text-secondary hover:text-text-primary transition-colors duration-200"
+              onClick={() => setActiveLink(link.path)}
+              className={`text-[15px] font-normal transition-colors duration-200 ${activeClasses}`}
             >
               {link.name}
             </Link>
@@ -38,16 +51,13 @@ const Navbar = ({ onOpenAuth }) => {
             <a
               key={link.name}
               href={`#${link.name.toLowerCase()}`}
-              className={`text-[15px] font-normal transition-colors duration-200 ${
-                link.active
-                  ? 'text-text-primary border-b-2 border-brand-secondary pb-1'
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
+              onClick={() => setActiveLink(link.name)}
+              className={`text-[15px] font-normal transition-colors duration-200 ${activeClasses}`}
             >
               {link.name}
             </a>
-          ),
-        )}
+          );
+        })}
       </div>
 
       {/* Desktop Action Buttons */}
@@ -159,13 +169,21 @@ const Navbar = ({ onOpenAuth }) => {
 
         {/* Mobile Nav Links */}
         <div className="flex flex-col px-4 py-6 space-y-2">
-          {navLinks.map(link =>
-            link.path ? (
+          {navLinks.map(link => {
+            const isActive = link.path ? activeLink === link.path : activeLink === link.name;
+            const activeClasses = isActive
+              ? 'text-[#40B9FF] bg-gray-200/50'
+              : 'text-gray-600 hover:bg-gray-200/50';
+
+            return link.path ? (
               <Link
                 key={link.name}
                 to={link.path}
-                onClick={() => setIsMobileOpen(false)}
-                className="relative text-lg font-medium py-3 px-4 rounded-xl transition-all text-gray-600 hover:bg-gray-200/50"
+                onClick={() => {
+                  setActiveLink(link.path);
+                  setIsMobileOpen(false);
+                }}
+                className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${activeClasses}`}
               >
                 {link.name}
               </Link>
@@ -173,17 +191,16 @@ const Navbar = ({ onOpenAuth }) => {
               <a
                 key={link.name}
                 href={`#${link.name.toLowerCase()}`}
-                onClick={() => setIsMobileOpen(false)}
-                className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${
-                  link.active
-                    ? 'text-white bg-gradient-to-r from-[#40B9FF] to-[#AAE338] shadow-md'
-                    : 'text-gray-600 hover:bg-gray-200/50'
-                }`}
+                onClick={() => {
+                  setActiveLink(link.name);
+                  setIsMobileOpen(false);
+                }}
+                className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${activeClasses}`}
               >
                 {link.name}
               </a>
-            ),
-          )}
+            );
+          })}
         </div>
 
         <div className="border-t border-gray-200 px-4 pt-4 mt-2">
