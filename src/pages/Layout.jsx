@@ -1,18 +1,15 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import { Outlet } from 'react-router-dom'
-import Footer from '../components/Footer'
+import Navbar from "../components/Navbar";
+import { Outlet } from "react-router-dom";
+import Footer from "../components/Footer";
 
 export default function Layout() {
   return (
-    <>
-    
-    <Navbar/>
+    <div className="w-[100%] max-w-[1920px] mx-auto">
+      <Navbar />
 
-    <Outlet/>
+      <Outlet />
 
-    <Footer/>
-
-    </>
-  )
+      <Footer />
+    </div>
+  );
 }
