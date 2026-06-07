@@ -16,7 +16,7 @@ const Navbar = ({ onOpenAuth }) => {
   ];
 
   return (
-    <nav className="flex items-center justify-between bg-[#F4F3F5] px-20 max-[1200px]:px-14 max-[1000px]:px-8 py-6 font-roboto relative z-50">
+    <nav className="flex items-center justify-between bg-[#F4F3F5] px-20 max-[1200px]:px-14 max-[1000px]:px-8 py-6 relative z-50">
       {/* Logo */}
       <div className="flex items-center cursor-pointer">
         <img src="/logo.svg" alt="Logo" className="w-[139px] h-10" />
@@ -30,8 +30,8 @@ const Navbar = ({ onOpenAuth }) => {
             href={`#${link.name.toLowerCase()}`}
             className={`text-[15px] font-normal transition-colors duration-200 ${
               link.active
-                ? 'text-text-primary border-b-2 border-brand-secondary pb-1'
-                : 'text-text-secondary hover:text-text-primary'
+                ? 'text-[var(--Primary-Text-color)] border-b-2 border-[var(--Secondary-Brand-color)] pb-1'
+                : 'text-[var(--text-secondary)] hover:text-[var(--Primary-Text-color)]'
             }`}
           >
             {link.name}
@@ -45,7 +45,7 @@ const Navbar = ({ onOpenAuth }) => {
         <div className="relative">
           <button
             onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-2 h-12 border border-border-strong rounded-lg px-4 bg-surface-elevated hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 h-12 border border-[var(--Border-Strong)] rounded-lg px-4 bg-[var(--surface-elevated)] hover:bg-gray-50 transition-all cursor-pointer hover:scale-105"
           >
             <Globe className="w-4 h-4 text-gray-700" />
             <span className="font-semibold text-gray-700 text-sm">{language === 'English' ? 'EN' : 'AR'}</span>
@@ -54,10 +54,10 @@ const Navbar = ({ onOpenAuth }) => {
 
           {/* Dropdown Menu */}
           {isLangOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-lg shadow-2xl py-2 z-10">
+            <div className="absolute right-0 mt-2 w-44 bg-[var(--surface-elevated)] border border-gray-100 rounded-lg shadow-2xl py-2 z-10">
               <button
                 onClick={() => { setLanguage('English'); setIsLangOpen(false) }}
-                className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm"
+                className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <Globe className="w-4 h-4" />
@@ -68,7 +68,7 @@ const Navbar = ({ onOpenAuth }) => {
               <div className="h-px bg-gray-100 mx-2" />
               <button
                 onClick={() => { setLanguage('Arabic'); setIsLangOpen(false) }}
-                className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm"
+                className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
               >
                 <div className="flex items-center gap-3">
                   <Globe className="w-4 h-4" />
@@ -82,7 +82,7 @@ const Navbar = ({ onOpenAuth }) => {
 
         {/* Login + Signup group */}
         <div className="flex items-center gap-2">
-          <button onClick={() => onOpenAuth?.("login")} className="w-[104px] h-12 rounded-lg px-6 py-3 border border-brand-secondary text-brand-secondary font-semibold text-base flex items-center justify-center transition-all hover:shadow-sm">
+          <button onClick={() => onOpenAuth?.("login")} className="w-[104px] h-12 rounded-lg px-6 py-3 border border-[var(--Secondary-Brand-color)] text-[var(--Secondary-Brand-color)] font-semibold text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95">
             Login
           </button>
           <Button variant="signup" onClick={() => onOpenAuth?.("signup")}>
@@ -94,7 +94,7 @@ const Navbar = ({ onOpenAuth }) => {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="min-[1000px]:hidden p-2 rounded-lg hover:bg-gray-200/50 transition-colors"
+        className="min-[1000px]:hidden p-2 rounded-lg hover:bg-gray-200/50 transition-colors cursor-pointer"
         aria-label="Toggle menu"
       >
         {isMobileOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
@@ -115,7 +115,7 @@ const Navbar = ({ onOpenAuth }) => {
           <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors cursor-pointer"
             aria-label="Close menu"
           >
             <X className="w-5 h-5 text-gray-700" />
@@ -131,7 +131,7 @@ const Navbar = ({ onOpenAuth }) => {
               onClick={() => setIsMobileOpen(false)}
               className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${
                 link.active
-                  ? 'text-white bg-gradient-to-r from-[#40B9FF] to-[#AAE338] shadow-md'
+                  ? 'text-white bg-gradient-to-r from-[var(--Primary-Brand-color)] to-[#AAE338] shadow-md'
                   : 'text-gray-600 hover:bg-gray-200/50'
               }`}
             >
@@ -145,7 +145,7 @@ const Navbar = ({ onOpenAuth }) => {
           <div className="mb-4">
             <button
               onClick={() => setIsLangOpen(!isLangOpen)}
-              className="flex items-center justify-between w-full px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
+              className="flex items-center justify-between w-full px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all cursor-pointer"
             >
               <div className="flex items-center space-x-2">
                 <Globe className="w-5 h-5 text-gray-700" />
@@ -154,10 +154,10 @@ const Navbar = ({ onOpenAuth }) => {
               <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
             </button>
             {isLangOpen && (
-              <div className="mt-1 bg-white border border-gray-100 rounded-xl shadow-lg py-2">
+              <div className="mt-1 bg-[var(--surface-elevated)] border border-gray-100 rounded-xl shadow-lg py-2">
                 <button
                   onClick={() => { setLanguage('English'); setIsLangOpen(false) }}
-                  className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm"
+                  className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
                 >
                   <div className="flex items-center space-x-3">
                     <Globe className="w-4 h-4" />
@@ -168,7 +168,7 @@ const Navbar = ({ onOpenAuth }) => {
                 <div className="h-px bg-gray-100 mx-2" />
                 <button
                   onClick={() => { setLanguage('Arabic'); setIsLangOpen(false) }}
-                  className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm"
+                  className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
                 >
                   <div className="flex items-center space-x-3">
                     <Globe className="w-4 h-4" />
@@ -181,10 +181,10 @@ const Navbar = ({ onOpenAuth }) => {
           </div>
 
           {/* Mobile Action Buttons */}
-          <button onClick={() => { onOpenAuth?.("login"); setIsMobileOpen(false) }} className="w-full px-8 py-3 border-2 border-[#A6E22E] text-[#A6E22E] font-bold rounded-xl transition-all text-lg mb-3">
+          <button onClick={() => { onOpenAuth?.("login"); setIsMobileOpen(false) }} className="w-full px-8 py-3 border-2 border-[var(--Lime-Brand-color)] text-[var(--Lime-Brand-color)] font-bold rounded-xl transition-all text-lg mb-3 cursor-pointer hover:scale-[1.02] active:scale-95">
             Login
           </button>
-          <button onClick={() => { onOpenAuth?.("signup"); setIsMobileOpen(false) }} className="w-full px-8 py-3 bg-gradient-to-r from-[#40B9FF] via-[#69C9AC] to-[#AAE338] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 text-lg">
+          <button onClick={() => { onOpenAuth?.("signup"); setIsMobileOpen(false) }} className="w-full px-8 py-3 bg-gradient-to-r from-[var(--Primary-Brand-color)] via-[#69C9AC] to-[#AAE338] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 text-lg cursor-pointer hover:scale-[1.02]">
             Sign-up
           </button>
         </div>

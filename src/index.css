@@ -10,22 +10,15 @@
   --Secondary-Orange-Brand-color: #FF8A3D;
   --Gradient-bgc: linear-gradient(90deg, #40B9FF 14.9%, #69C9AC 55.29%, #AAE338 100%);
   --Primary-Text-color: #121826;
+  --text-secondary: #1E1E24;
   --Secondary-Text-color: #151B29;
   --Disabled-Text-color: #6B7280;
   --Border-Strong: #D5D9DE;
   --Border-Disabled: #6B7280;
   --Icon-Disabled: #BEC8D2;
+  --surface-elevated: #ffffff;
   --Bold: 700;
   --Semi-Bold: 500;
-}
-
-@theme {
-  --font-roboto: "Roboto", sans-serif;
-  --color-text-primary: #121826;
-  --color-text-secondary: #1e1e24;
-  --color-brand-secondary: #8ed321;
-  --color-surface-elevated: #ffffff;
-  --color-border-strong: #d5d9de;
 }
 
 *,
