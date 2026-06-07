@@ -5,26 +5,26 @@
 // import './App.css'
 import { lazy, Suspense, useMemo, useEffect } from 'react';
 
-import { BrowserRouter } from "react-router-dom"
-import { AuthProvider } from "./context/AuthContext"
-import Login from "./pages/Auth/Login"
-import Register from "./pages/Auth/Register"
-import AuthPage from "./pages/Auth/AuthPage"
-import GoogleCallback from "./pages/Auth/GoogleCallback"
-import Home from "./pages/home/Home"
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+import AuthPage from './pages/Auth/AuthPage';
+import GoogleCallback from './pages/Auth/GoogleCallback';
+import Home from './pages/home/Home';
 // const FurnitureDetail = lazy(() => import('./pages/FurnitureDetail'));
 
-import TryOn from "./pages/tryOn/TryOn"
-import Recycle from "./pages/recycle/Recycle"
+import TryOn from './pages/tryOn/TryOn';
+import Recycle from './pages/recycle/Recycle';
+import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 
-import Navbar from "./components/Navbar"
+import Navbar from './components/Navbar';
 import { CircularProgress, Box } from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import Layout from "./pages/Layout"
-import AdminLayout from "./pages/AdminLayout"
-import Dashboard from "./pages/admin/Dashboard"
-import Products from "./pages/admin/Products"
-
+import Layout from './pages/Layout';
+import AdminLayout from './pages/AdminLayout';
+import Dashboard from './pages/admin/Dashboard';
+import Products from './pages/admin/Products';
 
 const LoadingFallback = () => (
   <Box
@@ -40,9 +40,7 @@ const LoadingFallback = () => (
   </Box>
 );
 
-
 function AppContent() {
-
   const router = createBrowserRouter([
     {
       path: '/',
@@ -51,31 +49,27 @@ function AppContent() {
         { index: true, element: <Home /> },
         { path: 'tryOn', element: <TryOn /> },
         { path: 'recycle', element: <Recycle /> },
-        { path: 'auth/callback', element: <GoogleCallback /> }
-      ]
-
+        { path: 'about-recycle', element: <AboutRecycle /> },
+        { path: 'auth/callback', element: <GoogleCallback /> },
+      ],
     },
     {
       path: '/admin',
       element: <AdminLayout />,
       children: [
         { index: true, element: <Dashboard /> },
-        { path: 'products', element: <Products /> }
-
-      ]
-    }
-  ])
+        { path: 'products', element: <Products /> },
+      ],
+    },
+  ]);
   return (
     <Suspense fallback={<LoadingFallback />}>
-
       <RouterProvider router={router} />
     </Suspense>
   );
 }
 
-
 function App() {
-
   return (
     <AuthProvider>
       {/* <Navbar />
@@ -83,7 +77,7 @@ function App() {
 
       <AppContent />
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;
