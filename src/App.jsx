@@ -15,6 +15,7 @@ import Home from "./pages/home/Home"
 // const FurnitureDetail = lazy(() => import('./pages/FurnitureDetail'));
 
 import TryOn from "./pages/tryOn/TryOn"
+import Recycle from "./pages/recycle/Recycle"
 
 import Navbar from "./components/Navbar"
 import { CircularProgress, Box } from '@mui/material';
@@ -49,6 +50,7 @@ function AppContent() {
       children: [
         { index: true, element: <Home /> },
         { path: 'tryOn', element: <TryOn /> },
+        { path: 'recycle', element: <Recycle /> },
         { path: 'auth/callback', element: <GoogleCallback /> }
       ]
 
