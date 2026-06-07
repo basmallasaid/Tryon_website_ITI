@@ -35,9 +35,12 @@ export default function HeroSection() {
                   Start Recycling
                 </button>
                 <div className="rounded-lg bg-gradient-to-r from-[#FF8A3D] via-[#40B9FF] to-[#8ED321] p-px">
-                  <button className="inline-flex items-center gap-2 px-8 py-4 bg-[#F4F3F5] text-brand-secondary font-semibold rounded-lg text-base hover:shadow-lg active:scale-[0.98] transition-all duration-200 w-full">
+                  <a
+                    href="#how-it-works"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#F4F3F5] text-brand-secondary font-semibold rounded-lg text-base hover:shadow-lg active:scale-[0.98] transition-all duration-200 w-full"
+                  >
                     See how it works
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
