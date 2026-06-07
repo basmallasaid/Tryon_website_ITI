@@ -15,7 +15,7 @@ import Home from "./pages/home/Home"
 // const FurnitureDetail = lazy(() => import('./pages/FurnitureDetail'));
 
 import TryOn from "./pages/tryOn/TryOn"
-
+import StoresPage from "./pages/store/StoresPage"
 import Navbar from "./components/Navbar"
 import { CircularProgress, Box } from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router';
@@ -49,7 +49,8 @@ function AppContent() {
       children: [
         { index: true, element: <Home /> },
         { path: 'tryOn', element: <TryOn /> },
-        { path: 'auth/callback', element: <GoogleCallback /> }
+        { path: 'auth/callback', element: <GoogleCallback /> },
+        { path: 'stores', element: <StoresPage /> }
       ]
 
     },
