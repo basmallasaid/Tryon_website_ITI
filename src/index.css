@@ -1,24 +1,40 @@
-@import "tailwindcss";
-@import "@fontsource/roboto/400.css";
-@import "@fontsource/roboto/600.css";
+@import 'tailwindcss';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/600.css';
 
 :root {
-  --primary-bgc: #F5F6F7;
-  --Primary-Brand-color: #40B9FF;
-  --Secondary-Brand-color: #8ED321;
-  --Lime-Brand-color: #A6E22E;
-  --Secondary-Orange-Brand-color: #FF8A3D;
-  --Gradient-bgc: linear-gradient(90deg, #40B9FF 14.9%, #69C9AC 55.29%, #AAE338 100%);
+  --primary-bgc: #f5f6f7;
+  --Primary-Brand-color: #40b9ff;
+  --Secondary-Brand-color: #8ed321;
+  --Lime-Brand-color: #a6e22e;
+  --Secondary-Orange-Brand-color: #ff8a3d;
+  --Gradient-bgc: linear-gradient(
+    90deg,
+    #40b9ff 14.9%,
+    #69c9ac 55.29%,
+    #aae338 100%
+  );
   --Primary-Text-color: #121826;
-  --text-secondary: #1E1E24;
-  --Secondary-Text-color: #151B29;
-  --Disabled-Text-color: #6B7280;
-  --Border-Strong: #D5D9DE;
-  --Border-Disabled: #6B7280;
-  --Icon-Disabled: #BEC8D2;
+  --text-secondary: #1e1e24;
+  --Secondary-Text-color: #151b29;
+  --Disabled-Text-color: #6b7280;
+  --Border-Strong: #d5d9de;
+  --Border-Disabled: #6b7280;
+  --Icon-Disabled: #bec8d2;
   --surface-elevated: #ffffff;
   --Bold: 700;
   --Semi-Bold: 500;
+}
+
+@theme {
+  --font-roboto: 'Roboto', sans-serif;
+  --color-text-primary: #121826;
+  --color-text-secondary: #1e1e24;
+  --color-text-disabled: #6b7280;
+  --color-brand-secondary: #8ed321;
+  --color-surface-elevated: #ffffff;
+  --color-border-strong: #d5d9de;
+  --color-bg-primary: #f5f6f7;
 }
 
 *,
@@ -28,7 +44,7 @@
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
