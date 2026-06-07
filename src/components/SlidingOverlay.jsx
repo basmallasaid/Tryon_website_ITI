@@ -8,9 +8,9 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
   const isReset = view === "reset";
 
   return (
-    <div className={`absolute top-0 z-20 hidden h-full w-[40%] flex-col items-center justify-center bg-[#40B9FF] text-white transition-all duration-700 ease-in-out md:flex rounded-3xl  ${
+    <div className={`absolute top-0 z-20 hidden h-full w-[40%] flex-col items-center justify-center bg-cover bg-center bg-no-repeat text-white transition-all duration-700 ease-in-out md:flex rounded-3xl  ${
       overlayRight ? "translate-x-[150%]" : "translate-x-0"
-    }`}>
+    }`} style={{ backgroundImage: "linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), url('/2.png')" }}>
       <div className={`flex flex-col items-center text-center ${inModal ? 'p-8' : 'p-12'}`}>
         {isOtp ? (
           <>
@@ -59,9 +59,6 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
             </p>
             <button onClick={onToggle} className={`rounded-xl border-2 border-white font-semibold transition-all active:scale-95 ${inModal ? 'px-12 py-2.5 text-lg' : 'px-16 py-3 text-xl'}`}>
               Sign Up
-            </button>
-            <button onClick={onForgot} className="mt-3 text-sm font-semibold text-white/80 hover:text-white underline underline-offset-4">
-              Forgot Password?
             </button>
           </>
         ) : (
