@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Globe, ChevronDown, Check, Menu, X } from 'lucide-react';
+import Button from './Button';
 
 const Navbar = ({ onOpenAuth }) => {
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -84,9 +85,9 @@ const Navbar = ({ onOpenAuth }) => {
           <button onClick={() => onOpenAuth?.("login")} className="w-[104px] h-12 rounded-lg px-6 py-3 border border-brand-secondary text-brand-secondary font-semibold text-base flex items-center justify-center transition-all hover:shadow-sm">
             Login
           </button>
-          <button onClick={() => onOpenAuth?.("signup")} className="w-[104px] h-12 rounded-lg px-6 py-3 bg-gradient-to-r from-[#40B9FF] via-[#69C9AC] to-[#AAE338] text-white font-semibold text-base flex items-center justify-center transition-all hover:shadow-lg active:scale-95">
+          <Button variant="signup" onClick={() => onOpenAuth?.("signup")}>
             Sign-up
-          </button>
+          </Button>
         </div>
       </div>
 
