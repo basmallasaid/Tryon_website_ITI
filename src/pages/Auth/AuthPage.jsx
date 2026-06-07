@@ -1,15 +1,22 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { loginApi, registerApi, sendVerificationApi } from "../../api/authApi";
-import { updateProfileApi } from "../../api/userApi";
+import { loginApi, registerApi, sendVerificationApi, forgotPasswordApi, otpVerifyApi, resetPasswordApi } from "../../api/authApi";
+import { getUserApi, updateProfileApi } from "../../api/userApi";
 import Login from "./Login";
 import Register from "./Register";
+import ForgotPassword from "./ForgotPassword";
+import OtpVerification from "./OtpVerification";
+import ResetPassword from "./ResetPassword";
 import SlidingOverlay from "../../components/SlidingOverlay";
-export default function AuthPage() {
-    const [isLogin, setIsLogin] = useState(true);
+export default function AuthPage({ initialIsLogin = true, inModal = false, onClose }) {
+    const [view, setView] = useState(initialIsLogin ? "login" : "register");
+    const [forgotEmail, setForgotEmail] = useState("");
     const { login } = useAuth();
 
-    const toggleAuth = () => setIsLogin(!isLogin);
+    const toggleAuth = () => setView(view === "login" ? "register" : "login");
+
+    const handleForgot = () => setView("forgot");
+    const handleBackToLogin = () => setView("login");
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -17,8 +24,12 @@ export default function AuthPage() {
         const password = e.target.password.value;
         try {
             const res = await loginApi({ email, password });
-            login({ id: res.data.id, email: res.data.email, token: res.data.token });
-            console.log("Logged in successfully!");
+            console.log("Login successful", { response: res.data, email, timestamp: new Date().toISOString() });
+            login({ id: res.data._id, email: res.data.email, token: res.data.token });
+            const userRes = await getUserApi(res.data._id);
+            console.log("User profile data", { user: userRes.data, timestamp: new Date().toISOString() });
+            login({ id: res.data._id, email: res.data.email, token: res.data.token, ...userRes.data });
+            onClose?.();
         } catch (error) {
             alert(error.response?.data?.message || "Login failed");
         }
@@ -42,24 +53,68 @@ export default function AuthPage() {
                 password: formData.password,
                 confirmPassword: formData.confirmPassword,
             });
-            login({ id: res.data.id, email: res.data.email, token: res.data.token });
+            const token = res.data.token;
+            const userId = JSON.parse(atob(token.split('.')[1])).id;
+            console.log("Registration successful", { response: res.data, ...formData, password: undefined, confirmPassword: undefined, timestamp: new Date().toISOString() });
+            login({ id: userId, email: formData.email, token });
             await updateProfileApi({ firstName: formData.fname, lastName: formData.lname });
             await sendVerificationApi();
-            alert("Registration successful!");
+            const userRes = await getUserApi(userId);
+            console.log("User profile data after signup", { user: userRes.data, timestamp: new Date().toISOString() });
+            login({ id: userId, email: formData.email, token, ...userRes.data });
+            onClose?.();
         } catch (error) {
             alert(error.response?.data?.message || "Registration failed");
         }
     };
 
+    const handleForgotSubmit = async (e) => {
+        e.preventDefault();
+        const email = e.target.email.value;
+        try {
+            await forgotPasswordApi({ email });
+            setForgotEmail(email);
+            setView("otp");
+        } catch (error) {
+            alert(error.response?.data?.message || "Failed to send reset link");
+        }
+    };
+
+    const handleOtpVerify = async (otp) => {
+        try {
+            await otpVerifyApi({ email: forgotEmail, otp });
+            setView("reset");
+        } catch (error) {
+            alert(error.response?.data?.message || "Verification failed");
+        }
+    };
+
+    const handleResetPassword = async (password, confirmPassword) => {
+        if (password !== confirmPassword) return alert("Passwords do not match");
+        try {
+            await resetPasswordApi({ email: forgotEmail, password, confirmPassword });
+            alert("Password reset successfully! Please login with your new password.");
+            setView("login");
+        } catch (error) {
+            alert(error.response?.data?.message || "Failed to reset password");
+        }
+    };
+
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 font-sans">
-            <div className="relative h-[750px] w-full max-w-6xl overflow-hidden rounded-[40px] bg-white shadow-2xl">
+        <div className={`flex ${inModal ? '' : 'min-h-screen'} items-center justify-center ${inModal ? '' : 'bg-gray-100 p-4'} font-sans`}>
+            <div className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full ${inModal ? '' : 'max-w-6xl'} overflow-hidden rounded-[40px] bg-white shadow-2xl`}>
                 
-                <Login isVisible={isLogin} onLogin={handleLogin} />
+                <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} inModal={inModal} />
                 
-                <Register isVisible={isLogin} onRegister={handleRegister} toggleAuth={toggleAuth} />
+                <Register isVisible={view === "register"} onRegister={handleRegister} toggleAuth={toggleAuth} inModal={inModal} />
                 
-                <SlidingOverlay isLogin={isLogin} toggleAuth={toggleAuth} />
+                <ForgotPassword isVisible={view === "forgot"} onForgot={handleForgotSubmit} onBackToLogin={handleBackToLogin} inModal={inModal} />
+                
+                <OtpVerification isVisible={view === "otp"} email={forgotEmail} onVerify={handleOtpVerify} onBackToLogin={handleBackToLogin} inModal={inModal} />
+                
+                <ResetPassword isVisible={view === "reset"} onReset={handleResetPassword} onBackToLogin={handleBackToLogin} inModal={inModal} />
+                
+                <SlidingOverlay view={view} onToggle={toggleAuth} onForgot={handleForgot} inModal={inModal} />
                 
             </div>
         </div>
