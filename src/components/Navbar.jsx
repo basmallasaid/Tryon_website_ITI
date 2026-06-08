@@ -1,49 +1,42 @@
-import { useEffect, useState } from 'react';
-import { Globe, ChevronDown, Check, Menu, X } from 'lucide-react';
-import Button from './Button';
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from "react";
+import { Globe, ChevronDown, Check, Menu, X } from "lucide-react";
+import Button from "./Button";
+import { Link, useLocation } from "react-router-dom";
 
 const Navbar = ({ onOpenAuth }) => {
   const location = useLocation();
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const [language, setLanguage] = useState('English');
+  const [language, setLanguage] = useState("English");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState(location.pathname || '/');
-
-  useEffect(() => {
-    setActiveLink(location.pathname || '/');
-  }, [location.pathname]);
 
   const navLinks = [
-    { name: 'Features', active: true },
-    { name: 'Try-On', active: false, path: '/tryOn' },
-    { name: 'Recycle', active: false, path: '/recycle' },
-    {name: 'Stores', active: false, path: '/stores' },
-    { name: 'Pricing', active: false },
-    { name: 'About', active: false },
+    { name: "Features", path: "/" },
+    { name: "Try-On", path: "/tryOn" },
+    { name: "Recycle", path: "/recycle" },
+    { name: "Stores", path: "/stores" },
+    { name: "Pricing" },
+    { name: "About" },
   ];
 
   return (
     <nav className="flex items-center justify-between bg-[#F4F3F5] px-20 max-[1200px]:px-14 max-[1000px]:px-8 py-6 relative z-50">
       {/* Logo */}
-      <div className="flex items-center cursor-pointer">
+      <Link to="/" className="flex items-center cursor-pointer">
         <img src="/logo.svg" alt="Logo" className="w-[139px] h-10" />
-      </div>
+      </Link>
 
       {/* Navigation Links (Desktop) */}
       <div className="hidden min-[1000px]:flex items-center gap-10 max-[1200px]:gap-6">
-        {navLinks.map(link => {
-          const isActive = link.path ? activeLink === link.path : activeLink === link.name;
-          const activeClasses = isActive
-            ? 'text-text-primary border-b-2 border-brand-secondary pb-1'
-            : 'text-text-secondary hover:text-text-primary';
-
+        {navLinks.map((link) => {
           return link.path ? (
             <Link
               key={link.name}
               to={link.path}
-              onClick={() => setActiveLink(link.path)}
-              className={`text-[15px] font-normal transition-colors duration-200 ${activeClasses}`}
+              className={`text-[15px] font-normal transition-colors duration-200 inline-block ${
+                link.path === location.pathname
+                  ? "text-[var(--Primary-Text-color)] border-b-2 border-[var(--Secondary-Brand-color)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--Primary-Text-color)]"
+              }`}
             >
               {link.name}
             </Link>
@@ -51,8 +44,11 @@ const Navbar = ({ onOpenAuth }) => {
             <a
               key={link.name}
               href={`#${link.name.toLowerCase()}`}
-              onClick={() => setActiveLink(link.name)}
-              className={`text-[15px] font-normal transition-colors duration-200 ${activeClasses}`}
+              className={`text-[15px] font-normal transition-colors duration-200 inline-block ${
+                link.path === location.pathname
+                  ? "text-[var(--Primary-Text-color)] border-b-2 border-[var(--Secondary-Brand-color)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--Primary-Text-color)]"
+              }`}
             >
               {link.name}
             </a>
@@ -70,10 +66,10 @@ const Navbar = ({ onOpenAuth }) => {
           >
             <Globe className="w-4 h-4 text-gray-700" />
             <span className="font-semibold text-gray-700 text-sm">
-              {language === 'English' ? 'EN' : 'AR'}
+              {language === "English" ? "EN" : "AR"}
             </span>
             <ChevronDown
-              className={`w-3 h-3 text-gray-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
+              className={`w-3 h-3 text-gray-500 transition-transform ${isLangOpen ? "rotate-180" : ""}`}
             />
           </button>
 
@@ -82,7 +78,7 @@ const Navbar = ({ onOpenAuth }) => {
             <div className="absolute right-0 mt-2 w-44 bg-[var(--surface-elevated)] border border-gray-100 rounded-lg shadow-2xl py-2 z-10">
               <button
                 onClick={() => {
-                  setLanguage('English');
+                  setLanguage("English");
                   setIsLangOpen(false);
                 }}
                 className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
@@ -91,14 +87,14 @@ const Navbar = ({ onOpenAuth }) => {
                   <Globe className="w-4 h-4" />
                   <span>English</span>
                 </div>
-                {language === 'English' && (
+                {language === "English" && (
                   <Check className="w-4 h-4 text-gray-400" />
                 )}
               </button>
               <div className="h-px bg-gray-100 mx-2" />
               <button
                 onClick={() => {
-                  setLanguage('Arabic');
+                  setLanguage("Arabic");
                   setIsLangOpen(false);
                 }}
                 className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
@@ -107,7 +103,7 @@ const Navbar = ({ onOpenAuth }) => {
                   <Globe className="w-4 h-4" />
                   <span>Arabic</span>
                 </div>
-                {language === 'Arabic' && (
+                {language === "Arabic" && (
                   <Check className="w-4 h-4 text-gray-400" />
                 )}
               </button>
@@ -118,12 +114,12 @@ const Navbar = ({ onOpenAuth }) => {
         {/* Login + Signup group */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onOpenAuth?.('login')}
+            onClick={() => onOpenAuth?.("login")}
             className="w-[104px] h-12 rounded-lg px-6 py-3 border border-[var(--Secondary-Brand-color)] text-[var(--Secondary-Brand-color)] font-semibold text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95"
           >
             Login
           </button>
-          <Button variant="signup" onClick={() => onOpenAuth?.('signup')}>
+          <Button variant="signup" onClick={() => onOpenAuth?.("signup")}>
             Sign-up
           </Button>
         </div>
@@ -153,11 +149,13 @@ const Navbar = ({ onOpenAuth }) => {
       {/* Mobile Menu Drawer */}
       <div
         className={`fixed top-0 right-0 h-full w-72 bg-[#F4F3F5] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1000px]:hidden ${
-          isMobileOpen ? 'translate-x-0' : 'translate-x-full'
+          isMobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200">
-          <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
+          <Link to="/" onClick={() => setIsMobileOpen(false)}>
+            <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
+          </Link>
           <button
             onClick={() => setIsMobileOpen(false)}
             className="p-2 rounded-lg hover:bg-gray-200/50 transition-colors cursor-pointer"
@@ -169,21 +167,17 @@ const Navbar = ({ onOpenAuth }) => {
 
         {/* Mobile Nav Links */}
         <div className="flex flex-col px-4 py-6 space-y-2">
-          {navLinks.map(link => {
-            const isActive = link.path ? activeLink === link.path : activeLink === link.name;
-            const activeClasses = isActive
-              ? 'text-[#40B9FF] bg-gray-200/50'
-              : 'text-gray-600 hover:bg-gray-200/50';
-
+          {navLinks.map((link) => {
             return link.path ? (
               <Link
                 key={link.name}
                 to={link.path}
-                onClick={() => {
-                  setActiveLink(link.path);
-                  setIsMobileOpen(false);
-                }}
-                className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${activeClasses}`}
+                onClick={() => setIsMobileOpen(false)}
+                className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${
+                  link.path === location.pathname
+                    ? "text-white bg-gradient-to-r from-[#40B9FF] to-[#AAE338] shadow-md"
+                    : "text-gray-600 hover:bg-gray-200/50"
+                }`}
               >
                 {link.name}
               </Link>
@@ -191,11 +185,12 @@ const Navbar = ({ onOpenAuth }) => {
               <a
                 key={link.name}
                 href={`#${link.name.toLowerCase()}`}
-                onClick={() => {
-                  setActiveLink(link.name);
-                  setIsMobileOpen(false);
-                }}
-                className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${activeClasses}`}
+                onClick={() => setIsMobileOpen(false)}
+                className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${
+                  link.path === location.pathname
+                    ? "text-white bg-gradient-to-r from-[#40B9FF] to-[#AAE338] shadow-md"
+                    : "text-gray-600 hover:bg-gray-200/50"
+                }`}
               >
                 {link.name}
               </a>
@@ -215,14 +210,14 @@ const Navbar = ({ onOpenAuth }) => {
                 <span className="font-bold text-gray-700">{language}</span>
               </div>
               <ChevronDown
-                className={`w-4 h-4 text-gray-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 text-gray-500 transition-transform ${isLangOpen ? "rotate-180" : ""}`}
               />
             </button>
             {isLangOpen && (
               <div className="mt-1 bg-[var(--surface-elevated)] border border-gray-100 rounded-xl shadow-lg py-2">
                 <button
                   onClick={() => {
-                    setLanguage('English');
+                    setLanguage("English");
                     setIsLangOpen(false);
                   }}
                   className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
@@ -231,14 +226,14 @@ const Navbar = ({ onOpenAuth }) => {
                     <Globe className="w-4 h-4" />
                     <span>English</span>
                   </div>
-                  {language === 'English' && (
+                  {language === "English" && (
                     <Check className="w-4 h-4 text-gray-400" />
                   )}
                 </button>
                 <div className="h-px bg-gray-100 mx-2" />
                 <button
                   onClick={() => {
-                    setLanguage('Arabic');
+                    setLanguage("Arabic");
                     setIsLangOpen(false);
                   }}
                   className="flex items-center justify-between w-full px-4 py-3 hover:bg-gray-50 text-sm cursor-pointer"
@@ -247,7 +242,7 @@ const Navbar = ({ onOpenAuth }) => {
                     <Globe className="w-4 h-4" />
                     <span>Arabic</span>
                   </div>
-                  {language === 'Arabic' && (
+                  {language === "Arabic" && (
                     <Check className="w-4 h-4 text-gray-400" />
                   )}
                 </button>
@@ -258,7 +253,7 @@ const Navbar = ({ onOpenAuth }) => {
           {/* Mobile Action Buttons */}
           <button
             onClick={() => {
-              onOpenAuth?.('login');
+              onOpenAuth?.("login");
               setIsMobileOpen(false);
             }}
             className="w-full px-8 py-3 border-2 border-[var(--Lime-Brand-color)] text-[var(--Lime-Brand-color)] font-bold rounded-xl transition-all text-lg mb-3 cursor-pointer hover:scale-[1.02] active:scale-95"
@@ -267,7 +262,7 @@ const Navbar = ({ onOpenAuth }) => {
           </button>
           <button
             onClick={() => {
-              onOpenAuth?.('signup');
+              onOpenAuth?.("signup");
               setIsMobileOpen(false);
             }}
             className="w-full px-8 py-3 bg-gradient-to-r from-[var(--Primary-Brand-color)] via-[#69C9AC] to-[#AAE338] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 text-lg cursor-pointer hover:scale-[1.02]"
