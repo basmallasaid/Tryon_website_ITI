@@ -1,9 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-const StepIndicator = ({ currentStep = 1 }) => {
+const StepIndicator = ({ currentStep = 1, steps: customSteps }) => {
   const { t } = useTranslation();
-  const STEPS = [
+  const STEPS = customSteps || [
     { id: 1, title: t("recycle.step1Title"), subtitle: t("recycle.step1Subtitle") },
     { id: 2, title: t("recycle.step2Title"), subtitle: t("recycle.step2Subtitle") },
     { id: 3, title: t("recycle.step3Title"), subtitle: t("recycle.step3Subtitle") },
