@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import Button from '../../../components/Button';
 import { useNavigate } from 'react-router-dom';
 
 export default function HeroSection() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   return (
     <section className="relative overflow-hidden">
@@ -11,18 +13,15 @@ export default function HeroSection() {
             {/* Left: Text Content */}
             <div className="sm:max-w-md w-full">
               <h1 className="text-[32px] sm:text-[40px] lg:text-[48px] font-bold text-text-primary leading-tight mb-6">
-                Style your look with
+                {t('aboutTryon.heroTitle1')}
                 <br />
                 <span className="bg-gradient-to-r from-[#40B9FF] to-[#8ED321] bg-clip-text text-transparent">
-                  Virtual Try-on{' '}
+                  {t('aboutTryon.heroTitle2')}
                 </span>
               </h1>
 
               <p className="font-semibold text-text-disabled leading-relaxed mb-10">
-                Our intelligent recycling ecosystem ensures no garment ever goes
-                to waste. Use our Smart Bins to recycle, track your
-                environmental impact in real-time, and give your style a second
-                life.
+                {t('aboutTryon.heroDesc')}
               </p>
 
               <div className="flex flex-wrap gap-4 items-center w-full">
@@ -33,7 +32,7 @@ export default function HeroSection() {
                     navigate('/tryOn');
                   }}
                 >
-                  Try now
+                  {t('aboutTryon.tryNow')}
                 </Button>
                 <a
                   href="#how-it-works"
@@ -51,7 +50,7 @@ export default function HeroSection() {
                     }}
                   />
                   <span className="relative z-10 text-brand-secondary">
-                    See how it works
+                    {t('aboutTryon.seeHowItWorks')}
                   </span>
                 </a>
               </div>

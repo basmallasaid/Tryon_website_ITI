@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import CameraIcon from '../../../icons/CameraIcon';
 import BodyIcon from '../../../icons/BodyIcon';
 import SparkleIcon from '../../../icons/SparkleIcon';
@@ -6,9 +7,8 @@ const steps = [
   {
     number: 1,
     icon: CameraIcon,
-    title: 'Upload Your Photo',
-    description:
-      'Take a full-body photo or use your camera to create your digital fitting room avatar.',
+    titleKey: 'step1Title',
+    descKey: 'step1Desc',
     iconColor: '#004769',
     parentBg: '#40B9FF',
     badgeBg: '#006492',
@@ -16,9 +16,8 @@ const steps = [
   {
     number: 2,
     icon: BodyIcon,
-    title: 'See It on Your Body',
-    description:
-      'Browse our collection or upload any garment you like. Our AI maps it onto your body.',
+    titleKey: 'step2Title',
+    descKey: 'step2Desc',
     iconColor: '#9A4600',
     parentBg: '#FF9451',
     badgeBg: '#6F3000',
@@ -26,9 +25,8 @@ const steps = [
   {
     number: 3,
     icon: SparkleIcon,
-    title: 'See It Instantly',
-    description:
-      'Get a realistic preview in seconds. Move, zoom, and see how it looks from every angle.',
+    titleKey: 'step3Title',
+    descKey: 'step3Desc',
     iconColor: '#466E00',
     parentBg: '#ACF445',
     badgeBg: '#426900',
@@ -36,15 +34,16 @@ const steps = [
 ];
 
 export default function HowItWorksSection() {
+  const { t } = useTranslation();
   return (
     <section id="how-it-works" className="px-6 sm:px-10 lg:px-20 py-12">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-[28px] sm:text-[32px] lg:text-[36px] font-bold text-text-primary mb-4">
-            How It Works
+            {t('aboutTryon.howItWorks')}
           </h2>
           <p className="text-text-disabled max-w-2xl mx-auto leading-relaxed">
-            Three simple steps to see yourself in any outfit.
+            {t('aboutTryon.howItWorksSub')}
           </p>
         </div>
 
@@ -72,10 +71,10 @@ export default function HowItWorksSection() {
                 </div>
               </div>
               <h3 className="text-xl font-bold text-text-primary mb-3">
-                {step.title}
+                {t(`aboutTryon.${step.titleKey}`)}
               </h3>
               <p className="text-text-secondary leading-relaxed max-w-sm">
-                {step.description}
+                {t(`aboutTryon.${step.descKey}`)}
               </p>
             </div>
           ))}

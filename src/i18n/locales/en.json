@@ -241,5 +241,28 @@
     "aiSuggestsIdeasDesc": "Our AI analyzes your items and generates creative upcycling ideas tailored to your style.",
     "transformReuse": "Transform & Reuse",
     "transformReuseDesc": "Bring your new design to life or connect with creators in our curated marketplace."
+  },
+  "aboutTryon": {
+    "heroTitle1": "Style your look with",
+    "heroTitle2": "Virtual Try-on",
+    "heroDesc": "See how any outfit looks on you before you buy. Our AI-powered virtual try-on brings the fitting room to your screen — no dressing rooms, no hassle.",
+    "tryNow": "Try now",
+    "seeHowItWorks": "See how it works",
+    "whyMatters": "Why Try-on Matters",
+    "whyMattersSub": "See it before you buy it — no fitting room required.",
+    "fitAnalysis": "Fit & Analysis",
+    "fitAnalysisDesc": "Preview outfits on your own body instantly. No more guessing if something will look good — see it in real-time.",
+    "perfectFit": "Wardrobe Remix",
+    "perfectFitDesc": "Reimagine your existing wardrobe. Our AI suggests fresh combinations from clothes you already own.",
+    "stylingTip": "Styling Tip",
+    "stylingTipDesc": "Discover new styles and combinations you never considered. Experiment fearlessly with your wardrobe.",
+    "howItWorks": "How It Works",
+    "howItWorksSub": "Three simple steps to see yourself in any outfit.",
+    "step1Title": "Upload Your Photo",
+    "step1Desc": "Take a full-body photo or use your camera to create your digital fitting room avatar.",
+    "step2Title": "See It on Your Body",
+    "step2Desc": "Browse our collection or upload any garment you like. Our AI maps it onto your body.",
+    "step3Title": "See It Instantly",
+    "step3Desc": "Get a realistic preview in seconds. See exactly how the outfit looks on you with lifelike detail."
   }
 }
