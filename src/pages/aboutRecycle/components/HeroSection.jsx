@@ -32,7 +32,7 @@ export default function HeroSection() {
                   }}
                 >
                   {t("aboutRecycle.startRecycling")}
-                </button>
+                </Button>
                 <div className="rounded-lg bg-gradient-to-r from-[#FF8A3D] via-[#40B9FF] to-[#8ED321] p-px">
                   <a
                     href="#how-it-works"
