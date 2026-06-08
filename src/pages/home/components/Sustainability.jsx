@@ -1,7 +1,7 @@
-import bin from "../../../assets/bin.svg";
-import recycleIcon from "../../../assets/recycle-icon.svg";
-import ticketIcon from "../../../assets/ticket-icon.svg";
-import { useTranslation } from "react-i18next";
+import bin from '../../../assets/bin.svg';
+import recycleIcon from '../../../assets/recycle-icon.svg';
+import ticketIcon from '../../../assets/ticket-icon.svg';
+import { useTranslation } from 'react-i18next';
 
 const Sustainability = () => {
   const { t } = useTranslation();
@@ -17,10 +17,10 @@ const Sustainability = () => {
         <div className="w-[495px] h-[482px] max-[1100px]:w-full max-[1100px]:h-auto flex flex-col justify-between max-[1100px]:gap-6">
           <div className="flex flex-col gap-6">
             <h2 className="font-bold text-[36px] leading-[38px] text-text-primary">
-              {t("sustainability.title")}
+              {t('sustainability.title')}
             </h2>
             <p className="font-medium text-base leading-[22px] text-text-secondary opacity-[0.84]">
-              {t("sustainability.desc")}
+              {t('sustainability.desc')}
             </p>
 
             <div className="flex flex-col gap-6 pt-2">
@@ -32,10 +32,10 @@ const Sustainability = () => {
                 />
                 <div>
                   <h3 className="font-bold text-2xl leading-[38.4px] text-text-primary">
-                    {t("sustainability.upcycleTitle")}
+                    {t('sustainability.upcycleTitle')}
                   </h3>
                   <p className="font-normal text-base text-text-secondary">
-                    {t("sustainability.upcycleDesc")}
+                    {t('sustainability.upcycleDesc')}
                   </p>
                 </div>
               </div>
@@ -47,48 +47,55 @@ const Sustainability = () => {
                 />
                 <div>
                   <h3 className="font-bold text-2xl leading-[38.4px] text-text-primary">
-                    {t("sustainability.virtualTryOnTitle")}
+                    {t('sustainability.virtualTryOnTitle')}
                   </h3>
                   <p className="font-normal text-base text-text-secondary">
-                    {t("sustainability.virtualTryOnDesc")}
+                    {t('sustainability.virtualTryOnDesc')}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-between max-[550px]:flex-col max-[1100px]:items-center max-[1100px]:gap-4">
+          <div className="flex gap-6 max-[550px]:flex-col">
             <a
               href="/about-recycle/"
-              className="relative inline-flex items-center justify-center w-[223px] py-6 rounded-[8px] font-semibold text-base text-text-primary transition-transform cursor-pointer hover:scale-[1.02] active:scale-95 overflow-hidden"
+              className="relative inline-flex items-center justify-center w-[223px] max-[550px]:w-full py-6 rounded-[8px] font-semibold text-base text-text-primary transition-transform cursor-pointer hover:scale-[1.02] active:scale-95 overflow-hidden"
             >
               <span
                 className="absolute inset-0 p-[4px] rounded-[8px]"
                 style={{
                   background:
-                    "linear-gradient(90deg, var(--color-lime) 0%, var(--color-primary) 51.44%, var(--color-accent-orange) 100%)",
+                    'linear-gradient(90deg, var(--color-lime) 0%, var(--color-primary) 51.44%, var(--color-accent-orange) 100%)',
                   WebkitMask:
-                    "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  WebkitMaskComposite: "xor",
-                  maskComposite: "exclude",
+                    'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
                 }}
               />
-              <span className="relative z-10">{t("sustainability.learnRecycling")}</span>
+              <span className="relative z-10">
+                {t('sustainability.learnRecycling')}
+              </span>
             </a>
 
-            <a className="relative inline-flex items-center justify-center w-[223px] py-6 rounded-[8px] font-semibold text-base text-text-primary transition-transform cursor-pointer hover:scale-[1.02] active:scale-95 overflow-hidden">
+            <a
+              href="/about-tryOn/"
+              className="relative inline-flex items-center justify-center w-[223px] max-[550px]:w-full py-6 rounded-[8px] font-semibold text-base text-text-primary transition-transform cursor-pointer hover:scale-[1.02] active:scale-95 overflow-hidden"
+            >
               <span
                 className="absolute inset-0 p-[4px] rounded-[8px]"
                 style={{
                   background:
-                    "linear-gradient(90deg, var(--color-lime) 0%, var(--color-primary) 51.44%, var(--color-accent-orange) 100%)",
+                    'linear-gradient(90deg, var(--color-lime) 0%, var(--color-primary) 51.44%, var(--color-accent-orange) 100%)',
                   WebkitMask:
-                    "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  WebkitMaskComposite: "xor",
-                  maskComposite: "exclude",
+                    'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude',
                 }}
               />
-              <span className="relative z-10">{t("sustainability.learnTryOn")}</span>
+              <span className="relative z-10">
+                {t('sustainability.learnTryOn')}
+              </span>
             </a>
           </div>
         </div>
