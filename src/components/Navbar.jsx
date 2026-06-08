@@ -19,7 +19,7 @@ const Navbar = ({ onOpenAuth }) => {
   ];
 
   return (
-    <nav className="flex items-center justify-between bg-[#F4F3F5] px-20 max-[1200px]:px-14 max-[1000px]:px-8 py-6 relative z-50">
+    <nav className="flex items-center justify-between bg-bg-secondary px-20 max-[1200px]:px-14 max-[1000px]:px-8 py-6 relative z-50">
       {/* Logo */}
       <Link to="/" className="flex items-center cursor-pointer">
         <img src="/logo.svg" alt="Logo" className="w-[139px] h-10" />
@@ -34,8 +34,8 @@ const Navbar = ({ onOpenAuth }) => {
               to={link.path}
               className={`text-[15px] font-normal transition-colors duration-200 inline-block ${
                 link.path === location.pathname
-                  ? "text-[var(--Primary-Text-color)] border-b-2 border-[var(--Secondary-Brand-color)]"
-                  : "text-[var(--text-secondary)] hover:text-[var(--Primary-Text-color)]"
+                  ? "text-text-primary border-b-2 border-brand-secondary"
+                  : "text-text-secondary hover:text-text-primary"
               }`}
             >
               {link.name}
@@ -46,8 +46,8 @@ const Navbar = ({ onOpenAuth }) => {
               href={`#${link.name.toLowerCase()}`}
               className={`text-[15px] font-normal transition-colors duration-200 inline-block ${
                 link.path === location.pathname
-                  ? "text-[var(--Primary-Text-color)] border-b-2 border-[var(--Secondary-Brand-color)]"
-                  : "text-[var(--text-secondary)] hover:text-[var(--Primary-Text-color)]"
+                  ? "text-text-primary border-b-2 border-brand-secondary"
+                  : "text-text-secondary hover:text-text-primary"
               }`}
             >
               {link.name}
@@ -62,7 +62,7 @@ const Navbar = ({ onOpenAuth }) => {
         <div className="relative">
           <button
             onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-2 h-12 border border-[var(--Border-Strong)] rounded-lg px-4 bg-[var(--surface-elevated)] hover:bg-gray-50 transition-all cursor-pointer hover:scale-105"
+            className="flex items-center gap-2 h-12 border border-border-strong rounded-lg px-4 bg-surface-elevated hover:bg-gray-50 transition-all cursor-pointer hover:scale-105"
           >
             <Globe className="w-4 h-4 text-gray-700" />
             <span className="font-semibold text-gray-700 text-sm">
@@ -75,7 +75,7 @@ const Navbar = ({ onOpenAuth }) => {
 
           {/* Dropdown Menu */}
           {isLangOpen && (
-            <div className="absolute right-0 mt-2 w-44 bg-[var(--surface-elevated)] border border-gray-100 rounded-lg shadow-2xl py-2 z-10">
+            <div className="absolute right-0 mt-2 w-44 bg-surface-elevated border border-gray-100 rounded-lg shadow-2xl py-2 z-10">
               <button
                 onClick={() => {
                   setLanguage("English");
@@ -115,7 +115,7 @@ const Navbar = ({ onOpenAuth }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => onOpenAuth?.("login")}
-            className="w-[104px] h-12 rounded-lg px-6 py-3 border border-[var(--Secondary-Brand-color)] text-[var(--Secondary-Brand-color)] font-semibold text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95"
+            className="w-[104px] h-12 rounded-lg px-6 py-3 border border-brand-secondary text-brand-secondary font-semibold text-base flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95"
           >
             Login
           </button>
@@ -148,7 +148,7 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-72 bg-[#F4F3F5] shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1000px]:hidden ${
+        className={`fixed top-0 right-0 h-full w-72 bg-bg-secondary shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1000px]:hidden ${
           isMobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -175,7 +175,7 @@ const Navbar = ({ onOpenAuth }) => {
                 onClick={() => setIsMobileOpen(false)}
                 className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${
                   link.path === location.pathname
-                    ? "text-white bg-gradient-to-r from-[#40B9FF] to-[#AAE338] shadow-md"
+                    ? "text-white bg-gradient-to-r from-primary to-[#AAE338] shadow-md"
                     : "text-gray-600 hover:bg-gray-200/50"
                 }`}
               >
@@ -188,7 +188,7 @@ const Navbar = ({ onOpenAuth }) => {
                 onClick={() => setIsMobileOpen(false)}
                 className={`relative text-lg font-medium py-3 px-4 rounded-xl transition-all ${
                   link.path === location.pathname
-                    ? "text-white bg-gradient-to-r from-[#40B9FF] to-[#AAE338] shadow-md"
+                    ? "text-white bg-gradient-to-r from-primary to-[#AAE338] shadow-md"
                     : "text-gray-600 hover:bg-gray-200/50"
                 }`}
               >
@@ -214,7 +214,7 @@ const Navbar = ({ onOpenAuth }) => {
               />
             </button>
             {isLangOpen && (
-              <div className="mt-1 bg-[var(--surface-elevated)] border border-gray-100 rounded-xl shadow-lg py-2">
+              <div className="mt-1 bg-surface-elevated border border-gray-100 rounded-xl shadow-lg py-2">
                 <button
                   onClick={() => {
                     setLanguage("English");
@@ -256,7 +256,7 @@ const Navbar = ({ onOpenAuth }) => {
               onOpenAuth?.("login");
               setIsMobileOpen(false);
             }}
-            className="w-full px-8 py-3 border-2 border-[var(--Lime-Brand-color)] text-[var(--Lime-Brand-color)] font-bold rounded-xl transition-all text-lg mb-3 cursor-pointer hover:scale-[1.02] active:scale-95"
+            className="w-full px-8 py-3 border-2 border-lime text-lime font-bold rounded-xl transition-all text-lg mb-3 cursor-pointer hover:scale-[1.02] active:scale-95"
           >
             Login
           </button>
@@ -265,7 +265,7 @@ const Navbar = ({ onOpenAuth }) => {
               onOpenAuth?.("signup");
               setIsMobileOpen(false);
             }}
-            className="w-full px-8 py-3 bg-gradient-to-r from-[var(--Primary-Brand-color)] via-[#69C9AC] to-[#AAE338] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 text-lg cursor-pointer hover:scale-[1.02]"
+            className="w-full px-8 py-3 bg-gradient-to-r from-primary via-[#69C9AC] to-[#AAE338] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 text-lg cursor-pointer hover:scale-[1.02]"
           >
             Sign-up
           </button>

@@ -35,6 +35,13 @@
   --color-surface-elevated: #ffffff;
   --color-border-strong: #d5d9de;
   --color-bg-primary: #f5f6f7;
+  --color-primary: #40b9ff;
+  --color-lime: #a6e22e;
+  --color-secondary-text: #151b29;
+  --color-secondary-orange: #ff8a3d;
+  --color-border-disabled: #6b7280;
+  --color-icon-disabled: #bec8d2;
+  --color-bg-secondary: #f4f3f5;
 }
 
 *,
