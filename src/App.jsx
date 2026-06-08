@@ -14,12 +14,12 @@ import GoogleCallback from './pages/Auth/GoogleCallback';
 import Home from './pages/home/Home';
 // const FurnitureDetail = lazy(() => import('./pages/FurnitureDetail'));
 
-import TryOn from "./pages/tryOn/TryOn"
-import StoresPage from "./pages/store/StoresPage"
-import Navbar from "./components/Navbar"
+import TryOn from './pages/tryOn/TryOn';
+import StoresPage from './pages/store/StoresPage';
+import Navbar from './components/Navbar';
 import Recycle from './pages/recycle/Recycle';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
-
+import AboutTryon from './pages/aboutTryOn/AboutTryon';
 
 import { CircularProgress, Box } from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router';
@@ -50,13 +50,12 @@ function AppContent() {
       children: [
         { index: true, element: <Home /> },
         { path: 'tryOn', element: <TryOn /> },
+        { path: 'about-tryon', element: <AboutTryon /> },
         { path: 'auth/callback', element: <GoogleCallback /> },
         { path: 'stores', element: <StoresPage /> },
         { path: 'recycle', element: <Recycle /> },
         { path: 'about-recycle', element: <AboutRecycle /> },
-      ]
-
-      
+      ],
     },
     {
       path: '/admin',
