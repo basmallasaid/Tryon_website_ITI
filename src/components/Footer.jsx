@@ -1,8 +1,7 @@
 import GlobeIcon from '../icons/GlobeIcon';
 import ShareIcon from '../icons/ShareIcon';
 import AtSignIcon from '../icons/AtSignIcon';
-import CameraIcon from '../icons/CameraIcon';
-import VideoIcon from '../icons/VideoIcon';
+import PhoneIcon from '../icons/PhoneIcon';
 import MailIcon from '../icons/MailIcon';
 import { useTranslation } from 'react-i18next';
 
@@ -12,10 +11,9 @@ const socialIcons = [
   { icon: AtSignIcon, href: '#', label: 'Contact' },
 ];
 
-const connectIcons = [
-  { icon: CameraIcon, href: '#', label: 'Instagram' },
-  { icon: VideoIcon, href: '#', label: 'Video' },
-  { icon: MailIcon, href: '#', label: 'Email' },
+const contactInfo = [
+  { icon: PhoneIcon, value: '+20123456789', href: 'tel:+20123456789' },
+  { icon: MailIcon, value: 'ReDolapy@gmail.com', href: 'mailto:ReDolapy@gmail.com' },
 ];
 
 export default function Footer() {
@@ -68,24 +66,25 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Right Column — Connect */}
+            {/* Right Column — Contact Us */}
             <div className="md:col-span-1">
               <h3 className=" font-semibold uppercase tracking-widest text- text-[#006492] mb-2">
                 {t("footer.connect")}
               </h3>
-              <div className="flex items-center  mb-10">
-                {connectIcons.map(item => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    aria-label={item.label}
-                    className="w-10 h-10 flex items-center  hover:text-[#006492] text-[#3E4850] transition-all duration-200"
-                  >
-                    <item.icon className="w-5 h-5" />
-                  </a>
+              <ul className="space-y-4">
+                {contactInfo.map(item => (
+                  <li key={item.value}>
+                    <a
+                      href={item.href}
+                      className="flex items-center gap-3 text-text-disabled font-semibold hover:text-text-primary transition-colors"
+                    >
+                      <item.icon className="w-4 h-4 text-[#006492] shrink-0" />
+                      <span dir="ltr">{item.value}</span>
+                    </a>
+                  </li>
                 ))}
-              </div>
-              <p className="text-gray-400 text-xs">
+              </ul>
+              <p className="text-gray-400 text-xs mt-10">
                 &copy; {new Date().getFullYear()} {t("footer.copyright")}
               </p>
             </div>
