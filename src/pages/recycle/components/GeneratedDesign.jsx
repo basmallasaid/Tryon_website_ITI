@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, Download, Share2, Sparkles } from "lucide-react";
+import { Check, Download, Sparkles } from "lucide-react";
 
 const TAILORING_SUGGESTIONS = [
   "Use a blind stitch for the waist transition to keep the silhouette clean.",
@@ -111,7 +111,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
             />
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col h-full">
             <h3
               className="text-2xl sm:text-3xl md:text-4xl"
               style={{
@@ -167,7 +167,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
               </ul>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
+            <div className="mt-auto pt-8">
               <button
                 type="button"
                 onClick={() => {
@@ -177,46 +177,14 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
                   link.target = "_blank";
                   link.click();
                 }}
-                className="inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3 text-sm sm:text-base text-white transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3 text-sm sm:text-base text-white transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
                 style={{
                   backgroundColor: "var(--Secondary-Brand-color)",
                   fontWeight: "var(--Bold)",
-                  flex: "1 1 auto",
-                  minWidth: "160px",
                 }}
               >
                 <Download className="h-4 w-4" />
                 Save Specs
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator
-                      .share({
-                        title: idea.title,
-                        text: idea.design_description,
-                        url: imageUrl,
-                      })
-                      .catch(() => {});
-                  } else if (navigator.clipboard) {
-                    navigator.clipboard
-                      .writeText(imageUrl)
-                      .then(() => alert("Link copied to clipboard!"))
-                      .catch(() => {});
-                  }
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-lg px-5 sm:px-6 py-3 text-sm sm:text-base bg-white transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
-                style={{
-                  border: "1px solid var(--Border-Strong)",
-                  color: "var(--Primary-Text-color)",
-                  fontWeight: "var(--Bold)",
-                  flex: "1 1 auto",
-                  minWidth: "160px",
-                }}
-              >
-                <Share2 className="h-4 w-4" />
-                Share Look
               </button>
             </div>
           </div>

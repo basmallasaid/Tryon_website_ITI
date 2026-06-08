@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Lightbulb, Sparkles } from "lucide-react";
 
 import StepIndicator from "./components/StepIndicator";
@@ -15,18 +15,22 @@ import {
 const HangerIcon = ({ className = "", style = {} }) => (
   <svg
     width="40"
-    height="32"
-    viewBox="0 0 40 32"
+    height="40"
+    viewBox="0 0 40 40"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
     className={className}
     style={style}
     aria-hidden="true"
   >
-    <path
-      d="M2 32C1.43333 32 0.958333 31.8083 0.575 31.425C0.191667 31.0417 0 30.5667 0 30C0 29.6667 0.0666667 29.3583 0.2 29.075C0.333333 28.7917 0.533333 28.5667 0.8 28.4L18 15.5V12C18 11.4333 18.2 10.9583 18.6 10.575C19 10.1917 19.4833 10 20.05 10C20.8833 10 21.5833 9.7 22.15 9.1C22.7167 8.5 23 7.78333 23 6.95C23 6.11667 22.7083 5.41667 22.125 4.85C21.5417 4.28333 20.8333 4 20 4C19.1667 4 18.4583 4.29167 17.875 4.875C17.2917 5.45833 17 6.16667 17 7H13C13 5.06667 13.6833 3.41667 15.05 2.05C16.4167 0.683333 18.0667 0 20 0C21.9333 0 23.5833 0.675 24.95 2.025C26.3167 3.375 27 5.01667 27 6.95C27 8.51667 26.5417 9.91667 25.625 11.15C24.7083 12.3833 23.5 13.2333 22 13.7V15.5L39.2 28.4C39.4667 28.5667 39.6667 28.7917 39.8 29.075C39.9333 29.3583 40 29.6667 40 30C40 30.5667 39.8083 31.0417 39.425 31.425C39.0417 31.8083 38.5667 32 38 32H2ZM8 28H32L20 19L8 28Z"
-      fill="#121826"
-    />
+    <rect width="40" height="40" fill="url(#pattern0_972_1047)" />
+    <defs>
+      <pattern id="pattern0_972_1047" patternContentUnits="objectBoundingBox" width="1" height="1">
+        <use xlinkHref="#image0_972_1047" transform="scale(0.0078125)" />
+      </pattern>
+      <image id="image0_972_1047" width="128" height="128" preserveAspectRatio="none" xlinkHref="data:image/png;base64,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" />
+    </defs>
   </svg>
 );
 
@@ -74,6 +78,10 @@ const Recycle = () => {
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
   const [apiError, setApiError] = useState("");
 
+  const ideasRef = useRef(null);
+  const generateRef = useRef(null);
+  const resultRef = useRef(null);
+
   const selectedIdea = useMemo(
     () => ideas.find((i) => i.id === selectedIdeaId) || null,
     [ideas, selectedIdeaId]
@@ -89,34 +97,30 @@ const Recycle = () => {
     };
   }, [uploadedImages]);
 
+  useEffect(() => {
+    if (ideas.length > 0 && ideasRef.current) {
+      ideasRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [ideas]);
+
+  useEffect(() => {
+    if (selectedIdeaId && generateRef.current) {
+      generateRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [selectedIdeaId]);
+
+  useEffect(() => {
+    if ((generating || generatedIdea) && resultRef.current) {
+      setTimeout(() => {
+        resultRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      }, 300);
+    }
+  }, [generating, generatedIdea]);
+
   const handleFilesSelected = async (files) => {
     setApiError("");
     const previews = await buildPreviews(files);
-    setUploadedImages(previews);
-    setIdeas([]);
-    setSessionId(null);
-    setSelectedIdeaId(null);
-    setGeneratedIdea(null);
-    setGeneratedImageUrl(null);
-
-    setAnalyzing(true);
-    try {
-      const formData = new FormData();
-      previews.forEach((p) => formData.append("images", p.file));
-      const res = await analyzeRecycleApi(formData);
-      const data = res.data || {};
-      setSessionId(data.session_id);
-      setIdeas(data.ideas || []);
-    } catch (err) {
-      setApiError(
-        err.response?.data?.error ||
-          err.message ||
-          "Failed to analyze images. Please try again."
-      );
-      setUploadedImages([]);
-    } finally {
-      setAnalyzing(false);
-    }
+    setUploadedImages((prev) => [...prev, ...previews]);
   };
 
   const handleRemoveImage = (index) => {
@@ -127,6 +131,33 @@ const Recycle = () => {
     setSelectedIdeaId(null);
     setGeneratedIdea(null);
     setGeneratedImageUrl(null);
+  };
+
+  const handleDiscoverIdeas = async () => {
+    if (uploadedImages.length === 0) return;
+    setApiError("");
+    setAnalyzing(true);
+    setIdeas([]);
+    setSessionId(null);
+    setSelectedIdeaId(null);
+    setGeneratedIdea(null);
+    setGeneratedImageUrl(null);
+    try {
+      const formData = new FormData();
+      uploadedImages.forEach((p) => formData.append("images", p.file));
+      const res = await analyzeRecycleApi(formData);
+      const data = res.data || {};
+      setSessionId(data.session_id);
+      setIdeas(data.ideas || []);
+    } catch (err) {
+      setApiError(
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to analyze images. Please try again."
+      );
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const handleGenerate = async () => {
@@ -150,8 +181,8 @@ const Recycle = () => {
     } catch (err) {
       setApiError(
         err.response?.data?.error ||
-          err.message ||
-          "Image generation failed. Please try again."
+        err.message ||
+        "Image generation failed. Please try again."
       );
     } finally {
       setGenerating(false);
@@ -161,8 +192,8 @@ const Recycle = () => {
   const currentStep = generating
     ? 3
     : ideas.length > 0
-    ? 2
-    : 1;
+      ? 2
+      : 1;
 
   return (
     <div
@@ -178,12 +209,20 @@ const Recycle = () => {
           <h1
             className="text-3xl sm:text-4xl md:text-5xl"
             style={{
-              color: "var(--Primary-Text-color)",
               fontWeight: "var(--Bold)",
               lineHeight: "1.2",
             }}
           >
-            Redolapy Up-cycling Design Generator
+            <span style={{ color: "var(--Primary-Text-color)" }}>Redolapy </span>
+            <span
+              style={{
+                background: "linear-gradient(90deg, #40B9FF 0%, #69C9AC 50%, #AAE338 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Up-cycling Design Generator
+            </span>
           </h1>
           <p
             className="mt-3 text-base sm:text-lg md:text-xl"
@@ -278,12 +317,49 @@ const Recycle = () => {
                 />
               ))}
             </div>
+
+            {/* Discover Design Ideas Button */}
+            {ideas.length === 0 && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleDiscoverIdeas}
+                  disabled={analyzing}
+                  className={`inline-flex items-center gap-3 sm:gap-6 rounded-lg px-8 sm:px-16 py-4 text-lg sm:text-2xl text-white transition-all duration-300 ${analyzing
+                      ? "cursor-not-allowed"
+                      : "hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
+                    }`}
+                  style={{
+                    backgroundColor: analyzing
+                      ? "var(--Border-Strong)"
+                      : "var(--Secondary-Brand-color)",
+                    fontWeight: "var(--Bold)",
+                    minWidth: "320px",
+                    maxWidth: "480px",
+                    width: "100%",
+                    justifyContent: "center",
+                  }}
+                >
+                  {analyzing ? (
+                    <>
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
+                      Discover Design Ideas
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </section>
         )}
 
         {/* Style Ideas Section */}
         {ideas.length > 0 && (
-          <section className="mt-14 sm:mt-20">
+          <section ref={ideasRef} className="mt-14 sm:mt-20">
             <div className="flex items-center justify-between max-w-6xl mx-auto mb-8 sm:mb-14 px-1 gap-4 flex-wrap">
               <div className="inline-flex items-center gap-3 sm:gap-4">
                 <Lightbulb
@@ -312,7 +388,8 @@ const Recycle = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
+            {/* ✅ THE FIX: items-start prevents sibling cards from stretching */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto items-start">
               {ideas.map((idea, idx) => (
                 <DesignIdeaCard
                   key={idea.id}
@@ -336,16 +413,15 @@ const Recycle = () => {
             </div>
 
             {/* Generate Button */}
-            <div className="mt-8 flex justify-center">
+            <div ref={generateRef} className="mt-8 flex justify-center">
               <button
                 type="button"
                 onClick={handleGenerate}
                 disabled={!selectedIdeaId || generating}
-                className={`inline-flex items-center gap-3 sm:gap-6 rounded-lg px-8 sm:px-16 py-4 text-lg sm:text-2xl text-white transition-all duration-300 ${
-                  !selectedIdeaId || generating
+                className={`inline-flex items-center gap-3 sm:gap-6 rounded-lg px-8 sm:px-16 py-4 text-lg sm:text-2xl text-white transition-all duration-300 ${!selectedIdeaId || generating
                     ? "cursor-not-allowed"
                     : "hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-                }`}
+                  }`}
                 style={{
                   backgroundColor: !selectedIdeaId || generating
                     ? "var(--Border-Strong)"
@@ -375,11 +451,13 @@ const Recycle = () => {
 
         {/* Generated Design Section */}
         {(generating || generatedIdea) && (
-          <GeneratedDesign
-            idea={generatedIdea}
-            imageUrl={generatedImageUrl}
-            loading={generating}
-          />
+          <div ref={resultRef}>
+            <GeneratedDesign
+              idea={generatedIdea}
+              imageUrl={generatedImageUrl}
+              loading={generating}
+            />
+          </div>
         )}
       </div>
     </div>

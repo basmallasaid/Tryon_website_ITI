@@ -2,8 +2,8 @@ import React from "react";
 import { ChevronDown } from "lucide-react";
 
 const AI_ENGINES = [
-  { id: "qwen-image-2.0-pro", label: "Redolapy Vision 2.0 Pro" },
-  { id: "qwen-image-2.0", label: "Redolapy Vision 2.0" },
+  { id: "qwen-image-2.0-pro", label: "Design Maestro" },
+  { id: "qwen-image-2.0", label: "Style Starter" },
 ];
 
 const ASPECT_RATIOS = [
@@ -26,11 +26,11 @@ const SettingsRow = ({ model, setModel, aspectRatio, setAspectRatio }) => {
         >
           AI Engine
         </div>
-        <div className="mt-3 relative">
+        <div className="mt-3 relative inline-block w-full sm:w-auto">
           <select
             value={model}
             onChange={(e) => setModel(e.target.value)}
-            className="w-full appearance-none bg-transparent py-1 pr-8 text-base outline-none cursor-pointer"
+            className="w-full sm:w-auto appearance-none bg-transparent py-1 pr-8 text-base outline-none cursor-pointer"
             style={{ color: "var(--Disabled-Text-color)" }}
           >
             {AI_ENGINES.map((engine) => (
@@ -39,6 +39,11 @@ const SettingsRow = ({ model, setModel, aspectRatio, setAspectRatio }) => {
               </option>
             ))}
           </select>
+          <ChevronDown
+            className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2"
+            style={{ color: "var(--Disabled-Text-color)" }}
+            strokeWidth={1.8}
+          />
         </div>
       </div>
 
