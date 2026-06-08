@@ -4,8 +4,7 @@ import AtSignIcon from '../icons/AtSignIcon';
 import CameraIcon from '../icons/CameraIcon';
 import VideoIcon from '../icons/VideoIcon';
 import MailIcon from '../icons/MailIcon';
-
-const platformLinks = ['Style Guide', 'Try-On Tech', 'Features'];
+import { useTranslation } from 'react-i18next';
 
 const socialIcons = [
   { icon: GlobeIcon, href: '#', label: 'Website' },
@@ -20,6 +19,9 @@ const connectIcons = [
 ];
 
 export default function Footer() {
+  const { t } = useTranslation();
+  const platformLinks = [t("footer.styleGuide"), t("footer.tryOnTech"), t("footer.features")];
+
   return (
     <footer className="bg-[#F4F3F5]">
       <div className="px-6 sm:px-10 lg:px-20 py-16 lg:py-20">
@@ -28,11 +30,10 @@ export default function Footer() {
             {/* Left Column — Brand */}
             <div className="md:col-span-1">
               <h2 className="text-3xl font-bold  text-text-primary tracking-tight mb-4">
-                Redolapy
+                {t("footer.brand")}
               </h2>
               <p className="text-text-disabled leading-relaxed max-w-sm mb-8  font-semibold">
-                Elevating digital ateliers through artificial intelligence and
-                human creativity.
+                {t("footer.tagline")}
               </p>
               <div className="flex items-center gap-4">
                 {socialIcons.map(item => (
@@ -51,7 +52,7 @@ export default function Footer() {
             {/* Center Column — Platform */}
             <div className="md:col-span-1">
               <h3 className=" font-semibold uppercase tracking-widest text-[#006492] mb-2">
-                Platform
+                {t("footer.platform")}
               </h3>
               <ul className="space-y-4">
                 {platformLinks.map(link => (
@@ -70,7 +71,7 @@ export default function Footer() {
             {/* Right Column — Connect */}
             <div className="md:col-span-1">
               <h3 className=" font-semibold uppercase tracking-widest text- text-[#006492] mb-2">
-                Connect
+                {t("footer.connect")}
               </h3>
               <div className="flex items-center  mb-10">
                 {connectIcons.map(item => (
@@ -85,7 +86,7 @@ export default function Footer() {
                 ))}
               </div>
               <p className="text-gray-400 text-xs">
-                &copy; {new Date().getFullYear()} AELIA AI. All rights reserved.
+                &copy; {new Date().getFullYear()} {t("footer.copyright")}
               </p>
             </div>
           </div>

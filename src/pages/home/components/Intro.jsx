@@ -1,24 +1,26 @@
 import human from '../../../assets/human.svg';
-
-const steps = [
-  {
-    num: '1',
-    title: 'Upload & Sync',
-    desc: 'Upload photos of your current wardrobe or sync with your favorite shopping apps.',
-  },
-  {
-    num: '2',
-    title: 'Neural Analysis',
-    desc: 'Our AI analyzes color palettes, textures, and silhouettes to build your digital DNA.',
-  },
-  {
-    num: '3',
-    title: 'Curated Styling',
-    desc: 'Receive personalized daily lookbooks and shopping suggestions that fit your style.',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 const Intro = () => {
+  const { t } = useTranslation();
+  const steps = [
+    {
+      num: '1',
+      title: t('intro.step1Title'),
+      desc: t('intro.step1Desc'),
+    },
+    {
+      num: '2',
+      title: t('intro.step2Title'),
+      desc: t('intro.step2Desc'),
+    },
+    {
+      num: '3',
+      title: t('intro.step3Title'),
+      desc: t('intro.step3Desc'),
+    },
+  ];
+
   return (
     <section className="w-full bg-bg-secondary pr-20 pb-57 pl-20 max-[1200px]:pr-14 max-[1200px]:pl-14 max-[1000px]:pr-8 max-[1000px]:pl-8 max-[1000px]:pb-8">
       <div className="flex justify-center gap-[72px] max-[1000px]:flex-col">
@@ -29,7 +31,7 @@ const Intro = () => {
 
         <div className="w-[480px] h-[397px] max-[1000px]:w-full max-[1000px]:h-auto flex flex-col gap-10">
           <h2 className="font-bold text-[36px] leading-[38px] text-text-primary">
-            Simple. Smart. Seamless.
+            {t('intro.title')}
           </h2>
           <div className="flex flex-col gap-8">
             {steps.map((step) => (

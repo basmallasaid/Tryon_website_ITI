@@ -1,7 +1,9 @@
 import React from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const UploadedImageCard = ({ image, index, onRemove }) => {
+  const { t } = useTranslation();
   return (
     <div
       className="relative w-44 sm:w-52 rounded-2xl p-3 sm:p-4"
@@ -10,13 +12,13 @@ const UploadedImageCard = ({ image, index, onRemove }) => {
       <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white">
         <img
           src={image.preview}
-          alt={`Piece ${index + 1}`}
+          alt={`${t("recycle.piece")} ${index + 1}`}
           className="h-full w-full object-cover"
         />
         <button
           type="button"
           onClick={() => onRemove(index)}
-          aria-label={`Remove Piece ${index + 1}`}
+          aria-label={`${t("recycle.piece")} ${index + 1}`}
           className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-md transition-all duration-200 hover:bg-red-500 hover:text-white hover:scale-110"
         >
           <X className="h-4 w-4" />
@@ -32,7 +34,7 @@ const UploadedImageCard = ({ image, index, onRemove }) => {
           lineHeight: "14px",
         }}
       >
-        Piece {index + 1}
+        {t("recycle.piece")} {index + 1}
       </div>
     </div>
   );

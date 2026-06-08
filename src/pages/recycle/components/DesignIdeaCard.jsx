@@ -1,9 +1,15 @@
 import React, { useState, useId } from "react";
 import { Check } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const DesignIdeaCard = ({ idea, index, selected, onSelect, disabled }) => {
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const isSelected = selected === idea.id;
   const [expanded, setExpanded] = useState(false);
+
+  const displayTitle = isAr && idea.title_ar ? idea.title_ar : idea.title;
+  const displayDesc = isAr && idea.design_description_ar ? idea.design_description_ar : idea.design_description;
 
   const uid = useId().replace(/:/g, "-");
   const gradId = `dg-${uid}`;
@@ -89,7 +95,7 @@ const DesignIdeaCard = ({ idea, index, selected, onSelect, disabled }) => {
             lineHeight: "1.4",
           }}
         >
-          {idea.title}
+          {displayTitle}
         </h3>
 
         {/* Clean ellipsis truncation via line-clamp-3, full text when expanded */}
@@ -97,7 +103,7 @@ const DesignIdeaCard = ({ idea, index, selected, onSelect, disabled }) => {
           className={`mt-2 text-sm ${expanded ? "" : "line-clamp-3"}`}
           style={{ color: "var(--Disabled-Text-color)" }}
         >
-          {idea.design_description}
+          {displayDesc}
         </p>
 
         <div
@@ -113,7 +119,7 @@ const DesignIdeaCard = ({ idea, index, selected, onSelect, disabled }) => {
             setExpanded((prev) => !prev);
           }}
         >
-          {expanded ? "See less" : "See more"}
+          {expanded ? t("recycle.seeLess") : t("recycle.seeMore")}
         </div>
       </div>
     </button>

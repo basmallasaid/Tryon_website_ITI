@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { loginApi, registerApi, sendVerificationApi, forgotPasswordApi, otpVerifyApi, resetPasswordApi } from "../../api/authApi";
 import { getUserApi, updateProfileApi } from "../../api/userApi";
@@ -9,6 +10,7 @@ import OtpVerification from "./OtpVerification";
 import ResetPassword from "./ResetPassword";
 import SlidingOverlay from "../../components/SlidingOverlay";
 export default function AuthPage({ initialIsLogin = true, inModal = false, onClose }) {
+    const { t } = useTranslation();
     const [view, setView] = useState(initialIsLogin ? "login" : "register");
     const [forgotEmail, setForgotEmail] = useState("");
     const { login } = useAuth();
@@ -60,7 +62,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             login({ id: res.data._id, email: res.data.email, token: res.data.token, ...userRes.data });
             onClose?.();
         } catch (error) {
-            alert(error.response?.data?.message || "Login failed");
+            alert(error.response?.data?.message || t("auth.loginFailed"));
         }
     };
 
@@ -74,7 +76,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             confirmPassword: e.target.confirmPassword.value,
         };
 
-        if (formData.password !== formData.confirmPassword) return alert("Passwords do not match");
+        if (formData.password !== formData.confirmPassword) return alert(t("auth.passwordsNoMatch"));
 
         try {
             const res = await registerApi({
@@ -93,7 +95,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             login({ id: userId, email: formData.email, token, ...userRes.data });
             onClose?.();
         } catch (error) {
-            alert(error.response?.data?.message || "Registration failed");
+            alert(error.response?.data?.message || t("auth.registrationFailed"));
         }
     };
 
@@ -105,7 +107,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             setForgotEmail(email);
             setView("otp");
         } catch (error) {
-            alert(error.response?.data?.message || "Failed to send reset link");
+            alert(error.response?.data?.message || t("auth.failedToSendReset"));
         }
     };
 
@@ -114,18 +116,18 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             await otpVerifyApi({ email: forgotEmail, otp });
             setView("reset");
         } catch (error) {
-            alert(error.response?.data?.message || "Verification failed");
+            alert(error.response?.data?.message || t("auth.verificationFailed"));
         }
     };
 
     const handleResetPassword = async (password, confirmPassword) => {
-        if (password !== confirmPassword) return alert("Passwords do not match");
+        if (password !== confirmPassword) return alert(t("auth.passwordsNoMatch"));
         try {
             await resetPasswordApi({ email: forgotEmail, password, confirmPassword });
-            alert("Password reset successfully! Please login with your new password.");
+            alert(t("auth.resetSuccess"));
             setView("login");
         } catch (error) {
-            alert(error.response?.data?.message || "Failed to reset password");
+            alert(error.response?.data?.message || t("auth.failedToReset"));
         }
     };
 

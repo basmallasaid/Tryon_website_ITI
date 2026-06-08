@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Info } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ResetPassword({ isVisible, onReset, onBackToLogin, inModal }) {
+  const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNew, setShowNew] = useState(false);
@@ -18,7 +20,7 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
 
   const strength = getStrength(newPassword);
   const barColors = ["", "", "", ""];
-  const labels = ["None", "Weak", "Medium", "Good", "Strong"];
+  const labels = [t("auth.strengthNone"), t("auth.strengthWeak"), t("auth.strengthMedium"), t("auth.strengthGood"), t("auth.strengthStrong")];
   const labelColors = ["#777", "#ff4d4d", "#ffa500", "#40B9FF", "#A6E22E"];
 
   if (newPassword) {
@@ -27,7 +29,7 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) return alert("Passwords do not match");
+    if (newPassword !== confirmPassword) return alert(t("auth.passwordsNoMatch"));
     onReset(newPassword, confirmPassword);
   };
 
@@ -36,19 +38,19 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
       isVisible ? "z-10 opacity-100" : "z-0 opacity-0"
     } ${inModal ? "p-6 md:p-10" : "p-8 md:p-16"}`}>
       <div className="mx-auto w-full max-w-md">
-        <h2 className={`font-bold text-black ${inModal ? "text-2xl" : "text-3xl"}`}>Set New Password</h2>
+        <h2 className={`font-bold text-black ${inModal ? "text-2xl" : "text-3xl"}`}>{t("auth.setNewPassword")}</h2>
         <p className={`mt-2 text-gray-500 leading-relaxed ${inModal ? "mb-5 text-sm" : "mb-8"}`}>
-          Choose a unique, strong password that you haven't used before for this account.
+          {t("auth.setNewPasswordDesc")}
         </p>
         <form onSubmit={handleSubmit} className={inModal ? "space-y-4" : "space-y-5"}>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-black">New Password</label>
+            <label className="text-sm font-bold text-black">{t("auth.newPassword")}</label>
             <div className="relative">
               <input
                 type={showNew ? "text" : "password"}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="create strong password"
+                placeholder={t("auth.passwordPlaceholder")}
                 required
                 className={`w-full rounded-xl border border-gray-300 text-sm outline-none pr-11 ${
                   inModal ? "p-3" : "p-4"
@@ -71,18 +73,18 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
               ))}
             </div>
             <p className="text-xs" style={{ color: newPassword ? labelColors[strength] : "#777" }}>
-              Password strength: {newPassword ? labels[strength] : "None"}
+              {t("auth.passwordStrength")} {newPassword ? labels[strength] : t("auth.strengthNone")}
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-black">Confirm password</label>
+            <label className="text-sm font-bold text-black">{t("auth.confirmPasswordLabel")}</label>
             <div className="relative">
               <input
                 type={showConfirm ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="confirm the password that you created"
+                placeholder={t("auth.confirmPasswordPlaceholder")}
                 required
                 className={`w-full rounded-xl border border-gray-300 text-sm outline-none pr-11 ${
                   inModal ? "p-3" : "p-4"
@@ -97,17 +99,17 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
           <div className="flex items-center gap-2.5 rounded-xl bg-[#f1f8e9] p-3">
             <Info size={18} className="shrink-0 text-[#A6E22E]" />
             <p className="text-xs font-medium text-[#7cb342]">
-              Use 8+ characters with a mix of letters, numbers & symbols.
+              {t("auth.passwordHint")}
             </p>
           </div>
 
           <button type="submit" className={`w-full rounded-xl bg-[#40B9FF] font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-[#89D4FF] ${inModal ? "py-3" : "py-4"}`}>
-            Update Password
+            {t("auth.updatePassword")}
           </button>
 
           <div className="pt-1 text-center">
             <button type="button" onClick={onBackToLogin} className="inline-flex items-center gap-1 font-semibold text-[#A6E22E] border-b border-[#A6E22E] pb-0.5 text-sm hover:opacity-80">
-              Back to Login
+              {t("auth.backToLogin")}
             </button>
           </div>
         </form>

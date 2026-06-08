@@ -1,8 +1,10 @@
 import bin from "../../../assets/bin.svg";
 import recycleIcon from "../../../assets/recycle-icon.svg";
 import ticketIcon from "../../../assets/ticket-icon.svg";
+import { useTranslation } from "react-i18next";
 
 const Sustainability = () => {
+  const { t } = useTranslation();
   return (
     <section className="w-full bg-bg-sustainability py-20 px-8 pb-10">
       <div className="flex items-center justify-center gap-[158px] max-[1200px]:gap-12 max-[1100px]:flex-col">
@@ -15,13 +17,10 @@ const Sustainability = () => {
         <div className="w-[495px] h-[482px] max-[1100px]:w-full max-[1100px]:h-auto flex flex-col justify-between max-[1100px]:gap-6">
           <div className="flex flex-col gap-6">
             <h2 className="font-bold text-[36px] leading-[38px] text-text-primary">
-              Sustainable Wardrobe
+              {t("sustainability.title")}
             </h2>
             <p className="font-medium text-base leading-[22px] text-text-secondary opacity-[0.84]">
-              AELIA is committed to circular fashion. Our platform doesn't just
-              help you style your clothes—it helps you manage their entire
-              lifecycle. Join our movement to reduce textile waste through smart
-              recycling, reselling, and donation programs.
+              {t("sustainability.desc")}
             </p>
 
             <div className="flex flex-col gap-6 pt-2">
@@ -33,10 +32,10 @@ const Sustainability = () => {
                 />
                 <div>
                   <h3 className="font-bold text-2xl leading-[38.4px] text-text-primary">
-                    Upcycle & Renew
+                    {t("sustainability.upcycleTitle")}
                   </h3>
                   <p className="font-normal text-base text-text-secondary">
-                    Mix and match your existing clothes
+                    {t("sustainability.upcycleDesc")}
                   </p>
                 </div>
               </div>
@@ -48,11 +47,10 @@ const Sustainability = () => {
                 />
                 <div>
                   <h3 className="font-bold text-2xl leading-[38.4px] text-text-primary">
-                    Virtual Try-On
+                    {t("sustainability.virtualTryOnTitle")}
                   </h3>
                   <p className="font-normal text-base text-text-secondary">
-                    Virtual TryOn Recycled pieces to ensure that it is perfectly
-                    complement your current wardrobe.
+                    {t("sustainability.virtualTryOnDesc")}
                   </p>
                 </div>
               </div>
@@ -64,7 +62,6 @@ const Sustainability = () => {
               href="/about-recycle/"
               className="relative inline-flex items-center justify-center w-[223px] py-6 rounded-[8px] font-semibold text-base text-text-primary transition-transform cursor-pointer hover:scale-[1.02] active:scale-95 overflow-hidden"
             >
-              {/* This pseudo-element creates the 4px gradient border mask seamlessly */}
               <span
                 className="absolute inset-0 p-[4px] rounded-[8px]"
                 style={{
@@ -76,7 +73,7 @@ const Sustainability = () => {
                   maskComposite: "exclude",
                 }}
               />
-              <span className="relative z-10">Learn about recycling</span>
+              <span className="relative z-10">{t("sustainability.learnRecycling")}</span>
             </a>
 
             <a className="relative inline-flex items-center justify-center w-[223px] py-6 rounded-[8px] font-semibold text-base text-text-primary transition-transform cursor-pointer hover:scale-[1.02] active:scale-95 overflow-hidden">
@@ -91,7 +88,7 @@ const Sustainability = () => {
                   maskComposite: "exclude",
                 }}
               />
-              <span className="relative z-10">Learn about TryOn</span>
+              <span className="relative z-10">{t("sustainability.learnTryOn")}</span>
             </a>
           </div>
         </div>

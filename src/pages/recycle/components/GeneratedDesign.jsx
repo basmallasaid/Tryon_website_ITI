@@ -1,12 +1,10 @@
 import React from "react";
 import { Check, Download, Sparkles } from "lucide-react";
-
-const TAILORING_SUGGESTIONS = [
-  "Use a blind stitch for the waist transition to keep the silhouette clean.",
-  "Repurpose the leftover ivory silk for a matching neck scarf or hair accessory.",
-];
+import { useTranslation } from "react-i18next";
 
 const GeneratedDesign = ({ idea, imageUrl, loading }) => {
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   if (loading) {
     return (
       <section className="max-w-6xl mx-auto mt-16 sm:mt-20">
@@ -23,7 +21,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
               lineHeight: "1.05",
             }}
           >
-            Your Generated Design
+            {t("recycle.yourGeneratedDesign")}
           </h2>
         </div>
         <div
@@ -46,7 +44,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
                     className="text-sm"
                     style={{ color: "var(--Disabled-Text-color)" }}
                   >
-                    Generating your design...
+                    {t("recycle.generatingDesign")}
                   </p>
                 </div>
               </div>
@@ -94,7 +92,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
             lineHeight: "1.05",
           }}
         >
-          Your Generated Design
+          {t("recycle.yourGeneratedDesign")}
         </h2>
       </div>
 
@@ -120,7 +118,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
                 lineHeight: "1.05",
               }}
             >
-              {idea.title}
+              {isAr && idea.title_ar ? idea.title_ar : idea.title}
             </h3>
             <p
               className="mt-4 text-sm sm:text-base"
@@ -129,7 +127,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
                 lineHeight: "1.5",
               }}
             >
-              {idea.design_description}
+              {isAr && idea.design_description_ar ? idea.design_description_ar : idea.design_description}
             </p>
 
             <div className="mt-6">
@@ -140,10 +138,10 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
                   fontWeight: "var(--Bold)",
                 }}
               >
-                Tailoring Suggestions:
+                {t("recycle.tailoringSuggestions")}
               </div>
               <ul className="mt-3 space-y-3">
-                {TAILORING_SUGGESTIONS.map((s, i) => (
+                {(idea.tailoring_suggestions || []).map((s, i) => (
                   <li
                     key={i}
                     className="flex items-start gap-3 text-sm"
@@ -184,7 +182,7 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
                 }}
               >
                 <Download className="h-4 w-4" />
-                Save Specs
+                {t("recycle.saveSpecs")}
               </button>
             </div>
           </div>

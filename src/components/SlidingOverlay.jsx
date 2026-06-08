@@ -1,6 +1,8 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
+  const { t } = useTranslation();
   const overlayRight = view === "login" || view === "otp" || view === "reset";
   const isOtp = view === "otp";
   const isForgot = view === "forgot";
@@ -21,57 +23,57 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
               </svg>
             </div>
             <h1 className={`font-bold ${inModal ? 'mb-3 text-4xl' : 'mb-4 text-5xl'}`}>
-              Verify Your Identity
+              {t("auth.verifyIdentity")}
             </h1>
             <p className={`opacity-90 leading-relaxed ${inModal ? 'text-base' : 'mb-0 text-lg'}`}>
-              To protect your wardrobe and style preferences, please confirm it's really you.
+              {t("auth.verifyIdentityDesc")}
             </p>
           </>
         ) : isForgot ? (
           <>
             <h1 className={`font-bold ${inModal ? 'mb-3 text-4xl' : 'mb-4 text-5xl'}`}>
-              <span className="block mb-2">Reset Your</span>
-              <span className="block">Password</span>
+              <span className="block mb-2">{t("auth.resetYourPassword")}</span>
+              <span className="block">{t("auth.password")}</span>
             </h1>
             <p className={`opacity-90 ${inModal ? 'mb-6 text-base' : 'mb-10 text-lg'}`}>
-              Remember your password?
+              {t("auth.rememberPassword")}
             </p>
             <button onClick={onToggle} className={`rounded-xl border-2 border-white font-semibold transition-all active:scale-95 ${inModal ? 'px-12 py-2.5 text-lg' : 'px-16 py-3 text-xl'}`}>
-              Back to Login
+              {t("auth.backToLogin")}
             </button>
           </>
         ) : isReset ? (
           <>
-            <h1 className={`font-bold ${inModal ? 'mb-3 text-5xl' : 'mb-2 text-6xl'}`}>Redolapy</h1>
-            <h2 className={`font-semibold ${inModal ? 'mb-6 text-lg' : 'mb-10 text-xl'}`}>Secure Your Atelier</h2>
+            <h1 className={`font-bold ${inModal ? 'mb-3 text-5xl' : 'mb-2 text-6xl'}`}>{t("footer.brand")}</h1>
+            <h2 className={`font-semibold ${inModal ? 'mb-6 text-lg' : 'mb-10 text-xl'}`}>{t("auth.secureAtelier")}</h2>
             <p className={`opacity-90 leading-relaxed ${inModal ? 'text-sm' : 'text-base'}`}>
-              Protect your digital fashion sanctuary. A stronger password ensures your curated wardrobe remains exclusively yours.
+              {t("auth.secureAtelierDesc")}
             </p>
           </>
         ) : isLogin ? (
           <>
             <h1 className={`font-bold ${inModal ? 'mb-3 text-4xl' : 'mb-4 text-5xl'}`}>
-              <span className="block mb-2">Welcome</span>
-              <span className="block">Back</span>
+              <span className="block mb-2">{t("auth.welcomeBack")}</span>
+              <span className="block">{t("auth.back")}</span>
             </h1>
             <p className={`opacity-90 ${inModal ? 'mb-6 text-base' : 'mb-10 text-lg'}`}>
-              Don't Have an account?
+              {t("auth.dontHaveAccount")}
             </p>
             <button onClick={onToggle} className={`rounded-xl border-2 border-white font-semibold transition-all active:scale-95 ${inModal ? 'px-12 py-2.5 text-lg' : 'px-16 py-3 text-xl'}`}>
-              Sign Up
+              {t("auth.signUp")}
             </button>
           </>
         ) : (
           <>
             <h1 className={`font-bold ${inModal ? 'mb-3 text-4xl' : 'mb-4 text-5xl'}`}>
-              <span className="block mb-2">Welcome To</span>
+              <span className="block mb-2">{t("auth.welcomeTo")}</span>
             </h1>
-            <h2 className={`font-bold ${inModal ? 'mb-5 text-4xl' : 'mb-8 text-5xl'}`}>Redolapy</h2>
+            <h2 className={`font-bold ${inModal ? 'mb-5 text-4xl' : 'mb-8 text-5xl'}`}>{t("footer.brand")}</h2>
             <p className={`opacity-90 ${inModal ? 'mb-6 text-base' : 'mb-10 text-lg'}`}>
-              Already have an account?
+              {t("auth.alreadyHaveAccountOverlay")}
             </p>
             <button onClick={onToggle} className={`rounded-xl border-2 border-white font-semibold transition-all active:scale-95 ${inModal ? 'px-12 py-2.5 text-lg' : 'px-16 py-3 text-xl'}`}>
-              Login
+              {t("auth.login")}
             </button>
           </>
         )}

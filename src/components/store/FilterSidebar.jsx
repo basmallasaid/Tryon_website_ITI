@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronDown, SlidersHorizontal, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const FilterSection = ({ title, children }) => (
   <div className="group border-b border-gray-100/60 py-6 last:border-none">
@@ -23,6 +24,7 @@ const FilterSidebar = ({
   maxPriceLimit,
   products,
 }) => {
+  const { t } = useTranslation();
   const toggleArrayFilter = (field, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -42,7 +44,7 @@ const FilterSidebar = ({
           </div>
 
           <h2 className="text-xl font-black text-gray-900 tracking-tight">
-            Filters
+            {t("stores.filters")}
           </h2>
         </div>
 
@@ -50,12 +52,12 @@ const FilterSidebar = ({
           onClick={() => window.location.reload()}
           className="text-[10px] font-black text-gray-400 hover:text-[#40B9FF] transition-colors uppercase tracking-widest"
         >
-          Reset
+          {t("stores.reset")}
         </button>
       </div>
 
       {/* Categories */}
-      <FilterSection title="Categories">
+      <FilterSection title={t("stores.categories")}>
         <div className="space-y-3.5">
           {options.categories.map((cat) => (
             <label
@@ -87,7 +89,7 @@ const FilterSidebar = ({
       </FilterSection>
 
       {/* Brands */}
-      <FilterSection title="Brands">
+      <FilterSection title={t("stores.brands")}>
         <div className="space-y-3.5 max-h-48 overflow-y-auto pr-2">
           {options.brands.map((b) => (
             <label
@@ -117,7 +119,7 @@ const FilterSidebar = ({
       </FilterSection>
 
       {/* Colors */}
-      <FilterSection title="Colors">
+      <FilterSection title={t("stores.colors")}>
         <div className="flex flex-wrap gap-3">
           {options.colors.map((color) => {
             const isActive = filters.selectedColors.includes(color);
@@ -156,7 +158,7 @@ const FilterSidebar = ({
       </FilterSection>
 
       {/* Seasons */}
-      <FilterSection title="Season">
+      <FilterSection title={t("stores.season")}>
         <div className="flex flex-wrap gap-2">
           {options.seasons.map((season) => (
             <button
@@ -178,7 +180,7 @@ const FilterSidebar = ({
       </FilterSection>
 
       {/* Price */}
-      <FilterSection title="Price Range">
+      <FilterSection title={t("stores.priceRange")}>
         <div className="px-1">
           <input
             type="range"
@@ -197,7 +199,7 @@ const FilterSidebar = ({
           <div className="flex justify-between mt-4">
             <div className="flex flex-col">
               <span className="text-[9px] font-black text-gray-300 uppercase">
-                Limit
+                {t("stores.limit")}
               </span>
 
               <span className="text-[13px] font-black text-gray-400 tracking-tighter">
@@ -207,7 +209,7 @@ const FilterSidebar = ({
 
             <div className="flex flex-col items-end">
               <span className="text-[9px] font-black text-gray-300 uppercase">
-                Current
+                {t("stores.current")}
               </span>
 
               <span className="text-[13px] font-black text-[#40B9FF] tracking-tighter">

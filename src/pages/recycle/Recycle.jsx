@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Lightbulb, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import StepIndicator from "./components/StepIndicator";
 import UploadArea from "./components/UploadArea";
@@ -66,6 +67,8 @@ const buildPreviews = async (files) => {
 };
 
 const Recycle = () => {
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
   const [uploadedImages, setUploadedImages] = useState([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [ideas, setIdeas] = useState([]);
@@ -153,7 +156,7 @@ const Recycle = () => {
       setApiError(
         err.response?.data?.error ||
         err.message ||
-        "Failed to analyze images. Please try again."
+        t("recycle.analysisFailed")
       );
     } finally {
       setAnalyzing(false);
@@ -176,13 +179,13 @@ const Recycle = () => {
       if (data.image_url) {
         setGeneratedImageUrl(data.image_url);
       } else {
-        setApiError("No image was returned from the server.");
+        setApiError(t("recycle.noImageReturned"));
       }
     } catch (err) {
       setApiError(
         err.response?.data?.error ||
         err.message ||
-        "Image generation failed. Please try again."
+        t("recycle.generationFailed")
       );
     } finally {
       setGenerating(false);
@@ -221,7 +224,7 @@ const Recycle = () => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Up-cycling Design Generator
+              {t("recycle.subtitle")}
             </span>
           </h1>
           <p
@@ -232,7 +235,7 @@ const Recycle = () => {
               opacity: 0.85,
             }}
           >
-            Upload your pieces · Pick a design · See it come to life
+            {t("recycle.heroDesc")}
           </p>
         </section>
 
@@ -257,7 +260,7 @@ const Recycle = () => {
                     lineHeight: "38px",
                   }}
                 >
-                  Upload Your Garments
+                  {t("recycle.uploadGarments")}
                 </h2>
                 <p
                   className="text-sm sm:text-base"
@@ -267,7 +270,7 @@ const Recycle = () => {
                     lineHeight: "18px",
                   }}
                 >
-                  Support for JPG, PNG, WEBP (max 10MB each)
+                  {t("recycle.uploadSupport")}
                 </p>
               </div>
             </div>
@@ -293,7 +296,7 @@ const Recycle = () => {
                   borderTopColor: "var(--Secondary-Brand-color)",
                 }}
               />
-              Analyzing your garments...
+              {t("recycle.analyzingGarments")}
             </div>
           )}
 
@@ -343,12 +346,12 @@ const Recycle = () => {
                   {analyzing ? (
                     <>
                       <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                      Analyzing...
+                      {t("recycle.analyzing")}
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-                      Discover Design Ideas
+                      {t("recycle.discoverIdeas")}
                     </>
                   )}
                 </button>
@@ -375,7 +378,7 @@ const Recycle = () => {
                     lineHeight: "1.05",
                   }}
                 >
-                  Choose Your Style Idea
+                  {t("recycle.chooseIdea")}
                 </h2>
               </div>
               <span
@@ -384,7 +387,7 @@ const Recycle = () => {
                   backgroundColor: "var(--Secondary-Brand-color)",
                 }}
               >
-                AI Suggested
+                {t("recycle.aiSuggested")}
               </span>
             </div>
 
@@ -436,12 +439,12 @@ const Recycle = () => {
                 {generating ? (
                   <>
                     <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    Generating...
+                    {t("recycle.generating")}
                   </>
                 ) : (
                   <>
                     <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-                    Generate Selected Design
+                    {t("recycle.generateSelected")}
                   </>
                 )}
               </button>

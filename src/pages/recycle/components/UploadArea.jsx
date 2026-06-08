@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const ACCEPTED_EXTENSIONS = [
   ".jpg",
@@ -39,6 +40,7 @@ const UploadArea = ({
   disabled = false,
   maxFiles = 2,
 }) => {
+  const { t } = useTranslation();
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState("");
@@ -52,12 +54,12 @@ const UploadArea = ({
     for (const file of files) {
       if (!isAcceptedFile(file)) {
         setError(
-          `Unsupported file type. Accepted: ${ACCEPTED_EXTENSIONS.join(", ")}`
+          t("recycle.unsupportedFileType", { types: ACCEPTED_EXTENSIONS.join(", ") })
         );
         return;
       }
       if (file.size > MAX_FILE_SIZE) {
-        setError(`"${file.name}" exceeds the 10MB size limit.`);
+        setError(t("recycle.fileTooLarge", { name: file.name }));
         return;
       }
     }
@@ -138,21 +140,21 @@ const UploadArea = ({
             className="mt-3 text-sm sm:text-base"
             style={{ color: "var(--Primary-Text-color, #333333)" }}
           >
-            Click or drag
+            {t("recycle.clickOrDrag")}
           </p>
 
           <p
             className="text-sm sm:text-base"
             style={{ color: "var(--Primary-Text-color, #333333)" }}
           >
-            images here
+            {t("recycle.imagesHere")}
           </p>
 
           <p
             className="mt-3 text-xs"
             style={{ color: "var(--Disabled-Text-color, #aaaaaa)" }}
           >
-            Up to {maxFiles} images · 10MB each
+            {t("recycle.uploadInfo", { max: maxFiles })}
           </p>
         </div>
 

@@ -1,12 +1,14 @@
 import React from "react";
-
-const STEPS = [
-  { id: 1, title: "Upload", subtitle: "Upload 1-2 garment photos" },
-  { id: 2, title: "Choose Idea", subtitle: "Pick your favorite design" },
-  { id: 3, title: "Generate", subtitle: "Visualize your upcycled piece" },
-];
+import { useTranslation } from "react-i18next";
 
 const StepIndicator = ({ currentStep = 1 }) => {
+  const { t } = useTranslation();
+  const STEPS = [
+    { id: 1, title: t("recycle.step1Title"), subtitle: t("recycle.step1Subtitle") },
+    { id: 2, title: t("recycle.step2Title"), subtitle: t("recycle.step2Subtitle") },
+    { id: 3, title: t("recycle.step3Title"), subtitle: t("recycle.step3Subtitle") },
+  ];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
       {STEPS.map((step) => {

@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function HeroSection() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -11,18 +13,15 @@ export default function HeroSection() {
             {/* Left: Text Content */}
             <div className="max-w-md">
               <h1 className="text-[32px] sm:text-[40px] lg:text-[48px] font-bold text-text-primary leading-tight mb-6">
-                Give Your Clothes a
+                {t("aboutRecycle.heroTitle1")}
                 <br />
                 <span className="bg-gradient-to-r from-[#40B9FF]  to-[#8ED321] bg-clip-text text-transparent">
-                  Second Life
+                  {t("aboutRecycle.heroTitle2")}
                 </span>
               </h1>
 
               <p className="font-semibold text-text-disabled leading-relaxed mb-10">
-                Our intelligent recycling ecosystem ensures no garment ever goes
-                to waste. Use our Smart Bins to recycle, track your
-                environmental impact in real-time, and give your style a second
-                life.
+                {t("aboutRecycle.heroDesc")}
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -32,14 +31,14 @@ export default function HeroSection() {
                     navigate('/recycle');
                   }}
                 >
-                  Start Recycling
+                  {t("aboutRecycle.startRecycling")}
                 </button>
                 <div className="rounded-lg bg-gradient-to-r from-[#FF8A3D] via-[#40B9FF] to-[#8ED321] p-px">
                   <a
                     href="#how-it-works"
                     className="inline-flex items-center gap-2 px-8 py-4 bg-[#F4F3F5] text-brand-secondary font-semibold rounded-lg text-base hover:shadow-lg active:scale-[0.98] transition-all duration-200 w-full"
                   >
-                    See how it works
+                    {t("aboutRecycle.seeHowItWorks")}
                   </a>
                 </div>
               </div>
@@ -66,7 +65,7 @@ export default function HeroSection() {
                         transform: 'rotate(-45deg)',
                       }}
                     >
-                      Before
+                      {t("aboutRecycle.before")}
                     </span>
                   </div>
                 </div>
@@ -89,7 +88,7 @@ export default function HeroSection() {
                         transform: 'rotate(45deg)',
                       }}
                     >
-                      After
+                      {t("aboutRecycle.after")}
                     </span>
                   </div>
                 </div>

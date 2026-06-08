@@ -1,19 +1,21 @@
 import React from "react";
 import { ChevronDown } from "lucide-react";
-
-const AI_ENGINES = [
-  { id: "qwen-image-2.0-pro", label: "Design Maestro" },
-  { id: "qwen-image-2.0", label: "Style Starter" },
-];
-
-const ASPECT_RATIOS = [
-  { id: "1024*1024", label: "1024 x 1024 (1:1)" },
-  { id: "1536*1024", label: "1536 x 1024 (3:2)" },
-  { id: "1024*1536", label: "1024 x 1536 (2:3)" },
-  { id: "1280*720", label: "1280 x 720 (16:9)" },
-];
+import { useTranslation } from "react-i18next";
 
 const SettingsRow = ({ model, setModel, aspectRatio, setAspectRatio }) => {
+  const { t } = useTranslation();
+  const AI_ENGINES = [
+    { id: "qwen-image-2.0-pro", label: t("recycle.designMaestro") },
+    { id: "qwen-image-2.0", label: t("recycle.styleStarter") },
+  ];
+
+  const ASPECT_RATIOS = [
+    { id: "1024*1024", label: "1024 x 1024 (1:1)" },
+    { id: "1536*1024", label: "1536 x 1024 (3:2)" },
+    { id: "1024*1536", label: "1024 x 1536 (2:3)" },
+    { id: "1280*720", label: "1280 x 720 (16:9)" },
+  ];
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 max-w-6xl mx-auto px-1">
       <div>
@@ -24,7 +26,7 @@ const SettingsRow = ({ model, setModel, aspectRatio, setAspectRatio }) => {
             fontWeight: "var(--Semi-Bold)",
           }}
         >
-          AI Engine
+          {t("recycle.aiEngine")}
         </div>
         <div className="mt-3 relative inline-block w-full sm:w-auto">
           <select
@@ -55,7 +57,7 @@ const SettingsRow = ({ model, setModel, aspectRatio, setAspectRatio }) => {
             fontWeight: "var(--Semi-Bold)",
           }}
         >
-          Aspect Ratio
+          {t("recycle.aspectRatio")}
         </div>
         <div className="mt-3 relative inline-block w-full sm:w-auto">
           <select

@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function OtpVerification({ isVisible, email, onVerify, onBackToLogin, inModal }) {
+  const { t } = useTranslation();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(300);
   const inputRefs = useRef([]);
@@ -58,9 +60,9 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
       isVisible ? "z-10 opacity-100" : "z-0 opacity-0"
     } ${inModal ? "p-6 md:p-10" : "p-8 md:p-16"}`}>
       <div className="mx-auto w-full max-w-md">
-        <h2 className={`font-bold text-black ${inModal ? "text-2xl" : "text-3xl"}`}>Enter Verification Code</h2>
+        <h2 className={`font-bold text-black ${inModal ? "text-2xl" : "text-3xl"}`}>{t("auth.enterVerificationCode")}</h2>
         <p className={`mt-2 text-gray-500 leading-relaxed ${inModal ? "mb-6 text-sm" : "mb-8"}`}>
-          We sent a 6-digit code to your email {maskEmail(email)}. Enter it below to proceed.
+          {t("auth.otpDesc", { email: maskEmail(email) })}
         </p>
         <form onSubmit={handleSubmit}>
           <div className="flex gap-2 mb-6 justify-center">
@@ -83,22 +85,22 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
           </div>
 
           <button type="submit" className={`w-full rounded-xl bg-[#40B9FF] font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-[#89D4FF] inline-flex items-center justify-center gap-2 ${inModal ? "py-3" : "py-4"}`}>
-            Verify & Continue <span>→</span>
+            {t("auth.verifyContinue")} <span>→</span>
           </button>
 
           <div className="mt-8 text-center space-y-4">
             <p className="text-sm font-semibold text-gray-700">
-              Didn't receive the code?{" "}
-              <button type="button" className="underline hover:text-gray-900">Resend Code</button>
+              {t("auth.noCode")}{" "}
+              <button type="button" className="underline hover:text-gray-900">{t("auth.resendCode")}</button>
             </p>
 
             <p className={`text-sm font-semibold ${timeLeft > 0 ? "text-[#FF7E41]" : "text-gray-400"}`}>
-              Request a new code in {formatTime(timeLeft)}
+              {t("auth.requestNewCode")} {formatTime(timeLeft)}
             </p>
 
             <div className="pt-2">
               <button type="button" onClick={onBackToLogin} className="inline-flex items-center gap-1 font-semibold text-[#A6E22E] border-b border-[#A6E22E] pb-0.5 text-sm hover:opacity-80">
-                <span>←</span> Back to Login
+                <span>←</span> {t("auth.backToLogin")}
               </button>
             </div>
           </div>

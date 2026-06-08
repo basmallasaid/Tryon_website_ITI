@@ -3,6 +3,7 @@ import FilterSidebar from '../../components/store/FilterSidebar';
 import ProductCard from '../../components/store/ProductCard';
 import { getAllProducts, getAllStores } from '../../api/userApi';
 import { SlidersHorizontal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const normalizeId = (id) => {
   if (!id) return null;
@@ -15,6 +16,7 @@ const normalizeId = (id) => {
 };
 
 const StoresPage = () => {
+  const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -153,11 +155,11 @@ const StoresPage = () => {
         <div className="flex-1 bg-[#FEFEFE] rounded-[2rem] p-5 md:p-8 lg:p-10">
           <div className="mb-10 md:mb-12">
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-2">
-              Stores
+              {t("stores.title")}
             </h1>
 
             <p className="text-gray-400 text-sm font-medium">
-              Curated collections from the world's most iconic brands.
+              {t("stores.subtitle")}
             </p>
           </div>
 
@@ -194,14 +196,14 @@ const StoresPage = () => {
               </div>
 
               <p className="text-gray-500 font-bold text-center">
-                No products match your criteria.
+                {t("stores.noProducts")}
               </p>
 
               <button
                 onClick={() => window.location.reload()}
                 className="mt-4 text-[#40B9FF] font-bold text-sm hover:underline"
               >
-                Clear all filters
+                {t("stores.clearFilters")}
               </button>
             </div>
           )}
