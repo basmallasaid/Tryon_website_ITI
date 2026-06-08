@@ -4,6 +4,7 @@
 // import heroImg from './assets/hero.png'
 // import './App.css'
 import { lazy, Suspense, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
@@ -74,6 +75,12 @@ function AppContent() {
 }
 
 function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.dir();
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
   return (
     <AuthProvider>
       {/* <Navbar />

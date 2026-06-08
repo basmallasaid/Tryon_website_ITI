@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import Button from '../../../components/Button';
 
 export default function HeroSection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
   const navigate = useNavigate();
 
   return (
@@ -69,13 +70,12 @@ export default function HeroSection() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="absolute top-0 left-0 w-0 h-0 border-t-[80px] border-r-[80px] border-t-black/70 border-r-transparent">
+                  <div className="absolute top-0 ltr:left-0 rtl:right-0 w-0 h-0 ltr:border-r-[80px] rtl:border-l-[80px] border-t-[80px] ltr:border-r-transparent rtl:border-l-transparent border-t-black/70">
                     <span
-                      className="absolute text-white text-[11px] font-bold uppercase tracking-widest"
+                      className="absolute text-white text-[11px] font-bold uppercase tracking-widest ltr:left-[10px] rtl:right-[10px]"
                       style={{
                         top: '-60px',
-                        left: '10px',
-                        transform: 'rotate(-45deg)',
+                        transform: `rotate(${isRtl ? '45deg' : '-45deg'})`,
                       }}
                     >
                       {t('aboutRecycle.before')}
@@ -92,13 +92,12 @@ export default function HeroSection() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="absolute top-0 right-0 w-0 h-0 border-t-[80px] border-l-[80px] border-t-[#8ed321] border-l-transparent">
+                  <div className="absolute top-0 ltr:right-0 rtl:left-0 w-0 h-0 ltr:border-l-[80px] rtl:border-r-[80px] border-t-[80px] ltr:border-l-transparent rtl:border-r-transparent border-t-[#8ed321]">
                     <span
-                      className="absolute text-white text-[11px] font-bold uppercase tracking-widest"
+                      className="absolute text-white text-[11px] font-bold uppercase tracking-widest ltr:right-[10px] rtl:left-[10px]"
                       style={{
                         top: '-60px',
-                        right: '10px',
-                        transform: 'rotate(45deg)',
+                        transform: `rotate(${isRtl ? '-45deg' : '45deg'})`,
                       }}
                     >
                       {t('aboutRecycle.after')}
