@@ -25,8 +25,8 @@ export default function HeroSection() {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                <button
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#40B9FF] via-[#69C9AC] to-[#AAE338] text-white font-semibold rounded-lg text-base hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                <Button
+                  variant="styling"
                   onClick={() => {
                     navigate('/recycle');
                   }}
@@ -36,7 +36,7 @@ export default function HeroSection() {
                 <div className="rounded-lg bg-gradient-to-r from-[#FF8A3D] via-[#40B9FF] to-[#8ED321] p-px">
                   <a
                     href="#how-it-works"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#F4F3F5] text-brand-secondary font-semibold rounded-lg text-base hover:shadow-lg active:scale-[0.98] transition-all duration-200 w-full"
+                    className="inline-flex items-center gap-2 px-8 py-4 bg-[#F4F3F5] text-brand-secondary font-semibold rounded-[8px] text-base hover:shadow-lg active:scale-[0.98] transition-all duration-200 w-full"
                   >
                     {t("aboutRecycle.seeHowItWorks")}
                   </a>
