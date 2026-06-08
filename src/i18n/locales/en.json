@@ -51,6 +51,33 @@
     "desc": "The Redolapy Virtual Try-On uses hyper-realistic rendering to show you exactly how clothes will look and drape on your body.",
     "tryNow": "Try now"
   },
+  "pricing": {
+    "title": "Simple Pricing",
+    "subtitle": "Choose the plan that fits your fashion journey.",
+    "perMonth": "/mo",
+    "essential": {
+      "name": "Essential",
+      "price": "$0",
+      "items": [
+        "AI Wardrobe Sync",
+        "Daily Lookbooks (3 outfits)",
+        "Basic Virtual Try-On"
+      ],
+      "button": "Get Started"
+    },
+    "popular": "POPULAR",
+    "pro": {
+      "name": "Pro Stylist",
+      "price": "$19",
+      "items": [
+        "Everything in Essential",
+        "Hyper-Realistic Try-On",
+        "Unlimited Lookbooks",
+        "Personal Style Coaching"
+      ],
+      "button": "Start free trial"
+    }
+  },
   "footer": {
     "brand": "Redolapy",
     "tagline": "Elevating digital ateliers through artificial intelligence and human creativity.",

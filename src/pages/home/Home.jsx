@@ -3,6 +3,7 @@ import Intro from "./components/Intro";
 import Features from "./components/Features";
 import Sustainability from "./components/Sustainability";
 import Mirror from "./components/Mirror";
+import Pricing from "./components/Pricing";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <Features />
       <Sustainability />
       <Mirror />
+      <Pricing />
     </>
   );
 }
