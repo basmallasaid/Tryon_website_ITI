@@ -2,16 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import FilterSidebar from '../../components/store/FilterSidebar';
 import ProductCard from '../../components/store/ProductCard';
 import { getAllProducts, getAllStores } from '../../api/userApi';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, Search, ChevronDown, LayoutGrid, List as ListIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const normalizeId = (id) => {
   if (!id) return null;
-
   if (typeof id === 'object') {
     return String(id.$oid || id._id || '');
   }
-
   return String(id);
 };
 
@@ -20,6 +18,8 @@ const StoresPage = () => {
   const [products, setProducts] = useState([]);
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState('grid');
 
   const [options, setOptions] = useState({
     categories: [],
@@ -43,103 +43,68 @@ const StoresPage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-
         const [prodRes, storeRes] = await Promise.all([
           getAllProducts(),
           getAllStores(),
         ]);
-
         const prodData = prodRes?.data ?? [];
         const storeData = storeRes?.data ?? [];
-
         setProducts(prodData);
         setStores(storeData);
 
-        const categories = [
-          ...new Set(prodData.map((p) => p.category).filter(Boolean)),
-        ];
+        const categories = [...new Set(
+          prodData.map((p) => p.category?.trim().toUpperCase()).filter(Boolean)
+        )];
 
-        const brands = storeData.map((s) => ({
-          id: normalizeId(s._id || s.id),
-          name: s.name,
+        const brands = storeData.map((s) => ({ 
+          id: normalizeId(s._id || s.id), 
+          name: s.name?.trim().toUpperCase() 
         }));
 
-        const colors = [
-          ...new Set(prodData.flatMap((p) => p.color_tags || [])),
-        ];
+        const colors = [...new Set(
+          prodData.flatMap((p) => p.color_tags || [])
+                 .map(c => c?.trim().toUpperCase())
+                 .filter(Boolean)
+        )];
 
-        const seasons = [
-          ...new Set(prodData.flatMap((p) => p.season_tags || [])),
-        ];
+        const seasons = [...new Set(
+          prodData.flatMap((p) => p.season_tags || [])
+                 .map(s => s?.trim().toUpperCase())
+                 .filter(Boolean)
+        )];
 
-        const prices = prodData
-          .map((p) => Number(p.price))
-          .filter((n) => !isNaN(n));
-
+        const prices = prodData.map((p) => Number(p.price)).filter((n) => !isNaN(n));
         const maxP = prices.length ? Math.max(...prices) : 2000;
 
-        setOptions({
-          categories,
-          brands,
-          colors,
-          seasons,
-        });
-
+        setOptions({ categories, brands, colors, seasons });
         setMaxPriceLimit(maxP);
-
-        setFilters((prev) => ({
-          ...prev,
-          maxPrice: maxP,
-        }));
+        setFilters((prev) => ({ ...prev, maxPrice: maxP }));
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const productStoreId = normalizeId(product.store_id);
-
-      const brandMatch =
-        filters.selectedBrands.length === 0 ||
-        filters.selectedBrands.includes(productStoreId);
-
-      const categoryMatch =
-        filters.selectedCategories.length === 0 ||
-        filters.selectedCategories.includes(product.category);
-
-      const seasonMatch =
-        filters.selectedSeasons.length === 0 ||
-        (product.season_tags || []).some((season) =>
-          filters.selectedSeasons.includes(season)
-        );
-
+      const nameMatch = product.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      const brandMatch = filters.selectedBrands.length === 0 || filters.selectedBrands.includes(productStoreId);
+      const categoryMatch = filters.selectedCategories.length === 0 || 
+                           filters.selectedCategories.includes(product.category?.toUpperCase());
+      const seasonMatch = filters.selectedSeasons.length === 0 || 
+                         (product.season_tags || []).some((s) => filters.selectedSeasons.includes(s.toUpperCase()));
+      const colorMatch = filters.selectedColors.length === 0 || 
+                        (product.color_tags || []).some((c) => filters.selectedColors.includes(c.toUpperCase()));
       const priceMatch = Number(product.price) <= filters.maxPrice;
+      const tryOnMatch = !filters.tryOnOnly || product.try_on_enabled === true;
 
-      const colorMatch =
-        filters.selectedColors.length === 0 ||
-        (product.color_tags || []).some((color) =>
-          filters.selectedColors.includes(color)
-        );
-
-      const tryOnMatch =
-        !filters.tryOnOnly || product.try_on_enabled === true;
-
-      return (
-        brandMatch &&
-        categoryMatch &&
-        seasonMatch &&
-        priceMatch &&
-        colorMatch &&
-        tryOnMatch
-      );
+      return nameMatch && brandMatch && categoryMatch && seasonMatch && priceMatch && colorMatch && tryOnMatch;
     });
-  }, [products, filters]);
+  }, [products, filters, searchQuery]);
 
   return (
     <div className="min-h-screen bg-[#F4F3F5] px-4 sm:px-6 lg:px-10 py-6 font-roboto mt-5">
@@ -152,59 +117,83 @@ const StoresPage = () => {
           products={products}
         />
 
-        <div className="flex-1 bg-[#FEFEFE] rounded-[2rem] p-5 md:p-8 lg:p-10">
-          <div className="mb-10 md:mb-12">
-            <h1 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-2">
-              {t("stores.title")}
-            </h1>
-
-            <p className="text-gray-400 text-sm font-medium">
-              {t("stores.subtitle")}
+        <div className="flex-1 p-2 md:p-4">
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-black text-[#101828] tracking-tight mb-3">Brands</h1>
+            <p className="text-gray-500 text-[15px] font-bold mb-6">
+              you can get Discount on all your Favorite Brands Now, when you{" "}
+              <span className="bg-gradient-to-r from-[#8ED321] to-[#40B9FF] bg-clip-text text-transparent font-bold cursor-pointer hover:underline">install the application!</span>
             </p>
+
+            <div className="relative mb-6">
+              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 bg-white border-transparent rounded-[1.2rem] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#40B9FF]/20 transition-all text-gray-600 font-medium"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between bg-white px-6 py-4 rounded-[1.5rem] shadow-sm border border-gray-50 gap-4">
+              <p className="text-sm font-medium text-gray-500">
+                Showing <span className="text-gray-900 font-bold">1-{filteredProducts.length}</span> of {products.length} products
+              </p>
+              
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 cursor-pointer group">
+                  <span className="text-xs text-gray-400 font-medium tracking-tight">Sort by:</span>
+                  <span className="text-sm font-bold text-gray-900 group-hover:text-[#40B9FF] transition-colors">Newest</span>
+                  <ChevronDown size={16} className="text-gray-400" />
+                </div>
+                
+                <div className="flex items-center gap-1 bg-[#F4F3F5] p-1.5 rounded-2xl">
+                  <button 
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 rounded-xl transition-all duration-300 ${viewMode === 'grid' ? 'bg-white text-[#40B9FF] shadow-sm border border-gray-50' : 'text-gray-300'}`}
+                  >
+                    <LayoutGrid size={18} />
+                  </button>
+                  <button 
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-xl transition-all duration-300 ${viewMode === 'list' ? 'bg-white text-[#40B9FF] shadow-sm border border-gray-50' : 'text-gray-300'}`}
+                  >
+                    <ListIcon size={18} />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                <div key={i} className="flex flex-col gap-4">
-                  <div className="aspect-[3/4] bg-gray-100 rounded-[1.5rem] animate-pulse" />
-                  <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
-                  <div className="h-4 w-1/4 bg-gray-100 rounded animate-pulse" />
+            <div className={`grid gap-6 lg:gap-8 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 2xl:grid-cols-3' : 'grid-cols-1'}`}>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className={`flex gap-4 ${viewMode === 'grid' ? 'flex-col' : 'flex-row'}`}>
+                  <div className={`${viewMode === 'grid' ? 'aspect-[3/4]' : 'w-1/3 h-48'} bg-gray-100 rounded-[1.5rem] animate-pulse`} />
+                  <div className="flex-1 space-y-3">
+                    <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
+                    <div className="h-4 w-1/4 bg-gray-100 rounded animate-pulse" />
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 lg:gap-8">
+            <div className={`grid gap-8 transition-all duration-500 ${
+              viewMode === 'grid' 
+                ? 'grid-cols-1 md:grid-cols-2 2xl:grid-cols-3' 
+                : 'grid-cols-1'
+            }`}>
               {filteredProducts.map((product, idx) => (
                 <ProductCard
                   key={normalizeId(product._id) || idx}
                   product={product}
-                  store={stores.find(
-                    (s) =>
-                      normalizeId(s._id || s.id) ===
-                      normalizeId(product.store_id)
-                  )}
+                  viewMode={viewMode}
+                  store={stores.find((s) => normalizeId(s._id || s.id) === normalizeId(product.store_id))}
                 />
               ))}
-            </div>
-          )}
-
-          {!loading && filteredProducts.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 md:py-32 bg-white rounded-[2rem] border border-dashed border-gray-200">
-              <div className="p-5 bg-gray-50 rounded-full mb-4">
-                <SlidersHorizontal size={30} className="text-gray-300" />
-              </div>
-
-              <p className="text-gray-500 font-bold text-center">
-                {t("stores.noProducts")}
-              </p>
-
-              <button
-                onClick={() => window.location.reload()}
-                className="mt-4 text-[#40B9FF] font-bold text-sm hover:underline"
-              >
-                {t("stores.clearFilters")}
-              </button>
             </div>
           )}
         </div>

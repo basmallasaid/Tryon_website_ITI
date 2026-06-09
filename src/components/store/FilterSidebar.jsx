@@ -1,21 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, SlidersHorizontal, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-const FilterSection = ({ title, children }) => (
-  <div className="group border-b border-gray-100/60 py-6 last:border-none">
-    <div className="flex items-center justify-between mb-4 cursor-pointer group-hover:opacity-80 transition-opacity">
-      <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-[0.15em]">
-        {title}
-      </h3>
-      <ChevronDown
-        size={14}
-        className="text-gray-300 group-hover:text-gray-600 transition-colors"
-      />
+const FilterSection = ({ title, children }) => {
+  const [isOpen, setIsOpen] = useState(true); 
+
+  return (
+    <div className="group border-b border-gray-100/60 py-6 last:border-none">
+      <div 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between mb-2 cursor-pointer group-hover:opacity-80 transition-opacity"
+      >
+        <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-[0.15em]">
+          {title}
+        </h3>
+        <ChevronDown
+          size={14}
+          className={`text-gray-300 transition-transform duration-300 ${
+            isOpen ? "rotate-0" : "-rotate-90"
+          }`}
+        />
+      </div>
+
+     
+      <div 
+        className={`grid transition-all duration-300 ease-in-out ${
+          isOpen 
+            ? "grid-rows-[1fr] opacity-100 mt-4" 
+            : "grid-rows-[0fr] opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="overflow-hidden">
+          {children}
+        </div>
+      </div>
     </div>
-    {children}
-  </div>
-);
+  );
+};
 
 const FilterSidebar = ({
   options,
@@ -25,6 +46,7 @@ const FilterSidebar = ({
   products,
 }) => {
   const { t } = useTranslation();
+  
   const toggleArrayFilter = (field, value) => {
     setFilters((prev) => ({
       ...prev,
@@ -80,7 +102,7 @@ const FilterSidebar = ({
                 />
               </div>
 
-              <span className="text-[13px] font-bold text-gray-500 group-hover/label:text-gray-900 capitalize transition-colors">
+              <span className="text-[13px] font-bold text-gray-500 group-hover:label:text-gray-900 capitalize transition-colors">
                 {cat}
               </span>
             </label>
@@ -90,7 +112,7 @@ const FilterSidebar = ({
 
       {/* Brands */}
       <FilterSection title={t("stores.brands")}>
-        <div className="space-y-3.5 max-h-48 overflow-y-auto pr-2">
+        <div className="space-y-3.5 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
           {options.brands.map((b) => (
             <label
               key={b.id}
@@ -110,7 +132,7 @@ const FilterSidebar = ({
                 />
               </div>
 
-              <span className="text-[13px] font-bold text-gray-500 group-hover/label:text-gray-900 transition-colors">
+              <span className="text-[13px] font-bold text-gray-500 group-hover:label:text-gray-900 transition-colors">
                 {b.name}
               </span>
             </label>
