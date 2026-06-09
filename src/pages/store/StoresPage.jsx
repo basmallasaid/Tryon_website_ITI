@@ -119,7 +119,7 @@ const StoresPage = () => {
 
         <div className="flex-1 p-2 md:p-4">
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-black text-[#101828] tracking-tight mb-3">Brands</h1>
+            <h1 className="text-3xl md:text-4xl font-black text-[#101828] tracking-tight mb-3">Stores</h1>
             <p className="text-gray-500 text-[15px] font-bold mb-6">
               you can get Discount on all your Favorite Brands Now, when you{" "}
               <span className="bg-gradient-to-r from-[#8ED321] to-[#40B9FF] bg-clip-text text-transparent font-bold cursor-pointer hover:underline">install the application!</span>
