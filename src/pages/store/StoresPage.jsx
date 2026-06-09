@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import FilterSidebar from '../../components/store/FilterSidebar';
 import ProductCard from '../../components/store/ProductCard';
 import { getAllProducts, getAllStores } from '../../api/userApi';
 import { SlidersHorizontal, Search, ChevronDown, LayoutGrid, List as ListIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { translateProducts } from '../../utils/translate';
 
 const normalizeId = (id) => {
   if (!id) return null;
@@ -14,12 +15,16 @@ const normalizeId = (id) => {
 };
 
 const StoresPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   const [products, setProducts] = useState([]);
+  const [translatedProducts, setTranslatedProducts] = useState([]);
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [translating, setTranslating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('grid');
+  const translationCache = useRef({});
 
   const [options, setOptions] = useState({
     categories: [],
@@ -88,8 +93,39 @@ const StoresPage = () => {
     fetchData();
   }, []);
 
+  const handleTranslate = useCallback(async () => {
+    if (products.length === 0) return;
+
+    const cacheKey = products.map(p => p._id).join(',');
+    if (translationCache.current[cacheKey]) {
+      setTranslatedProducts(translationCache.current[cacheKey]);
+      return;
+    }
+
+    try {
+      setTranslating(true);
+      const translated = await translateProducts(products);
+      translationCache.current[cacheKey] = translated;
+      setTranslatedProducts(translated);
+    } catch (error) {
+      console.error('Translation error:', error);
+    } finally {
+      setTranslating(false);
+    }
+  }, [products]);
+
+  useEffect(() => {
+    if (isArabic && products.length > 0 && translatedProducts.length === 0) {
+      handleTranslate();
+    }
+  }, [isArabic, products, translatedProducts.length, handleTranslate]);
+
+  const displayProducts = isArabic && translatedProducts.length > 0
+    ? translatedProducts
+    : products;
+
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return displayProducts.filter((product) => {
       const productStoreId = normalizeId(product.store_id);
       const nameMatch = product.name?.toLowerCase().includes(searchQuery.toLowerCase());
       const brandMatch = filters.selectedBrands.length === 0 || filters.selectedBrands.includes(productStoreId);
@@ -104,7 +140,9 @@ const StoresPage = () => {
 
       return nameMatch && brandMatch && categoryMatch && seasonMatch && priceMatch && colorMatch && tryOnMatch;
     });
-  }, [products, filters, searchQuery]);
+  }, [displayProducts, filters, searchQuery]);
+
+  const showProducts = loading || translating;
 
   return (
     <div className="min-h-screen bg-[#F4F3F5] px-4 sm:px-6 lg:px-10 py-6 font-roboto mt-5">
@@ -140,7 +178,8 @@ const StoresPage = () => {
 
             <div className="flex flex-wrap items-center justify-between bg-white px-6 py-4 rounded-[1.5rem] shadow-sm border border-gray-50 gap-4">
               <p className="text-sm font-medium text-gray-500">
-                Showing <span className="text-gray-900 font-bold">1-{filteredProducts.length}</span> of {products.length} products
+                Showing <span className="text-gray-900 font-bold">1-{filteredProducts.length}</span> of {displayProducts.length} products
+                {translating && <span className="ml-2 text-[#40B9FF]">Translating...</span>}
               </p>
               
               <div className="flex items-center gap-6">
@@ -168,7 +207,7 @@ const StoresPage = () => {
             </div>
           </div>
 
-          {loading ? (
+          {showProducts ? (
             <div className={`grid gap-6 lg:gap-8 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 2xl:grid-cols-3' : 'grid-cols-1'}`}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className={`flex gap-4 ${viewMode === 'grid' ? 'flex-col' : 'flex-row'}`}>

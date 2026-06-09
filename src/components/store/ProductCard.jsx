@@ -1,7 +1,14 @@
 import React from 'react';
 import { Heart, Sparkles, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const ProductCard = ({ product, store, viewMode }) => {
+  const { i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
+  
+  const displayName = isArabic && product.name_ar ? product.name_ar : product.name;
+  const displayDescription = isArabic && product.description_ar ? product.description_ar : product.description;
+  
   const imageUrl = product.images?.[0] || 'https://via.placeholder.com/400x600?text=No+Image';
   const logoUrl = store?.logo_url;
   const brandName = store?.name || 'Brand';
@@ -9,12 +16,12 @@ const ProductCard = ({ product, store, viewMode }) => {
   const isList = viewMode === 'list';
 
   return (
-    <div className={`group relative flex bg-white rounded-[1.5rem] border border-gray-100/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden ${
+    <div className={`group relative flex bg-white rounded-[1.5rem] border border-gray-100/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden ${isArabic ? 'rtl' : 'ltr'} ${
       isList ? 'flex-row h-56 md:h-60 w-full' : 'flex-col h-full'
     }`}>
       
       {/* View Badge - Pill Style */}
-      <div className="absolute top-3 left-3 z-10">
+      <div className={`absolute top-3 z-10 ${isArabic ? 'right-3' : 'left-3'}`}>
         {product.purchase_url && (
           <a
             href={product.purchase_url}
@@ -22,14 +29,14 @@ const ProductCard = ({ product, store, viewMode }) => {
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 bg-white/90 backdrop-blur-md text-gray-700 text-[9px] font-bold px-2.5 py-1.5 rounded-full shadow-sm hover:bg-[#40B9FF] hover:text-white transition-all duration-300 group/view"
           >
-            <span>VIEW</span>
+            <span>{isArabic ? 'عرض' : 'VIEW'}</span>
             <ExternalLink size={9} className="group-hover/view:translate-x-0.5 transition-transform" />
           </a>
         )}
       </div>
 
       {/* Wishlist Button */}
-      <button className="absolute top-3 right-3 z-10 p-2 bg-white/80 backdrop-blur-md rounded-full text-gray-400 hover:text-rose-500 transition-all duration-300 shadow-sm">
+      <button className={`absolute top-3 z-10 p-2 bg-white/80 backdrop-blur-md rounded-full text-gray-400 hover:text-rose-500 transition-all duration-300 shadow-sm ${isArabic ? 'left-3' : 'right-3'}`}>
         <Heart size={16} />
       </button>
 
@@ -39,7 +46,7 @@ const ProductCard = ({ product, store, viewMode }) => {
       }`}>
         <img
           src={imageUrl}
-          alt={product.name}
+          alt={displayName}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -51,7 +58,7 @@ const ProductCard = ({ product, store, viewMode }) => {
         <div className="flex flex-col gap-1">
           {/* Product Name - Smaller Font */}
           <h3 className="text-[14px] md:text-base font-bold text-gray-900 truncate tracking-tight group-hover:text-[#40B9FF] transition-colors">
-            {product.name}
+            {displayName}
           </h3>
 
           {/* Brand Logo - Slimmer Height */}
@@ -67,9 +74,9 @@ const ProductCard = ({ product, store, viewMode }) => {
             )}
           </div>
 
-          {isList && product.description && (
+          {isList && displayDescription && (
             <p className="text-gray-400 text-[13px] line-clamp-2 max-w-lg mt-2 leading-relaxed hidden md:block">
-              {product.description}
+              {displayDescription}
             </p>
           )}
         </div>
@@ -94,7 +101,7 @@ const ProductCard = ({ product, store, viewMode }) => {
               className="flex items-center gap-2 bg-[#40B9FF]/10 text-[#40B9FF] px-4 py-2 rounded-xl text-[11px] font-black hover:bg-[#40B9FF] hover:text-white transition-all duration-300 group/tryon shadow-sm shadow-[#40B9FF]/5"
             >
               <Sparkles size={13} className="group-hover/tryon:rotate-12 transition-transform" />
-              TRY-ON
+              {isArabic ? 'تجربة' : 'TRY-ON'}
             </a>
           </div>
         </div>
