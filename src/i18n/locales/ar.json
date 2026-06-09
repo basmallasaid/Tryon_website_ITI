@@ -8,7 +8,8 @@
     "about": "عن المنصة",
     "login": "تسجيل الدخول",
     "signup": "إنشاء حساب",
-    "language": "اللغة"
+    "language": "اللغة",
+    "logout":"تسجيل الخروج"
   },
   "hero": {
     "yourPersonal": " stylist الخاص بك",

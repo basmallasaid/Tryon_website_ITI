@@ -59,7 +59,17 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             login({ id: res.data._id, email: res.data.email, token: res.data.token });
             const userRes = await getUserApi(res.data._id);
             console.log("User profile data", { user: userRes.data, timestamp: new Date().toISOString() });
-            login({ id: res.data._id, email: res.data.email, token: res.data.token, ...userRes.data });
+            const apiUser = userRes.data?.user || userRes.data;
+            const fullName = apiUser?.profile
+              ? [apiUser.profile.first_name, apiUser.profile.last_name].filter(Boolean).join(" ").trim()
+              : apiUser?.name;
+            login({
+                id: res.data._id,
+                email: res.data.email,
+                token: res.data.token,
+                ...apiUser,
+                name: fullName,
+            });
             onClose?.();
         } catch (error) {
             alert(error.response?.data?.message || t("auth.loginFailed"));
@@ -92,7 +102,17 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             await sendVerificationApi();
             const userRes = await getUserApi(userId);
             console.log("User profile data after signup", { user: userRes.data, timestamp: new Date().toISOString() });
-            login({ id: userId, email: formData.email, token, ...userRes.data });
+            const apiUser = userRes.data?.user || userRes.data;
+            const fullName = apiUser?.profile
+              ? [apiUser.profile.first_name, apiUser.profile.last_name].filter(Boolean).join(" ").trim()
+              : apiUser?.name;
+            login({
+                id: userId,
+                email: formData.email,
+                token,
+                ...apiUser,
+                name: fullName,
+            });
             onClose?.();
         } catch (error) {
             alert(error.response?.data?.message || t("auth.registrationFailed"));

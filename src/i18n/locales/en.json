@@ -8,7 +8,8 @@
     "about": "About",
     "login": "Login",
     "signup": "Sign-up",
-    "language": "Language"
+    "language": "Language",
+    "logout":"Logout"
   },
   "hero": {
     "yourPersonal": "Your Personal",
