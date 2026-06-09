@@ -78,6 +78,15 @@
       "button": "Start free trial"
     }
   },
+  "questions": {
+    "title": "Styling Questions?",
+    "q0": "How does the AI know my size?",
+    "a0": "Our AI uses precise body mapping technology that analyzes your uploaded photos to calculate your unique body measurements. It then cross-references these with brand-specific size charts to recommend the perfect fit every time. The more you use the virtual try-on, the more accurate the predictions become.",
+    "q1": "Can I use Redolapy with my current clothes?",
+    "a1": "Absolutely! You can upload photos of your existing wardrobe and our AI will analyze each piece — from color palettes to fabric textures. It can suggest fresh outfit combinations, identify styling gaps, and even recommend upcycling ideas for items you no longer wear. Your current clothes are the perfect starting point.",
+    "q2": "What kind of outfit recommendations can I get?",
+    "a2": "Our AI generates personalized daily lookbooks based on your style profile, wardrobe inventory, and even upcoming weather or events. From casual streetwear to formal occasions, the recommendations evolve with your taste — the more you interact, the smarter they get."
+  },
   "footer": {
     "brand": "Redolapy",
     "tagline": "Elevating digital ateliers through artificial intelligence and human creativity.",
