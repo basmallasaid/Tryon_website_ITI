@@ -21,6 +21,7 @@ import Navbar from './components/Navbar';
 import Recycle from './pages/recycle/Recycle';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 import AboutTryon from './pages/aboutTryOn/AboutTryon';
+import PricingPage from './pages/pricing/PricingPage';
 
 import { CircularProgress, Box } from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router';
@@ -52,6 +53,7 @@ function AppContent() {
         { index: true, element: <Home /> },
         { path: 'tryOn', element: <TryOn /> },
         { path: 'about-tryon', element: <AboutTryon /> },
+        { path: 'pricing', element: <PricingPage /> },
         { path: 'auth/callback', element: <GoogleCallback /> },
         { path: 'stores', element: <StoresPage /> },
         { path: 'recycle', element: <Recycle /> },
