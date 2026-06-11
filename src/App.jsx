@@ -30,6 +30,7 @@ import AdminLayout from './pages/AdminLayout';
 import Dashboard from './pages/admin/Dashboard';
 import Products from './pages/admin/Products';
 import EditProfilePage from './pages/profile/EditProfilePage';
+import ContactUs from './pages/contactUs/ContactUs';
 
 const LoadingFallback = () => (
   <Box
@@ -59,6 +60,7 @@ function AppContent() {
         { path: 'stores', element: <StoresPage /> },
         { path: 'recycle', element: <Recycle /> },
         { path: 'about-recycle', element: <AboutRecycle /> },
+        { path: 'contact-us', element: <ContactUs /> },
         {path:'editprofile',element:<EditProfilePage/>},
       ],
     },

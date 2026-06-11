@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Globe,
   ChevronDown,
@@ -20,6 +20,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import ProfilePopup from "../pages/profile/ProfilePopup";
+import NotificationWindow from "./NotificationWindow";
+import { getNotifications } from "../api/notificationApi";
 
 const Navbar = ({ onOpenAuth }) => {
   const { t, i18n } = useTranslation();
@@ -29,7 +31,8 @@ const Navbar = ({ onOpenAuth }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false); 
   const [isProfileOpen, setIsProfileOpen] = useState(false); 
-  const [isNotifEnabled, setIsNotifEnabled] = useState(true); 
+  const [isNotifOpen, setIsNotifOpen] = useState(false); 
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const isArabic = i18n.language === "ar";
 
@@ -63,7 +66,23 @@ const Navbar = ({ onOpenAuth }) => {
     { name: t("nav.stores"), path: "/stores" },
     { name: t("nav.pricing"), path: "/pricing" },
     { name: t("nav.about") },
+    { name: t("nav.contactUs"), path: "/contact-us" },
   ];
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchUnread = async () => {
+      try {
+        const data = await getNotifications();
+        setUnreadCount(data.unreadCount);
+      } catch (err) {
+        // silent
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <nav
@@ -108,10 +127,30 @@ const Navbar = ({ onOpenAuth }) => {
         {/* Utilities Center */}
         <div className="flex items-center bg-gray-100/50 p-1 rounded-xl gap-1">
           {user && (
-            <button className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-brand-secondary relative cursor-pointer">
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-            </button>
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsNotifOpen(!isNotifOpen);
+                  setIsProfileOpen(false);
+                }}
+                className="p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all text-gray-500 hover:text-brand-secondary relative cursor-pointer"
+              >
+                <Bell size={20} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-rose-500 text-white text-[10px] font-bold rounded-full border-2 border-white px-1">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+              {isNotifOpen && (
+                <NotificationWindow
+                  isArabic={isArabic}
+                  onClose={() => setIsNotifOpen(false)}
+                  onUnreadChange={setUnreadCount}
+                />
+              )}
+            </div>
           )}
 
           <button
@@ -158,7 +197,10 @@ const Navbar = ({ onOpenAuth }) => {
           {user ? (
             <div className="relative">
               <div 
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  setIsNotifOpen(false);
+                }}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-all border border-gray-100 cursor-pointer select-none"
               >
                 <div className="w-7 h-7 rounded-full bg-brand-secondary/10 flex items-center justify-center">
@@ -205,7 +247,32 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* Mobile Menu Button */}
       <div className="min-[1100px]:hidden flex items-center gap-3">
-        {user && <button className="p-2 text-gray-500 cursor-pointer"><Bell size={22} /></button>}
+        {user && (
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsNotifOpen(!isNotifOpen);
+                setIsMobileOpen(false);
+              }}
+              className="p-2 text-gray-500 cursor-pointer relative"
+            >
+              <Bell size={22} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-rose-500 text-white text-[10px] font-bold rounded-full border-2 border-white px-1">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </button>
+            {isNotifOpen && (
+              <NotificationWindow
+                isArabic={isArabic}
+                onClose={() => setIsNotifOpen(false)}
+                onUnreadChange={setUnreadCount}
+              />
+            )}
+          </div>
+        )}
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           className="p-2 rounded-lg bg-gray-100 text-gray-700 transition-all active:scale-90 cursor-pointer"
