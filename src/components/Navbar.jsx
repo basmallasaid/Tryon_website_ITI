@@ -318,7 +318,7 @@ const Navbar = ({ onOpenAuth }) => {
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer">
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />} {isDarkMode ? "Light" : "Dark"}
             </button>
-            <button onClick={() => setIsLangOpen(!isLangOpen)} className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer">
+            <button onClick={() => changeLanguage(isArabic ? "en" : "ar")} className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer">
               <Globe size={18} /> {isArabic ? "العربية" : "EN"}
             </button>
           </div>

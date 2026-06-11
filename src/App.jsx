@@ -22,6 +22,7 @@ import Recycle from './pages/recycle/Recycle';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 import AboutTryon from './pages/aboutTryOn/AboutTryon';
 import PricingPage from './pages/pricing/PricingPage';
+import AvatarGeneration from './pages/avatar/AvatarGeneration';
 
 import { CircularProgress, Box } from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router';
@@ -58,6 +59,7 @@ function AppContent() {
         { path: 'pricing', element: <PricingPage /> },
         { path: 'auth/callback', element: <GoogleCallback /> },
         { path: 'stores', element: <StoresPage /> },
+        { path: 'avatar', element: <AvatarGeneration /> },
         { path: 'recycle', element: <Recycle /> },
         { path: 'about-recycle', element: <AboutRecycle /> },
         { path: 'contact-us', element: <ContactUs /> },
