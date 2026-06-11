@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Footer from "../components/Footer";
 import AuthModal from "../components/AuthModal";
 
 export default function Layout() {
+  const location = useLocation();
   const [authModal, setAuthModal] = useState({ isOpen: false, mode: "login" });
+
+  useEffect(() => {
+    if (location.state?.openAuth) {
+      setAuthModal({ isOpen: true, mode: location.state.openAuth });
+      window.history.replaceState({}, "");
+    }
+  }, [location.state]);
 
   const openAuth = (mode) => setAuthModal({ isOpen: true, mode });
   const closeAuth = () => setAuthModal({ isOpen: false, mode: "login" });

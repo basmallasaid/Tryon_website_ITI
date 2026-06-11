@@ -1,7 +1,7 @@
-@import "tailwindcss";
-@import "@fontsource/roboto/400.css";
-@import "@fontsource/roboto/600.css";
-@import "@fontsource/plus-jakarta-sans/700.css";
+@import 'tailwindcss';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
 
 :root {
   --primary-bgc: #f5f6f7;
@@ -28,7 +28,7 @@
 }
 
 @theme {
-  --font-roboto: "Roboto", sans-serif;
+  --font-roboto: 'Roboto', sans-serif;
   --color-text-primary: #121826;
   --color-text-secondary: #1e1e24;
   --color-text-disabled: #6b7280;
@@ -47,7 +47,8 @@
   --color-border-strong: #d5d9de;
   --color-placeholder: #a0a6b2;
   --color-checkbox-border: #bec8d2;
-  --color-primary-hover:#89d4ff;
+  --color-primary-hover: #89d4ff;
+  --color-accent-pink: #ff6b8a;
 }
 
 *,
@@ -57,7 +58,7 @@
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f4f3f5;
