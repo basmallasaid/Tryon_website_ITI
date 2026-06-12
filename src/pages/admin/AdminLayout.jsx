@@ -4,7 +4,7 @@ import AdminTopBar from './components/AdminTopBar';
 import AdminMobileHeader from './components/AdminMobileHeader';
 import AdminBottomNav from './components/AdminBottomNav';
 
-export default function AdminLayout({ activePage, setActivePage, children }) {
+export default function AdminLayout({ activePage, setActivePage, topBarActions, children }) {
   return (
     <div className="font-geist bg-admin-page min-h-screen">
       <AdminSidebar className="hidden lg:flex" activePage={activePage} setActivePage={setActivePage} />
@@ -12,7 +12,7 @@ export default function AdminLayout({ activePage, setActivePage, children }) {
       <AdminMobileHeader className="lg:hidden" />
 
       <main className="lg:ml-[280px]">
-        <AdminTopBar className="hidden lg:flex sticky top-0 z-10 bg-white h-[110px]" />
+        <AdminTopBar className="hidden lg:flex sticky top-0 z-10 bg-white h-[110px]" actions={topBarActions} />
 
         <div className="pb-[72px] lg:pb-0 lg:p-8 mt-[186px] lg:mt-0">
           {children}
