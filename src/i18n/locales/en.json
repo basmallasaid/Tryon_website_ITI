@@ -79,8 +79,10 @@
     "terms": "By subscribing, you agree to Redolapy's Terms of Service and Privacy Policy."
   },
   "pricing": {
-    "title": "Simple Pricing",
-    "subtitle": "Choose the plan that fits your fashion journey.",
+    "title": "Subscription Plans",
+    "subtitle": "Pick your favourite plan to get started",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
     "perMonth": "/mo",
     "essential": {
       "name": "Essential",
@@ -103,12 +105,30 @@
         "Personal Style Coaching"
       ],
       "button": "Start free trial"
-    }
+    },
+    "currentPlan": "Your current plan",
+    "proPricing": {
+      "monthlyLabel": "Monthly Subscription",
+      "monthlyPrice": "$19.99",
+      "yearlyLabel": "Yearly Subscription",
+      "yearlyPrice": "$15.99",
+      "earlyBird": "Early Bird Discount",
+      "monthlyDiscount": "-$5.00",
+      "yearlyDiscount": "-$5.00",
+      "yearlyTax": "$1.20",
+      "tax": "Estimated Tax",
+      "taxAmount": "$1.20",
+      "dueToday": "Due today",
+      "monthlyTotal": "$16.19",
+      "yearlyTotal": "$12.19"
+    },
+    "subscribeNow": "Subscribe to pro",
+    "terms": "By subscribing, you agree to Redolapy's Terms of Service and Privacy Policy."
   },
   "questions": {
     "title": "Styling Questions?",
-    "q0": "How does the AI know my size?",
-    "a0": "Our AI uses precise body mapping technology that analyzes your uploaded photos to calculate your unique body measurements. It then cross-references these with brand-specific size charts to recommend the perfect fit every time. The more you use the virtual try-on, the more accurate the predictions become.",
+    "q0": "How does the virtual try-on actually work?",
+    "a0": "It's simple! Upload a full-body photo of yourself, then choose any garment from our collection or upload your own. Our AI maps the clothing onto your body with realistic draping, lighting, and fabric simulation — so you can see exactly how it fits before you buy or wear it.",
     "q1": "Can I use Redolapy with my current clothes?",
     "a1": "Absolutely! You can upload photos of your existing wardrobe and our AI will analyze each piece — from color palettes to fabric textures. It can suggest fresh outfit combinations, identify styling gaps, and even recommend upcycling ideas for items you no longer wear. Your current clothes are the perfect starting point.",
     "q2": "What kind of outfit recommendations can I get?",
