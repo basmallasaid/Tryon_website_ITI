@@ -20,6 +20,7 @@ import TryOn from './pages/tryOn/TryOn';
 import StoresPage from './pages/store/StoresPage';
 import Navbar from './components/Navbar';
 import Recycle from './pages/recycle/Recycle';
+import Matching from './pages/matching/Matching';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 import AboutTryon from './pages/aboutTryOn/AboutTryon';
 import PricingPage from './pages/pricing/PricingPage';
@@ -62,6 +63,7 @@ function AppContent() {
         { path: 'auth/callback', element: <GoogleCallback /> },
         { path: 'stores', element: <StoresPage /> },
         { path: 'avatar', element: <AvatarGeneration /> },
+        { path: 'matching', element: <Matching /> },
         { path: 'recycle', element: <Recycle /> },
         { path: 'about-recycle', element: <AboutRecycle /> },
         { path: 'contact-us', element: <ContactUs /> },

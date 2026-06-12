@@ -4,7 +4,7 @@ export default function ModelSelectionCard({ children, selected, onClick, badge,
   return (
     <div
       onClick={onClick}
-      className={`relative p-6 rounded-2xl cursor-pointer flex items-center justify-between transition-all outline-none ${
+      className={`relative p-6 rounded-2xl cursor-pointer flex items-center justify-between transition-all outline-none w-full h-full ${
         selected
           ? "bg-[#E6F6FFCC] border-2 border-[#4FC3FF]"
           : "bg-white border border-gray-100 shadow-sm"
@@ -21,7 +21,7 @@ export default function ModelSelectionCard({ children, selected, onClick, badge,
       <div className="flex items-center gap-3 shrink-0 ml-4 mr-6">
         {media && (
           typeof media === "string"
-            ? <img src={media} alt="" className="w-24 h-24" />
+            ? <img src={media} alt="" className="w-32 h-32" />
             : media
         )}
       </div>

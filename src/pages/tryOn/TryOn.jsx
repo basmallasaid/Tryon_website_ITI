@@ -269,58 +269,90 @@ export default function TryOn() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-extrabold">
-            Redolapy{" "}
-            <span className="text-lime-500 font-light">Virtual Try-on</span>
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundColor: "var(--primary-bgc)",
+        color: "var(--Primary-Text-color)",
+      }}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        {/* Hero / Title */}
+        <section className="text-center mt-2 sm:mt-6">
+          <h1
+            className="text-3xl sm:text-4xl md:text-5xl"
+            style={{
+              fontWeight: "var(--Bold)",
+              lineHeight: "1.2",
+            }}
+          >
+            <span style={{ color: "var(--Primary-Text-color)" }}>Redolapy </span>
+            <span
+              style={{
+                background: "linear-gradient(90deg, #40B9FF 0%, #69C9AC 50%, #AAE338 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Virtual Try-on
+            </span>
           </h1>
-          <p className="text-gray-500 mt-2">Upload your pieces · Pick a style · See it come to life</p>
-        </div>
+          <p
+            className="mt-3 text-base sm:text-lg md:text-xl"
+            style={{
+              color: "var(--Primary-Text-color)",
+              fontWeight: "var(--Semi-Bold)",
+              opacity: 0.85,
+            }}
+          >
+            Upload your pieces · Pick a style · See it come to life
+          </p>
+        </section>
 
-        {/* Steps */}
-        <section className="mb-10">
-          <StepIndicator currentStep={currentStep} steps={steps} containerClassName="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6" />
+        {/* Step Indicator */}
+        <section className="mt-8 sm:mt-10">
+          <StepIndicator currentStep={currentStep} steps={steps} />
         </section>
 
         {/* Model Selection */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
-          <ModelSelectionCard
-            selected={selectedModel === "avatar"}
-            onClick={() => setSelectedModel(selectedModel === "avatar" ? null : "avatar")}
-            media="/boyTryOn.png"
-          >
-            <h3 className="font-bold text-lg mt-2">Avatar</h3>
-            <span className="bg-[#40B9FF] text-white text-[10px] px-2 py-0.5 rounded-full uppercase font-semibold">
-              recommended
-            </span>
-            <p className="text-xs text-gray-500 max-w-[180px] mt-1">
-              Create your digital twin and try outfits instantly.
-            </p>
-          </ModelSelectionCard>
+        <section className="mt-12 sm:mt-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-6xl mx-auto">
+            <ModelSelectionCard
+              selected={selectedModel === "avatar"}
+              onClick={() => setSelectedModel(selectedModel === "avatar" ? null : "avatar")}
+              media="/boyTryOn.png"
+            >
+              <h3 className="font-bold text-lg mt-2">Avatar</h3>
+              <span className="bg-[#40B9FF] text-white text-[10px] px-2 py-0.5 rounded-full uppercase font-semibold">
+                recommended
+              </span>
+              <p className="text-xs text-gray-500 max-w-[180px] mt-1">
+                Create your digital twin and try outfits instantly.
+              </p>
+            </ModelSelectionCard>
 
-          <ModelSelectionCard
-            selected={selectedModel === "photo"}
-            onClick={() => setSelectedModel(selectedModel === "photo" ? null : "photo")}
-            media={
-              <div className="w-24 h-24 bg-blue-50 rounded-2xl flex flex-col items-center justify-center border border-dashed border-blue-200">
-                <img src="/cameraFrame.png" alt="" className="w-10 h-10 object-contain" />
-                <span className="text-[8px] mt-1 text-blue-400">Tap to upload</span>
-              </div>
-            }
-          >
-            <h3 className="font-bold text-lg">Your Photo</h3>
-            <p className="text-xs text-gray-500 max-w-[180px] mt-1">
-              Upload your own photo for realistic try-on.
-            </p>
-          </ModelSelectionCard>
-        </div>
+            <ModelSelectionCard
+              selected={selectedModel === "photo"}
+              onClick={() => setSelectedModel(selectedModel === "photo" ? null : "photo")}
+              media={
+                <div className="w-32 h-32 bg-blue-50 rounded-2xl flex flex-col items-center justify-center border border-dashed border-blue-200">
+                  <img src="/cameraFrame.png" alt="" className="w-12 h-12 object-contain" />
+                  <span className="text-[10px] mt-1 text-blue-400">Tap to upload</span>
+                </div>
+              }
+            >
+              <h3 className="font-bold text-lg">Your Photo</h3>
+              <p className="text-xs text-gray-500 max-w-[180px] mt-1">
+                Upload your own photo for realistic try-on.
+              </p>
+            </ModelSelectionCard>
+          </div>
+        </section>
 
         {/* Model Preview */}
         {selectedModel === "avatar" && (
-          <div className="flex justify-center mb-10 transition-all duration-500">
+          <section className="mt-12 sm:mt-16">
+            <div className="flex justify-center transition-all duration-500">
             {avatarLoading ? (
               <div className="rounded-3xl shadow-xl h-[350px] sm:h-[450px] w-full max-w-[300px] bg-gray-100 flex items-center justify-center">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
@@ -343,16 +375,20 @@ export default function TryOn() {
               </div>
             )}
           </div>
+        </section>
         )}
 
         {selectedModel === "photo" && !userPhoto && (
-          <div className="mb-10 transition-all duration-500">
-            <UploadArea onFilesSelected={handlePhotoSelected} maxFiles={1} />
-          </div>
+          <section className="mt-12 sm:mt-16">
+            <div className="transition-all duration-500">
+              <UploadArea onFilesSelected={handlePhotoSelected} maxFiles={1} />
+            </div>
+          </section>
         )}
 
         {selectedModel === "photo" && userPhoto && (
-          <div className="flex justify-center mb-10 transition-all duration-500">
+          <section className="mt-12 sm:mt-16">
+            <div className="flex justify-center transition-all duration-500">
             <div className="relative rounded-2xl p-4 sm:p-5 shadow-xl" style={{ backgroundColor: "#E9EDFF" }}>
               <div className="relative overflow-hidden rounded-lg bg-white" style={{ width: "300px", aspectRatio: "3/4" }}>
                 <img
@@ -375,16 +411,18 @@ export default function TryOn() {
               </div>
             </div>
           </div>
+        </section>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6">
+        <section className="mt-12 sm:mt-16">
+          <div className="flex gap-4 max-w-6xl mx-auto">
           <button
             onClick={() => setActiveTab("wardrobe")}
             className={`flex-1 py-3 rounded-xl font-medium transition-all ${
               activeTab === "wardrobe"
                 ? "bg-blue-50 text-blue-600 border border-blue-200"
-                : "bg-gray-100 text-gray-400"
+                : "bg-[#E9EBEE] text-gray-400"
             }`}
           >
             <span className="inline-flex items-center gap-1.5"><Shirt className="w-4 h-4" /> My Wardrobe</span>
@@ -394,15 +432,17 @@ export default function TryOn() {
             className={`flex-1 py-3 rounded-xl font-medium transition-all ${
               activeTab === "gallery"
                 ? "bg-blue-50 text-blue-600 border border-blue-200"
-                : "bg-gray-100 text-gray-400"
+                : "bg-[#E9EBEE] text-gray-400"
             }`}
           >
             <span className="inline-flex items-center gap-1.5"><Grid3x3 className="w-4 h-4" /> Gallery</span>
           </button>
         </div>
+        </section>
 
         {/* Wardrobe / Gallery Content */}
-        <div className="mb-6">
+        <section className="mt-12 sm:mt-16">
+          <div className="max-w-6xl mx-auto">
           {activeTab === "wardrobe" ? (
             <>
               <div className="flex items-center justify-between mb-5" style={{ marginTop: "30px" }}>
@@ -445,7 +485,6 @@ export default function TryOn() {
             </>
           ) : (
             <>
-              <h3 className="font-bold text-lg mb-4">Upload Gallery</h3>
               {galleryFiles.length < 2 && (
                 <div className="mb-6">
                   <UploadArea onFilesSelected={handleGalleryFilesSelected} maxFiles={2} />
@@ -466,9 +505,11 @@ export default function TryOn() {
             </>
           )}
         </div>
+        </section>
 
         {/* Status Bar */}
-        <div className="mb-10">
+        <section className="mt-12 sm:mt-16">
+          <div className="max-w-6xl mx-auto">
           <div className="flex items-center mb-4">
             <h3 style={{ color: "#1a202c", fontSize: "1.2rem", fontWeight: 700 }}>
               {selectedItems.length > 0
@@ -500,13 +541,15 @@ export default function TryOn() {
             </div>
           </div>
         </div>
+        </section>
 
         {/* Generate Button */}
-        <div className="flex justify-center mb-20">
+        <section className="mt-12 sm:mt-16">
+          <div className="flex justify-center">
           <button
             onClick={handleGenerate}
             disabled={!isReady || generating}
-            className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg ${
+            className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg w-full max-w-md justify-center ${
               isReady && !generating
                 ? "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
                 : "bg-gray-400 cursor-not-allowed"
@@ -525,10 +568,11 @@ export default function TryOn() {
             )}
           </button>
         </div>
+        </section>
 
         {/* Result */}
         {(generating || generatedImageUrl || generateError) && (
-          <section ref={resultRef} className="mt-10">
+          <section ref={resultRef} className="mt-12 sm:mt-16">
             {generating ? (
               <div className="rounded-2xl shadow-xl bg-gray-100 flex flex-col items-center justify-center py-20">
                 <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
