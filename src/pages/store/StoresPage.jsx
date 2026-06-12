@@ -208,18 +208,13 @@ const StoresPage = () => {
           </div>
 
           {showProducts ? (
-            <div className={`grid gap-6 lg:gap-8 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 2xl:grid-cols-3' : 'grid-cols-1'}`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className={`flex gap-4 ${viewMode === 'grid' ? 'flex-col' : 'flex-row'}`}>
-                  <div className={`${viewMode === 'grid' ? 'aspect-[3/4]' : 'w-1/3 h-48'} bg-gray-100 rounded-[1.5rem] animate-pulse`} />
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 w-3/4 bg-gray-100 rounded animate-pulse" />
-                    <div className="h-4 w-1/4 bg-gray-100 rounded animate-pulse" />
-                  </div>
-                </div>
+                <div key={i} className="aspect-[4/6] bg-gray-100 rounded-[2rem] animate-pulse" />
               ))}
             </div>
           ) : (
+            /* Grid Displaying the New Cards */
             <div className={`grid gap-8 transition-all duration-500 ${
               viewMode === 'grid' 
                 ? 'grid-cols-1 md:grid-cols-2 2xl:grid-cols-3' 
