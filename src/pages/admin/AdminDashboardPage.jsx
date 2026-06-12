@@ -60,6 +60,10 @@ export default function AdminDashboardPage() {
     <button onClick={handleAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
       <Plus className="w-4 h-4" /> Add notifications
     </button>
+  ) : activePage === 'apiManagement' ? (
+    <button className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
+      <Plus className="w-4 h-4" /> Add API Key
+    </button>
   ) : null;
 
   let currentSection;
