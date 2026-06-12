@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, Sparkles, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import MatchWardrobePopup from './MatchWardrobePopup'; 
@@ -6,6 +7,7 @@ import { getProductMatchesApi } from '../../api/userApi';
 
 const ProductCard = ({ product, store, viewMode }) => {
   const { i18n, t } = useTranslation();
+  const navigate = useNavigate();
   const [isMatchOpen, setIsMatchOpen] = useState(false);
   const [matches, setMatches] = useState([]); 
   const [loadingMatches, setLoadingMatches] = useState(false); 
@@ -43,6 +45,10 @@ const ProductCard = ({ product, store, viewMode }) => {
 
   const handleSeeMatch = () => {
     setIsMatchOpen(true);
+  };
+
+  const handleTryOn = () => {
+    navigate('/tryOn', { state: { productImage: imageUrl, productName: displayName } });
   };
 
   return (
@@ -90,10 +96,10 @@ const ProductCard = ({ product, store, viewMode }) => {
                 {isArabic ? 'رؤية المطابقة' : 'See Match'}
               </button>
             )}
-            <a href={product.purchase_url} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 bg-[var(--Primary-Brand-color)] text-white py-3 rounded-[8px] text-[13px] font-black hover:bg-[var(--color-primary-hover)] transition-all shadow-md shadow-blue-100 group/tryon">
+            <button onClick={handleTryOn} className="flex-1 flex items-center justify-center gap-2 bg-[var(--Primary-Brand-color)] text-white py-3 rounded-[8px] text-[13px] font-black hover:bg-[var(--color-primary-hover)] transition-all shadow-md shadow-blue-100 group/tryon">
               <Sparkles size={16} className="group-hover/tryon:rotate-12 transition-transform" />
               {isArabic ? 'تجربة' : 'Try-on'}
-            </a>
+            </button>
           </div>
         </div>
       </div>
