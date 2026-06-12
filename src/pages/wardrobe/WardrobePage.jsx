@@ -1,0 +1,158 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import Swal from 'sweetalert2';
+import WardrobeHealth from '../../components/wardrobe/WardrobeHealth';
+import WardrobeFilters from '../../components/wardrobe/WardrobeFilters';
+import WardrobeItemCard from '../../components/wardrobe/WardrobeItemCard';
+import EmptyState from '../../components/wardrobe/EmptyState';
+import AddItemModal from '../../components/wardrobe/AddItemModal';
+import ItemDetailsModal from '../../components/wardrobe/ItemDetailsModal';
+import { Plus, Loader2, AlertCircle } from 'lucide-react';
+import { getWardrobeApi, deleteWardrobeItemApi } from '../../api/userApi';
+
+const WardrobePage = () => {
+  const { i18n, t } = useTranslation();
+  const isArabic = i18n.language === 'ar';
+
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  // 1. استخراج التصنيفات الموجودة فعلياً في البيانات القادمة من الباك إند
+  const dynamicCategories = useMemo(() => {
+    if (items.length === 0) return ['All'];
+
+    // نأخذ كل الـ categories من الملابس، نحذف الفارغ، ونوحد شكل النص (أول حرف كبير)
+    const existingCats = items
+      .map((item) => item.category)
+      .filter((cat) => cat) // التأكد أن التصنيف ليس null أو undefined
+      .map((cat) => cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase());
+
+    // نستخدم Set لحذف التكرار، ثم نضيف 'All' في البداية
+    return ['All', ...new Set(existingCats)];
+  }, [items]);
+
+  const fetchWardrobe = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await getWardrobeApi();
+      setItems(res.data.items || []);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || 'Failed to load wardrobe');
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchWardrobe();
+  }, [fetchWardrobe]);
+
+  const handleDelete = async (itemId) => {
+    const result = await Swal.fire({
+      title: 'Delete Item?',
+      text: 'Are you sure you want to remove this item from your wardrobe?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Delete',
+      cancelButtonText: 'Cancel',
+    });
+    if (!result.isConfirmed) return;
+    try {
+      await deleteWardrobeItemApi(itemId);
+      setItems((prev) => prev.filter((item) => item._id !== itemId));
+      setSelectedItem(null);
+      Swal.fire({ icon: 'success', title: 'Item deleted successfully', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Failed to delete item', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+    }
+  };
+
+  // 2. منطق الفلترة المعتمد على التصنيف المختار
+  const filteredItems = useMemo(() => {
+    return activeFilter === 'All'
+      ? items
+      : items.filter((item) => 
+          item.category?.toLowerCase() === activeFilter.toLowerCase()
+        );
+  }, [items, activeFilter]);
+
+  return (
+    <div className="min-h-screen bg-[#FDFDFF] p-6 md:p-12 font-sans">
+      <div className="max-w-7xl mx-auto space-y-12">
+        <WardrobeHealth itemCount={items.length} />
+
+        {/* 3. تمرير الفلاتر الديناميكية */}
+        <WardrobeFilters
+          categories={dynamicCategories}
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+        />
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <Loader2 className="w-10 h-10 text-[#8ED321] animate-spin mb-4" />
+            <p className="text-gray-500 font-bold">
+              {isArabic ? 'جاري تحميل الخزانة...' : 'Loading wardrobe...'}
+            </p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <AlertCircle size={48} className="text-red-400 mb-4" />
+            <p className="text-red-500 font-bold text-lg mb-2">
+              {isArabic ? 'فشل في تحميل الخزانة' : 'Failed to load wardrobe'}
+            </p>
+            <p className="text-gray-400 text-sm text-center max-w-md">{error}</p>
+          </div>
+        ) : items.length === 0 ? (
+          <EmptyState onAdd={() => setIsAddModalOpen(true)} isArabic={isArabic} />
+        ) : (
+          <div className="space-y-8">
+            <div className="flex justify-between items-center px-2">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                   {isArabic ? `عرض ${filteredItems.length} قطعة` : `Showing ${filteredItems.length} items`}
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
+                {/* زر الإضافة السريع */}
+                <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="aspect-[4/5] border-4 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 text-gray-300 hover:border-[#40B9FF] hover:text-[#40B9FF] transition-all bg-white/50"
+                >
+                <div className="p-4 bg-gray-50 rounded-full"><Plus size={32} /></div>
+                <span className="font-bold text-[10px] tracking-widest uppercase">
+                    {isArabic ? 'إضافة قطعة' : 'Add Item'}
+                </span>
+                </button>
+
+                {filteredItems.map((item) => (
+                <WardrobeItemCard key={item._id} item={item} onClick={setSelectedItem} />
+                ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <AddItemModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={(newItem) => setItems((prev) => [...prev, newItem])}
+      />
+
+      <ItemDetailsModal
+        item={selectedItem}
+        onClose={() => setSelectedItem(null)}
+        onDelete={handleDelete}
+        isArabic={isArabic}
+      />
+    </div>
+  );
+};
+
+export default WardrobePage;
