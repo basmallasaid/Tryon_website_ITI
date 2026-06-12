@@ -67,6 +67,7 @@ const Navbar = ({ onOpenAuth }) => {
     { name: t("nav.matching"), path: "/matching" },
     { name: t("nav.recycle"), path: "/recycle" },
     { name: t("nav.stores"), path: "/stores" },
+    {name:"Wardrobe",path:"/wardrobe"},
     { name: t("nav.pricing"), path: "/pricing" },
     { name: t("nav.about") },
     { name: t("nav.contactUs"), path: "/contact-us" },

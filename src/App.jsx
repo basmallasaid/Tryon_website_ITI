@@ -37,6 +37,7 @@ import EditProfilePage from './pages/profile/EditProfilePage';
 import ContactUs from './pages/contactUs/ContactUs';
 import WardrobePage from './pages/wardrobe/WardrobePage';
 import EditItemWardrobe from './components/wardrobe/EditItemWardrobe';
+import ItemDetailsModal from './components/wardrobe/ItemDetailsModal';
 
 const LoadingFallback = () => (
   <Box
@@ -70,21 +71,25 @@ function AppContent() {
       path: '/',
       element: <UserGuard />,
       children: [
-        { index: true, element: <Home /> },
-        { path: 'tryOn', element: <TryOn /> },
-        { path: 'about-tryon', element: <AboutTryon /> },
-        { path: 'pricing', element: <PricingPage /> },
-        { path: 'auth/callback', element: <GoogleCallback /> },
-        { path: 'stores', element: <StoresPage /> },
-        { path: 'avatar', element: <AvatarGeneration /> },
-        { path: 'recycle', element: <Recycle /> },
-        { path: 'about-recycle', element: <AboutRecycle /> },
-         { path: 'matching', element: <Matching /> },
-        { path: 'contact-us', element: <ContactUs /> },
-        {path:'editprofile',element:<EditProfilePage/>},
-        {path:'wardeobe',element:<WardrobePage/>},
-        {path:'wardeobe/edit/:id',element:<EditItemWardrobe/>}
-         
+        {
+          element: <Layout />,
+          children: [
+            { index: true, element: <Home /> },
+            { path: 'tryOn', element: <TryOn /> },
+            { path: 'about-tryon', element: <AboutTryon /> },
+            { path: 'pricing', element: <PricingPage /> },
+            { path: 'auth/callback', element: <GoogleCallback /> },
+            { path: 'stores', element: <StoresPage /> },
+            { path: 'avatar', element: <AvatarGeneration /> },
+            { path: 'matching', element: <Matching /> },
+            { path: 'recycle', element: <Recycle /> },
+            { path: 'about-recycle', element: <AboutRecycle /> },
+            { path: 'contact-us', element: <ContactUs /> },
+            { path: 'editprofile', element: <EditProfilePage /> },
+            {path:'wardrobe',element:<WardrobePage/>},
+            { path: '/wardrobe/edit/:id',element: <EditItemWardrobe />}
+          ],
+        },
       ],
     },
     {

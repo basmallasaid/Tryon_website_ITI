@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Trash2, ShoppingBag, CloudSun, Palette, Layers, User, Sparkles, PenLine } from 'lucide-react';
+import { X, Trash2, ShoppingBag, CloudSun, Palette, Layers, User, Sparkles, Eye } from 'lucide-react';
 
 const ColorDot = ({ color }) => (
   <span
@@ -122,11 +122,11 @@ const ItemDetailsModal = ({ item, onClose, onDelete, isArabic }) => {
               </button>
             )}
             <button
-              onClick={() => { onClose(); navigate(`/wardeobe/edit/${item._id}`); }}
+              onClick={() => { onClose(); navigate(`/wardrobe/edit/${item._id}`); }}
               className="flex-1 bg-[var(--color-primary)] text-white py-4 rounded-2xl font-bold shadow-lg shadow-gray-200  hover:shadow-gray-300 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
             >
-              <PenLine size={20} />
-              <span className="text-sm tracking-wide">{isArabic ? 'تعديل البيانات' : 'EDIT PIECE'}</span>
+              <Eye size={20} />
+              <span className="text-sm tracking-wide">{isArabic ? 'عرض' : 'View'}</span>
             </button>
           </div>
         </div>

@@ -146,7 +146,7 @@ const EditItemWardrobe = () => {
                 });
                 await addWardrobeItemFromAnalysisApi(analysisId, { garment_index: 0 });
                 Swal.fire({ icon: 'success', title: 'Item added to wardrobe successfully', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-                navigate('/wardeobe');
+                navigate('/wardrobe');
             }
         } catch (err) {
             Swal.fire({ icon: 'error', title: 'Failed to add item', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
@@ -168,7 +168,7 @@ const EditItemWardrobe = () => {
         try {
             await deleteWardrobeItemApi(id);
             Swal.fire({ icon: 'success', title: 'Item deleted successfully', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-            navigate('/wardeobe');
+            navigate('/wardrobe');
         } catch (err) {
             Swal.fire({ icon: 'error', title: 'Failed to delete item', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
         }
@@ -199,7 +199,7 @@ const EditItemWardrobe = () => {
         <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
-                    <button onClick={() => navigate('/wardeobe')} className="group flex items-center gap-2 text-gray-500 font-semibold hover:text-gray-900">
+                    <button onClick={() => navigate('/wardrobe')} className="group flex items-center gap-2 text-gray-500 font-semibold hover:text-gray-900">
                         <div className="p-2 bg-white rounded-lg shadow-sm"><ArrowLeft size={18} /></div>
                         Back to Wardrobe
                     </button>
