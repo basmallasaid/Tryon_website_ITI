@@ -11,3 +11,6 @@ export const getAllStores = () => api.get("/stores");
 export const getProductById = (id) => api.get(`/products/${id}`);
 export const deleteUserAccountApi = (email) =>
   api.delete("/users/account", { data: { email } });
+
+export const addToLatestTryOnApi = (data) =>
+  api.post("/users/latest-tryon", data);

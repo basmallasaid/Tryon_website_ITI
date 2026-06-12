@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { WardrobeProvider } from './context/WardrobeContext';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import AuthPage from './pages/Auth/AuthPage';
@@ -91,10 +92,12 @@ function App() {
   }, [i18n.language]);
   return (
     <AuthProvider>
-      {/* <Navbar />
+      <WardrobeProvider>
+        {/* <Navbar />
         <AuthPage /> */}
 
-      <AppContent />
+        <AppContent />
+      </WardrobeProvider>
     </AuthProvider>
   );
 }

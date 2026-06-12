@@ -57,7 +57,7 @@ const inputBaseClass =
 
 export default function AvatarGeneration() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL_FORM);
   const [processing, setProcessing] = useState(false);
@@ -117,6 +117,7 @@ export default function AvatarGeneration() {
       const imageUrl = res.data?.avatar?.image_url;
       if (imageUrl) {
         setGeneratedImageUrl(imageUrl);
+        login({ ...user, generatedAvatar: imageUrl });
       } else {
         setApiError(t('avatar.noImageReturned'));
       }
