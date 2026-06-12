@@ -1,51 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Bell } from 'lucide-react';
 import NotificationRow from '../components/NotificationRow';
 import NotificationCard from '../components/NotificationCard';
-
-const notifications = [
-  {
-    id: 1,
-    title: 'New Order Received',
-    message: 'A new order has been placed by John Doe for 3 items totaling $245.00.',
-    type: 'Push',
-    date: 'Mar 15, 2024',
-    relativeTime: '2m ago',
-    read: false,
-  },
-  {
-    id: 2,
-    title: 'Product Low Stock Alert',
-    message: 'Classic Oxford Shirt in size M is running low. Only 5 units remaining in inventory.',
-    type: 'In-App',
-    date: 'Mar 15, 2024',
-    relativeTime: '1h ago',
-    read: false,
-  },
-  {
-    id: 3,
-    title: 'Promotion Campaign Active',
-    message: 'Summer Sale 2024 promotion is now live. 25% off on all summer collection items.',
-    type: 'Push',
-    date: 'Mar 14, 2024',
-    relativeTime: '3h ago',
-    read: true,
-  },
-  {
-    id: 4,
-    title: 'Customer Review Posted',
-    message: 'Sarah left a 5-star review on Premium Leather Jacket. "Amazing quality!"',
-    type: 'In-App',
-    date: 'Mar 13, 2024',
-    relativeTime: 'yesterday',
-    read: true,
-  },
-];
+import { getNotificationsApi } from '../../../api/adminApi';
 
 const ITEMS_PER_PAGE = 4;
 
-export default function NotificationsSection() {
+function formatRelativeTime(dateStr) {
+  if (!dateStr) return '';
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diff = Math.floor((now - then) / 1000);
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 172800) return 'yesterday';
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export default function NotificationsSection({ onAddNotification }) {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await getNotificationsApi();
+        setNotifications(Array.isArray(res.data?.notifications) ? res.data.notifications : []);
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
+
   const totalPages = Math.ceil(notifications.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentItems = notifications.slice(startIdx, startIdx + ITEMS_PER_PAGE);
@@ -76,14 +72,20 @@ export default function NotificationsSection() {
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((n) => (
-              <NotificationRow key={n.id} notification={n} />
-            ))}
+            {loading ? (
+              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">Loading notifications…</td></tr>
+            ) : currentItems.length > 0 ? (
+              currentItems.map((n) => (
+                <NotificationRow key={n._id} notification={n} />
+              ))
+            ) : (
+              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">No notifications yet.</td></tr>
+            )}
           </tbody>
         </table>
         <div className="flex items-center justify-between px-6 py-4 border-t border-admin-border/40">
           <p className="text-xs text-admin-text-muted">
-            Showing {startIdx + 1}-{Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of {notifications.length} notifications
+            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length} notifications`}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -107,18 +109,24 @@ export default function NotificationsSection() {
       {/* Mobile Cards */}
       <div className="md:hidden">
         <div className="flex items-center justify-between mb-4">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand text-white rounded-xl text-xs font-medium">
+          <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand text-white rounded-xl text-xs font-medium">
             <Bell className="w-4 h-4" /> Create New
           </button>
         </div>
         <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
-          {currentItems.map((n) => (
-            <NotificationCard key={n.id} notification={n} />
-          ))}
+          {loading ? (
+            <p className="p-4 text-center text-sm text-admin-text-muted">Loading notifications…</p>
+          ) : currentItems.length > 0 ? (
+            currentItems.map((n) => (
+              <NotificationCard key={n._id} notification={n} />
+            ))
+          ) : (
+            <p className="p-4 text-center text-sm text-admin-text-muted">No notifications yet.</p>
+          )}
         </div>
         <div className="flex items-center justify-between mt-4 px-1">
           <p className="text-xs text-admin-text-muted">
-            Showing {startIdx + 1}-{Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of {notifications.length} notifications
+            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length} notifications`}
           </p>
           <div className="flex items-center gap-2">
             <button

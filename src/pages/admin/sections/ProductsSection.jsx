@@ -1,32 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Filter, X, ChevronLeft, ChevronRight, Plus, SlidersHorizontal } from 'lucide-react';
 import ProductRow from '../components/ProductRow';
 import ProductCard from '../components/ProductCard';
+import { getProductsApi, getStoresApi } from '../../../api/adminApi';
 
-const allProducts = [
-  { id: 1, name: 'Aura Leather Sneakers', sku: 'AU-24-998', image: 'https://i.pravatar.cc/120?img=11', store: 'Milan Flagship', category: 'Footwear', season: "Spring '24", price: 540, tryOn: true, status: 'Active' },
-  { id: 2, name: 'Minimalist Wool Overcoat', sku: 'MW-23-441', image: 'https://i.pravatar.cc/120?img=12', store: 'Paris Boutique', category: 'Outerwear', season: "Spring '24", price: 1250, tryOn: false, status: 'Draft' },
-  { id: 3, name: 'Heritage Crossbody Bag', sku: 'HB-24-001', image: 'https://i.pravatar.cc/120?img=13', store: 'Global E-Shop', category: 'Accessories', season: "Spring '24", price: 890, tryOn: true, status: 'Active' },
-  { id: 4, name: 'Silk Gala Slip Dress', sku: 'SG-24-322', image: 'https://i.pravatar.cc/120?img=14', store: 'London Flagship', category: 'Evening Wear', season: "Spring '24", price: 1450, tryOn: true, status: 'Out of Stock' },
-  { id: 5, name: 'Titanium Aviators', sku: 'TA-0044-G', image: 'https://i.pravatar.cc/120?img=15', store: 'London Flagship', category: 'Eyewear', season: "Spring '24", price: 320, tryOn: true, status: 'Active' },
-  { id: 6, name: 'Velvet Nocturne Clutch', sku: 'VC-1102-E', image: 'https://i.pravatar.cc/120?img=16', store: 'Paris Boutique', category: 'Accessories', season: "Winter '24", price: 680, tryOn: true, status: 'Active' },
-  { id: 7, name: 'Cashmere Turtleneck', sku: 'CT-7712-M', image: 'https://i.pravatar.cc/120?img=17', store: 'Milan Flagship', category: 'Outerwear', season: "Winter '24", price: 420, tryOn: false, status: 'Draft' },
-  { id: 8, name: 'Runway Platform Boots', sku: 'RP-5590-L', image: 'https://i.pravatar.cc/120?img=18', store: 'Global E-Shop', category: 'Footwear', season: "Spring '24", price: 760, tryOn: true, status: 'Active' },
-  { id: 9, name: 'Sapphire Pendant Necklace', sku: 'SPN-0088-S', image: 'https://i.pravatar.cc/120?img=19', store: 'London Flagship', category: 'Accessories', season: "Spring '24", price: 2100, tryOn: false, status: 'Out of Stock' },
-  { id: 10, name: 'Linen Summer Blazer', sku: 'LSB-3301-M', image: 'https://i.pravatar.cc/120?img=20', store: 'Paris Boutique', category: 'Outerwear', season: "Spring '24", price: 590, tryOn: true, status: 'Active' },
-];
-
-const stores = ['All Stores', 'Milan Flagship', 'Paris Boutique', 'Global E-Shop', 'London Flagship'];
-const categories = ['category', 'Footwear', 'Outerwear', 'Accessories', 'Evening Wear', 'Eyewear'];
 const PAGE_SIZE = 5;
 
+const categoryLabels = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', acc: 'Accessories' };
+
 export default function ProductsSection({ onAddProduct }) {
+  const [products, setProducts] = useState([]);
+  const [stores, setStores] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [storeFilter, setStoreFilter] = useState('All Stores');
   const [categoryFilter, setCategoryFilter] = useState('category');
   const [page, setPage] = useState(1);
 
-  const filtered = allProducts.filter((p) => {
-    const matchStore = storeFilter === 'All Stores' || p.store === storeFilter;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [productsRes, storesRes] = await Promise.all([
+          getProductsApi(),
+          getStoresApi(),
+        ]);
+        setProducts(Array.isArray(productsRes.data) ? productsRes.data : []);
+        setStores(Array.isArray(storesRes.data) ? storesRes.data : []);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const storeMap = {};
+  stores.forEach((s) => { storeMap[s._id] = s.name; });
+
+  const dynamicCategories = ['category', ...new Set(products.map((p) => p.category).filter(Boolean))];
+
+  const mapped = products.map((p) => ({
+    id: p._id,
+    name: p.name,
+    sku: p._id.slice(-8).toUpperCase(),
+    image: p.images?.[0] || null,
+    store: storeMap[p.store_id?._id || p.store_id] || 'Unknown Store',
+    storeId: p.store_id?._id || p.store_id,
+    category: p.category,
+    categoryLabel: categoryLabels[p.category] || p.category,
+    season: p.season_tags?.[0] || '—',
+    price: p.price || 0,
+    currency: p.currency || 'USD',
+    tryOn: p.try_on_enabled,
+    status: p.is_active ? 'Active' : 'Draft',
+  }));
+
+  const filtered = mapped.filter((p) => {
+    const matchStore = storeFilter === 'All Stores' || p.storeId === storeFilter;
     const matchCat = categoryFilter === 'category' || p.category === categoryFilter;
     return matchStore && matchCat;
   });
@@ -54,14 +84,17 @@ export default function ProductsSection({ onAddProduct }) {
             onChange={(e) => { setStoreFilter(e.target.value); setPage(1); }}
             className="px-4 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none min-w-[180px]"
           >
-            {stores.map((s) => <option key={s} value={s}>{s}</option>)}
+            <option value="All Stores">All Stores</option>
+            {stores.map((s) => <option key={s._id} value={s._id}>{s.name}</option>)}
           </select>
           <select
             value={categoryFilter}
             onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
             className="px-4 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none min-w-[160px]"
           >
-            {categories.map((c) => <option key={c} value={c}>{c === 'category' ? 'category' : c}</option>)}
+            {dynamicCategories.map((c) => (
+              <option key={c} value={c}>{c === 'category' ? 'category' : (categoryLabels[c] || c)}</option>
+            ))}
           </select>
           <button className="w-10 h-10 flex items-center justify-center bg-admin-category rounded-lg text-admin-text-secondary hover:bg-admin-border transition-colors">
             <SlidersHorizontal className="w-4 h-4" />
@@ -87,7 +120,9 @@ export default function ProductsSection({ onAddProduct }) {
               </tr>
             </thead>
             <tbody>
-              {paginated.length > 0 ? (
+              {loading ? (
+                <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">Loading products…</td></tr>
+              ) : paginated.length > 0 ? (
                 paginated.map((p) => <ProductRow key={p.id} product={p} />)
               ) : (
                 <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">No products match your filters.</td></tr>
@@ -97,7 +132,7 @@ export default function ProductsSection({ onAddProduct }) {
         </div>
 
         <div className="flex items-center justify-between text-sm text-admin-text-secondary">
-          <span>Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} products</span>
+          <span>{loading ? 'Loading…' : `Showing ${filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length} products`}</span>
           <div className="flex items-center gap-1">
             <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="w-8 h-8 rounded flex items-center justify-center hover:bg-admin-brand-activeBg disabled:opacity-40 transition-colors">
               <ChevronLeft className="w-4 h-4" />
@@ -118,7 +153,7 @@ export default function ProductsSection({ onAddProduct }) {
       <div className="lg:hidden px-4 py-6 flex flex-col gap-4">
         <div className="flex items-baseline justify-between">
           <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">Products</h1>
-          <span className="text-sm text-admin-text-secondary">{filtered.length} total</span>
+          <span className="text-sm text-admin-text-secondary">{loading ? '—' : `${filtered.length} total`}</span>
         </div>
 
         <div className="flex items-center gap-3">
@@ -133,7 +168,9 @@ export default function ProductsSection({ onAddProduct }) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {paginated.length > 0 ? (
+          {loading ? (
+            <p className="text-center text-sm text-admin-text-muted py-8">Loading products…</p>
+          ) : paginated.length > 0 ? (
             paginated.map((p) => <ProductCard key={p.id} product={p} />)
           ) : (
             <p className="text-center text-sm text-admin-text-muted py-8">No products match your filters.</p>

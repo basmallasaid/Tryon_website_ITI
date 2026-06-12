@@ -15,9 +15,10 @@ export default function GoogleCallback() {
     const lname = searchParams.get("lname");
     const id = searchParams.get("_id");
     const image = searchParams.get("image");
+    const role = searchParams.get("role") || "user";
 
     if (token && email) {
-      const userData = { id, email, token, firstName: fname, lastName: lname, userImage: image };
+      const userData = { id, email, token, firstName: fname, lastName: lname, userImage: image, role };
 
       if (window.opener) {
         window.opener.postMessage(
@@ -28,7 +29,11 @@ export default function GoogleCallback() {
       } else {
         console.log("Google OAuth login successful", userData);
         login(userData);
-        navigate("/", { replace: true });
+        if (userData.role === "admin") {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
       }
     } else if (!window.opener) {
       navigate("/", { replace: true });

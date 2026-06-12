@@ -1,22 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Filter, X, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import StoreRow from '../components/StoreRow';
 import StoreCard from '../components/StoreCard';
-
-const allStores = [
-  { id: 'ST-001', name: 'Zara', logo: 'https://i.pravatar.cc/80?img=1', website: '#', websiteLabel: 'zara.com', discountPercent: 25, couponCode: 'FASHION25', discountDescription: 'New arrivals discount', products: 12400, maxProducts: 15000, status: 'Active', joined: 'Jan 12, 2024', growth: 12.5 },
-  { id: 'ST-002', name: 'H&M', logo: 'https://i.pravatar.cc/80?img=2', website: '#', websiteLabel: 'hm.com', discountPercent: 20, couponCode: 'HM20OFF', discountDescription: 'Seasonal sale coupon', products: 9800, maxProducts: 15000, status: 'Active', joined: 'Feb 3, 2024', growth: 8.3 },
-  { id: 'ST-003', name: 'Uniqlo', logo: 'https://i.pravatar.cc/80?img=3', website: '#', websiteLabel: 'uniqlo.com', discountPercent: 15, couponCode: 'UNI15', discountDescription: 'Basic collection deal', products: 7600, maxProducts: 15000, status: 'Active', joined: 'Mar 18, 2024', growth: 15.1 },
-  { id: 'ST-004', name: 'Mango', logo: 'https://i.pravatar.cc/80?img=4', website: '#', websiteLabel: 'mango.com', discountPercent: 30, couponCode: 'MANGO30', discountDescription: 'Summer clearance', products: 5400, maxProducts: 15000, status: 'Inactive', joined: 'Apr 7, 2024', growth: -2.4 },
-  { id: 'ST-005', name: 'ASOS', logo: 'https://i.pravatar.cc/80?img=5', website: '#', websiteLabel: 'asos.com', discountPercent: 22, couponCode: 'ASOS22', discountDescription: 'Welcome discount', products: 11200, maxProducts: 15000, status: 'Active', joined: 'May 21, 2024', growth: 9.7 },
-  { id: 'ST-006', name: 'Nike', logo: 'https://i.pravatar.cc/80?img=6', website: '#', websiteLabel: 'nike.com', discountPercent: 18, couponCode: 'NIKE18', discountDescription: 'Athletic wear promo', products: 13800, maxProducts: 15000, status: 'Active', joined: 'Jun 14, 2024', growth: 18.9 },
-  { id: 'ST-007', name: 'Gucci', logo: 'https://i.pravatar.cc/80?img=7', website: '#', websiteLabel: 'gucci.com', discountPercent: 10, couponCode: 'GUCCI10', discountDescription: 'Exclusive member deal', products: 2100, maxProducts: 15000, status: 'Active', joined: 'Jul 2, 2024', growth: 5.6 },
-  { id: 'ST-008', name: 'Shein', logo: 'https://i.pravatar.cc/80?img=8', website: '#', websiteLabel: 'shein.com', discountPercent: 35, couponCode: 'SHEIN35', discountDescription: 'Mega sale event', products: 14500, maxProducts: 15000, status: 'Active', joined: 'Aug 19, 2024', growth: 22.3 },
-];
+import { getStoresApi, getProductsApi } from '../../../api/adminApi';
 
 const PAGE_SIZE = 5;
 
+function extractDomain(url) {
+  try {
+    return new URL(url).hostname.replace('www.', '');
+  } catch {
+    return url;
+  }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export default function StoresSection({ onAddStore }) {
+  const [stores, setStores] = useState([]);
+  const [productCounts, setProductCounts] = useState({});
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [tabFilter, setTabFilter] = useState('All Stores');
@@ -24,10 +31,51 @@ export default function StoresSection({ onAddStore }) {
 
   const tabs = ['All Stores', 'Performance', 'Growth'];
 
-  const filtered = allStores.filter((s) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [storesRes, productsRes] = await Promise.all([
+          getStoresApi(),
+          getProductsApi(),
+        ]);
+        const storesData = Array.isArray(storesRes.data) ? storesRes.data : [];
+        const productsData = Array.isArray(productsRes.data) ? productsRes.data : [];
+
+        const counts = {};
+        productsData.forEach((p) => {
+          const sid = p.store_id?._id || p.store_id;
+          if (sid) counts[sid] = (counts[sid] || 0) + 1;
+        });
+
+        setStores(storesData);
+        setProductCounts(counts);
+      } catch (err) {
+        console.error('Failed to fetch stores:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const mapped = stores.map((s) => ({
+    id: s._id,
+    name: s.name,
+    logo: s.logo_url,
+    website: s.website_url,
+    websiteLabel: extractDomain(s.website_url || ''),
+    discountPercent: s.discount_percent || 0,
+    couponCode: s.discount_code || '—',
+    discountDescription: s.description || '',
+    products: productCounts[s._id] || 0,
+    status: s.is_active ? 'Active' : 'Inactive',
+    joined: formatDate(s.created_at),
+  }));
+
+  const filtered = mapped.filter((s) => {
     const matchesSearch = s.name.toLowerCase().includes(filter.toLowerCase()) || s.id.toLowerCase().includes(filter.toLowerCase());
     const matchesStatus = statusFilter === 'All' || s.status === statusFilter;
-    const matchesTab = tabFilter === 'All Stores' || (tabFilter === 'Performance' && s.products >= 10000) || (tabFilter === 'Growth' && s.growth > 0);
+    const matchesTab = tabFilter === 'All Stores' || (tabFilter === 'Performance' && s.products >= 10) || (tabFilter === 'Growth' && s.status === 'Active');
     return matchesSearch && matchesStatus && matchesTab;
   });
 
@@ -88,7 +136,9 @@ export default function StoresSection({ onAddStore }) {
               </tr>
             </thead>
             <tbody>
-              {paginated.length > 0 ? (
+              {loading ? (
+                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">Loading stores…</td></tr>
+              ) : paginated.length > 0 ? (
                 paginated.map((store) => <StoreRow key={store.id} store={store} />)
               ) : (
                 <tr>
@@ -100,7 +150,7 @@ export default function StoresSection({ onAddStore }) {
         </div>
 
         <div className="flex items-center justify-between text-xs text-admin-text-secondary">
-          <span>Showing {(page - 1) * PAGE_SIZE + 1} - {Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length} stores</span>
+          <span>{loading ? 'Loading…' : `Showing ${filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1} - ${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length} stores`}</span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -177,7 +227,9 @@ export default function StoresSection({ onAddStore }) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {paginated.length > 0 ? (
+          {loading ? (
+            <p className="text-center text-sm text-admin-text-muted py-8">Loading stores…</p>
+          ) : paginated.length > 0 ? (
             paginated.map((store) => <StoreCard key={store.id} store={store} />)
           ) : (
             <p className="text-center text-sm text-admin-text-muted py-8">No stores match your filters.</p>

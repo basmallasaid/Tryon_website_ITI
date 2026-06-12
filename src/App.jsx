@@ -6,7 +6,8 @@
 import { lazy, Suspense, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { BrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
 import { WardrobeProvider } from './context/WardrobeContext';
 import Login from './pages/Auth/Login';
@@ -26,7 +27,6 @@ import PricingPage from './pages/pricing/PricingPage';
 import AvatarGeneration from './pages/avatar/AvatarGeneration';
 
 import { CircularProgress, Box } from '@mui/material';
-import { createBrowserRouter, RouterProvider } from 'react-router';
 import Layout from './pages/Layout';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -49,28 +49,48 @@ const LoadingFallback = () => (
   </Box>
 );
 
+function AdminGuard() {
+  const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+  if (!auth || auth.role !== 'admin') return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
+function UserGuard() {
+  const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+  if (auth?.role === 'admin') return <Navigate to="/admin" replace />;
+  return <Outlet />;
+}
+
 function AppContent() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Layout />,
+      element: <UserGuard />,
       children: [
-        { index: true, element: <Home /> },
-        { path: 'tryOn', element: <TryOn /> },
-        { path: 'about-tryon', element: <AboutTryon /> },
-        { path: 'pricing', element: <PricingPage /> },
-        { path: 'auth/callback', element: <GoogleCallback /> },
-        { path: 'stores', element: <StoresPage /> },
-        { path: 'avatar', element: <AvatarGeneration /> },
-        { path: 'recycle', element: <Recycle /> },
-        { path: 'about-recycle', element: <AboutRecycle /> },
-        { path: 'contact-us', element: <ContactUs /> },
-        {path:'editprofile',element:<EditProfilePage/>},
+        {
+          element: <Layout />,
+          children: [
+            { index: true, element: <Home /> },
+            { path: 'tryOn', element: <TryOn /> },
+            { path: 'about-tryon', element: <AboutTryon /> },
+            { path: 'pricing', element: <PricingPage /> },
+            { path: 'auth/callback', element: <GoogleCallback /> },
+            { path: 'stores', element: <StoresPage /> },
+            { path: 'avatar', element: <AvatarGeneration /> },
+            { path: 'recycle', element: <Recycle /> },
+            { path: 'about-recycle', element: <AboutRecycle /> },
+            { path: 'contact-us', element: <ContactUs /> },
+            {path:'editprofile',element:<EditProfilePage/>},
+          ],
+        },
       ],
     },
     {
       path: '/admin',
-      element: <AdminDashboardPage />,
+      element: <AdminGuard />,
+      children: [
+        { index: true, element: <AdminDashboardPage /> },
+      ],
     },
   ]);
   return (

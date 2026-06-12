@@ -4,11 +4,17 @@ export default function StoreCard({ store }) {
   return (
     <div className="bg-white rounded-xl border border-admin-border/40 p-4 shadow-sm">
       <div className="flex items-center gap-3 mb-3">
-        <img
-          src={store.logo}
-          alt={store.name}
-          className="w-10 h-10 rounded-full object-cover border border-admin-border/50"
-        />
+        {store.logo ? (
+          <img
+            src={store.logo}
+            alt={store.name}
+            className="w-10 h-10 rounded-full object-cover border border-admin-border/50"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-full bg-admin-brand/10 flex items-center justify-center text-sm font-bold text-admin-brand border border-admin-border/50">
+            {store.name?.charAt(0) || '?'}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-admin-text-primary truncate">{store.name}</p>
           <a
@@ -37,7 +43,7 @@ export default function StoreCard({ store }) {
           Products: <span className="font-medium text-admin-text-primary">{store.products.toLocaleString()}</span>
         </span>
         <span>
-          Growth: <span className="font-medium text-admin-success">+{store.growth}%</span>
+          Discount: <span className="font-medium text-admin-brand">{store.discountPercent || 0}%</span>
         </span>
       </div>
     </div>

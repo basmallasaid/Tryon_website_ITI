@@ -1,20 +1,24 @@
 import { ExternalLink } from 'lucide-react';
 
 export default function StoreRow({ store }) {
-  const progress = Math.min((store.products / store.maxProducts) * 100, 100);
-
   return (
     <tr className="border-b border-admin-border/40 hover:bg-admin-brand-activeBg/30 transition-colors">
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
-          <img
-            src={store.logo}
-            alt={store.name}
-            className="w-10 h-10 rounded-full object-cover border border-admin-border/50"
-          />
+          {store.logo ? (
+            <img
+              src={store.logo}
+              alt={store.name}
+              className="w-10 h-10 rounded-full object-cover border border-admin-border/50"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-admin-brand/10 flex items-center justify-center text-sm font-bold text-admin-brand border border-admin-border/50">
+              {store.name?.charAt(0) || '?'}
+            </div>
+          )}
           <div>
             <p className="text-sm font-medium text-admin-text-primary">{store.name}</p>
-            <p className="text-[11px] text-admin-text-muted">{store.id}</p>
+            <p className="text-[11px] text-admin-text-muted">{store.id.slice(-8).toUpperCase()}</p>
           </div>
         </div>
       </td>
@@ -33,24 +37,16 @@ export default function StoreRow({ store }) {
 
       <td className="py-3 px-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-admin-text-primary">{store.discountPercent}%</span>
+          <span className="text-sm font-semibold text-admin-text-primary">{store.discountPercent || 0}%</span>
           <span className="inline-block px-2 py-0.5 text-[11px] font-medium bg-admin-brand-bg text-admin-brand rounded-full">
             {store.couponCode}
           </span>
         </div>
-        <p className="text-[11px] text-admin-text-muted mt-0.5">{store.discountDescription}</p>
+        <p className="text-[11px] text-admin-text-muted mt-0.5 truncate max-w-[180px]">{store.discountDescription}</p>
       </td>
 
       <td className="py-3 px-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-admin-text-primary">{store.products.toLocaleString()}</span>
-          <div className="w-[80px] h-[6px] rounded-full bg-admin-border/40 overflow-hidden">
-            <div
-              className="h-full rounded-full bg-admin-brand transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
+        <span className="text-sm font-medium text-admin-text-primary">{store.products.toLocaleString()}</span>
       </td>
 
       <td className="py-3 px-4">

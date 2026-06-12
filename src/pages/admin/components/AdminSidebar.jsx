@@ -1,4 +1,6 @@
-import { LayoutDashboard, Store, Package, Tag, Bell, Mail, Users, KeyRound, Settings } from 'lucide-react';
+import { LayoutDashboard, Store, Package, Tag, Bell, Mail, Users, KeyRound, Settings, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -13,6 +15,14 @@ const navItems = [
 ];
 
 export default function AdminSidebar({ className = '', activePage, setActivePage }) {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/', { replace: true });
+  };
+
   return (
     <div className={`${className} flex-col justify-between fixed left-0 top-0 h-screen w-[280px] bg-admin-sidebar border-r border-admin-border py-6`}>
       <div>
@@ -45,14 +55,24 @@ export default function AdminSidebar({ className = '', activePage, setActivePage
         </nav>
       </div>
 
-      <div className="mx-4 bg-admin-profile rounded-xl p-3 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full border-2 border-admin-brand/20 bg-admin-brand-light flex items-center justify-center text-xs font-bold text-white">
-          AD
+      <div className="mx-4 flex flex-col gap-2">
+        <div className="bg-admin-profile rounded-xl p-3 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full border-2 border-admin-brand/20 bg-admin-brand-light flex items-center justify-center text-xs font-bold text-white">
+            AD
+          </div>
+          <div>
+            <p className="text-xs font-bold text-admin-text-primary" style={{ letterSpacing: '0.24px' }}>Admin User</p>
+            <p className="text-[10px] font-normal text-admin-text-secondary uppercase" style={{ letterSpacing: '0.5px' }}>Administrator</p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs font-bold text-admin-text-primary" style={{ letterSpacing: '0.24px' }}>Admin User</p>
-          <p className="text-[10px] font-normal text-admin-text-secondary uppercase" style={{ letterSpacing: '0.5px' }}>Administrator</p>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg hover:text-admin-danger transition-colors cursor-pointer"
+          style={{ letterSpacing: '0.24px' }}
+        >
+          <LogOut className="w-[18px] h-[18px]" />
+          Logout
+        </button>
       </div>
     </div>
   );

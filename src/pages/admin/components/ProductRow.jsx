@@ -3,7 +3,6 @@ import { Shirt } from 'lucide-react';
 const statusStyles = {
   Active: 'bg-admin-success/10 text-admin-success',
   Draft: 'bg-admin-border/20 text-admin-text-muted',
-  'Out of Stock': 'bg-admin-danger/10 text-admin-danger',
 };
 
 export default function ProductRow({ product }) {
@@ -16,7 +15,11 @@ export default function ProductRow({ product }) {
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
           <div className="w-14 h-14 rounded-lg bg-admin-category flex items-center justify-center overflow-hidden shrink-0">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            {product.image ? (
+              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-lg font-bold text-admin-text-muted">{product.name?.charAt(0) || '?'}</span>
+            )}
           </div>
           <div>
             <p className="text-sm font-bold text-admin-text-primary">{product.name}</p>
@@ -27,7 +30,7 @@ export default function ProductRow({ product }) {
 
       <td className="py-3 px-4">
         <p className="text-sm text-admin-text-primary">{product.store}</p>
-        <p className="text-xs text-admin-text-muted">{product.category}</p>
+        <p className="text-xs text-admin-text-muted">{product.categoryLabel}</p>
       </td>
 
       <td className="py-3 px-4">
@@ -37,8 +40,8 @@ export default function ProductRow({ product }) {
       </td>
 
       <td className="py-3 px-4">
-        <p className="text-base font-bold text-admin-text-primary">${product.price.toFixed(2)}</p>
-        <p className="text-[10px] text-admin-text-muted">USD</p>
+        <p className="text-base font-bold text-admin-text-primary">{product.currency === 'USD' ? '$' : product.currency}{product.price.toFixed(2)}</p>
+        <p className="text-[10px] text-admin-text-muted">{product.currency}</p>
       </td>
 
       <td className="py-3 px-4">

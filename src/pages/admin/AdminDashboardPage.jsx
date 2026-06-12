@@ -8,6 +8,7 @@ import ProductsSection from './sections/ProductsSection';
 import AddProductSection from './sections/AddProductSection';
 import PromotionsSection from './sections/PromotionsSection';
 import NotificationsSection from './sections/NotificationsSection';
+import AddNotificationSection from './sections/AddNotificationSection';
 import EmailCenterSection from './sections/EmailCenterSection';
 import UsersSection from './sections/UsersSection';
 import ApiManagementSection from './sections/ApiManagementSection';
@@ -17,6 +18,7 @@ export default function AdminDashboardPage() {
   const [activePage, setActivePage] = useState('dashboard');
   const [showAddStore, setShowAddStore] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
+  const [showAddNotification, setShowAddNotification] = useState(false);
 
   const handleAddStore = () => { setActivePage('stores'); setShowAddStore(true); };
   const handleBackFromAddStore = () => setShowAddStore(false);
@@ -24,10 +26,14 @@ export default function AdminDashboardPage() {
   const handleAddProduct = () => { setActivePage('products'); setShowAddProduct(true); };
   const handleBackFromAddProduct = () => setShowAddProduct(false);
 
+  const handleAddNotification = () => { setActivePage('notifications'); setShowAddNotification(true); };
+  const handleBackFromAddNotification = () => setShowAddNotification(false);
+
   const navigate = (page) => {
     setActivePage(page);
     setShowAddStore(false);
     setShowAddProduct(false);
+    setShowAddNotification(false);
   };
 
   const sectionMap = {
@@ -35,7 +41,7 @@ export default function AdminDashboardPage() {
     stores: <StoresSection onAddStore={handleAddStore} />,
     products: <ProductsSection onAddProduct={handleAddProduct} />,
     promotions: <PromotionsSection />,
-    notifications: <NotificationsSection />,
+    notifications: <NotificationsSection onAddNotification={handleAddNotification} />,
     emailCenter: <EmailCenterSection />,
     users: <UsersSection />,
     apiManagement: <ApiManagementSection />,
@@ -50,8 +56,8 @@ export default function AdminDashboardPage() {
     <button onClick={handleAddProduct} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
       <Plus className="w-4 h-4" /> Add product
     </button>
-  ) : activePage === 'notifications' ? (
-    <button className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
+  ) : activePage === 'notifications' && !showAddNotification ? (
+    <button onClick={handleAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
       <Plus className="w-4 h-4" /> Add notifications
     </button>
   ) : null;
@@ -61,6 +67,8 @@ export default function AdminDashboardPage() {
     currentSection = <AddStoreSection onBack={handleBackFromAddStore} />;
   } else if (showAddProduct) {
     currentSection = <AddProductSection onBack={handleBackFromAddProduct} />;
+  } else if (showAddNotification) {
+    currentSection = <AddNotificationSection onBack={handleBackFromAddNotification} />;
   } else {
     currentSection = sectionMap[activePage];
   }

@@ -1,19 +1,67 @@
+import { useState, useEffect } from 'react';
 import { Store, Package, Shirt, RefreshCw, TrendingUp, CalendarDays } from 'lucide-react';
 import MetricCard from '../components/MetricCard';
 import ActiveProductsBar from '../components/ActiveProductsBar';
 import TotalUsersCard from '../components/TotalUsersCard';
 import QuickActionsPanel from '../components/QuickActionsPanel';
 import TopCategoriesChart from '../components/TopCategoriesChart';
-
-const metrics = [
-  { label: 'Total Stores', value: '128', icon: Store, iconColor: 'text-admin-brand', overlayBg: 'bg-admin-brand/10', badge: '+4.5%', badgeColor: 'text-admin-success' },
-  { label: 'Total Products', value: '42,904', icon: Package, iconColor: 'text-admin-success', overlayBg: 'bg-admin-success/10', badge: '+12.2%', badgeColor: 'text-admin-success' },
-  { label: 'Try-On times', value: '85', icon: Shirt, iconColor: 'text-admin-amber', overlayBg: 'bg-admin-amber/10', badge: 'Enabled', badgeColor: 'text-admin-text-secondary' },
-  { label: 'Recycle times', value: '85', icon: RefreshCw, iconColor: 'text-admin-amber', overlayBg: 'bg-admin-amber/10', badge: 'Enabled', badgeColor: 'text-admin-text-secondary' },
-  { label: 'Monthly Revenue', value: '$0', icon: TrendingUp, iconColor: 'text-admin-danger', overlayBg: 'bg-admin-danger/10', badge: 'Peak', badgeColor: 'text-admin-success' },
-];
+import { getStoresApi, getProductsApi, getNotificationsApi } from '../../../api/adminApi';
 
 export default function DashboardSection() {
+  const [stores, setStores] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [storesRes, productsRes, notifRes] = await Promise.all([
+          getStoresApi(),
+          getProductsApi(),
+          getNotificationsApi(),
+        ]);
+        setStores(storesRes.data);
+        setProducts(productsRes.data);
+        setUnreadCount(notifRes.data.unreadCount || 0);
+      } catch (err) {
+        console.error('Dashboard fetch error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
+  const totalStores = stores.length;
+  const totalProducts = products.length;
+  const activeProducts = products.filter((p) => p.is_active).length;
+  const tryOnEnabled = products.filter((p) => p.try_on_enabled).length;
+  const activePercent = totalProducts > 0 ? Math.round((activeProducts / totalProducts) * 100) : 0;
+
+  const categoryCount = {};
+  products.forEach((p) => {
+    const cat = p.category || 'other';
+    categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+  });
+  const sortedCategories = Object.entries(categoryCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+  const topCategoryPercent = sortedCategories.length > 0
+    ? Math.round((sortedCategories[0][1] / totalProducts) * 100)
+    : 0;
+
+  const categoryLabels = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', acc: 'Accessories' };
+  const categoryColors = ['bg-admin-brand', 'bg-admin-success', 'bg-admin-category'];
+
+  const metrics = [
+    { label: 'Total Stores', value: loading ? '—' : totalStores.toLocaleString(), icon: Store, iconColor: 'text-admin-brand', overlayBg: 'bg-admin-brand/10', badge: `${totalStores}`, badgeColor: 'text-admin-success' },
+    { label: 'Total Products', value: loading ? '—' : totalProducts.toLocaleString(), icon: Package, iconColor: 'text-admin-success', overlayBg: 'bg-admin-success/10', badge: `${activeProducts} active`, badgeColor: 'text-admin-success' },
+    { label: 'Try-On enabled', value: loading ? '—' : tryOnEnabled.toLocaleString(), icon: Shirt, iconColor: 'text-admin-amber', overlayBg: 'bg-admin-amber/10', badge: 'Enabled', badgeColor: 'text-admin-text-secondary' },
+    { label: 'Unread Notifications', value: loading ? '—' : unreadCount.toLocaleString(), icon: RefreshCw, iconColor: 'text-admin-amber', overlayBg: 'bg-admin-amber/10', badge: unreadCount > 0 ? 'New' : 'All read', badgeColor: unreadCount > 0 ? 'text-admin-brand' : 'text-admin-text-secondary' },
+    { label: 'Active Rate', value: loading ? '—' : `${activePercent}%`, icon: TrendingUp, iconColor: 'text-admin-danger', overlayBg: 'bg-admin-danger/10', badge: 'of total', badgeColor: 'text-admin-success' },
+  ];
+
   return (
     <>
       {/* Desktop */}
@@ -38,13 +86,21 @@ export default function DashboardSection() {
         </div>
 
         <div className="flex gap-[26px] mb-8">
-          <ActiveProductsBar />
-          <TotalUsersCard />
+          <ActiveProductsBar activeProducts={activeProducts} totalProducts={totalProducts} activePercent={activePercent} loading={loading} />
+          <TotalUsersCard totalStores={totalStores} loading={loading} />
         </div>
 
         <div className="flex gap-8 mb-8">
           <QuickActionsPanel />
-          <TopCategoriesChart />
+          <TopCategoriesChart
+            categories={sortedCategories.map(([cat, count], i) => ({
+              color: categoryColors[i] || 'bg-admin-border',
+              label: categoryLabels[cat] || cat,
+              count,
+            }))}
+            topPercent={topCategoryPercent}
+            loading={loading}
+          />
         </div>
       </div>
 
