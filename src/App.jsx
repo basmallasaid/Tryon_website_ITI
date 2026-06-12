@@ -37,6 +37,8 @@ import Products from './pages/admin/Products';
 import EditProfilePage from './pages/profile/EditProfilePage';
 import ContactUs from './pages/contactUs/ContactUs';
 import Fav from './pages/fav/Fav';
+import WardrobePage from './pages/wardrobe/WardrobePage';
+import EditItemWardrobe from './components/wardrobe/EditItemWardrobe';
 
 const LoadingFallback = () => (
   <Box
@@ -80,12 +82,14 @@ function AppContent() {
             { path: 'auth/callback', element: <GoogleCallback /> },
             { path: 'stores', element: <StoresPage /> },
             { path: 'avatar', element: <AvatarGeneration /> },
-            { path: 'matching', element: <Matching /> },
             { path: 'recycle', element: <Recycle /> },
             { path: 'about-recycle', element: <AboutRecycle /> },
+            { path: 'matching', element: <Matching /> },
             { path: 'contact-us', element: <ContactUs /> },
             { path: 'editprofile', element: <EditProfilePage /> },
             { path: 'favorites', element: <Fav /> },
+            { path: 'wardeobe', element: <WardrobePage /> },
+            { path: 'wardeobe/edit/:id', element: <EditItemWardrobe /> },
           ],
         },
       ],

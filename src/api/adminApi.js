@@ -8,5 +8,6 @@ export const deleteStoreApi = (id) => api.delete(`/stores/${id}`);
 
 export const getProductsApi = (params) => api.get('/products', { params });
 export const getStoreProductsApi = (storeId) => api.get(`/stores/${storeId}/products`);
+export const createProductApi = (data) => api.post('/products', data);
 
 export const getNotificationsApi = () => api.get('/notifications');
