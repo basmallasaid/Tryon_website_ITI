@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ArrowLeft, Upload, Info, Image as ImageIcon, Tag, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Info, Image as ImageIcon, Tag, CheckCircle } from 'lucide-react';
+import { createStoreApi } from '../../../api/adminApi';
 
 export default function AddStoreSection({ onBack }) {
   const [storeName, setStoreName] = useState('');
@@ -8,16 +9,49 @@ export default function AddStoreSection({ onBack }) {
   const [discountCode, setDiscountCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState(10);
   const [isActive, setIsActive] = useState(true);
-  const [logo, setLogo] = useState(null);
+  const [logoUrl, setLogoUrl] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const handleLogoUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setLogo(reader.result);
-      reader.readAsDataURL(file);
+  const handleSubmit = async () => {
+    if (!storeName.trim() || !description.trim() || !websiteUrl.trim() || !logoUrl.trim()) {
+      alert('Please fill all required fields (Name, Description, Website, Logo URL).');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const payload = {
+        name: storeName.trim(),
+        description: description.trim(),
+        website_url: websiteUrl.startsWith('http') ? websiteUrl.trim() : `https://${websiteUrl.trim()}`,
+        logo_url: logoUrl.trim(),
+        discount_code: discountCode.trim() || null,
+        discount_percent: discountPercent || null,
+        is_active: isActive,
+      };
+      await createStoreApi(payload);
+      setSuccess(true);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to create store.');
+    } finally {
+      setSubmitting(false);
     }
   };
+
+  if (success) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-8">
+        <div className="text-center max-w-md">
+          <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-admin-text-primary mb-2">Store Created!</h2>
+          <p className="text-sm text-admin-text-secondary mb-6">"{storeName}" has been added to the network.</p>
+          <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
+            Back to Stores
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -28,8 +62,8 @@ export default function AddStoreSection({ onBack }) {
             <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">Add New Store</h1>
             <p className="text-sm text-admin-text-secondary mt-1">Configure your new digital storefront and brand identity.</p>
           </div>
-          <button className="flex items-center gap-2 px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors">
-            Save Store
+          <button onClick={handleSubmit} disabled={submitting} className="flex items-center gap-2 px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50">
+            {submitting ? 'Saving…' : 'Save Store'}
           </button>
         </div>
 
@@ -42,7 +76,7 @@ export default function AddStoreSection({ onBack }) {
             </div>
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Store Name</label>
+                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Store Name *</label>
                 <input
                   type="text"
                   value={storeName}
@@ -52,7 +86,7 @@ export default function AddStoreSection({ onBack }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Description</label>
+                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Description *</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -62,7 +96,7 @@ export default function AddStoreSection({ onBack }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Website URL</label>
+                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Website URL *</label>
                 <div className="flex">
                   <span className="flex items-center px-4 py-3.5 bg-admin-profile border border-r-0 border-admin-border rounded-l-xl text-xs text-admin-text-secondary">https://</span>
                   <input
@@ -83,20 +117,20 @@ export default function AddStoreSection({ onBack }) {
               <div className="w-5 h-5 text-admin-brand"><ImageIcon className="w-5 h-5" /></div>
               <h2 className="text-xl font-medium text-admin-text-primary">Brand Assets</h2>
             </div>
-            <div className="flex flex-col items-center">
-              <label className="block text-xs font-medium text-admin-text-secondary mb-3 tracking-wider">Brand Logo</label>
-              <label className="w-full max-w-[460px] h-[140px] flex flex-col items-center justify-center gap-2 bg-admin-brand-bg border-2 border-dashed border-admin-border rounded-2xl cursor-pointer hover:border-admin-brand transition-colors">
-                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-                {logo ? (
-                  <img src={logo} alt="Logo preview" className="w-20 h-20 rounded-full object-cover" />
-                ) : (
-                  <>
-                    <Upload className="w-6 h-6 text-admin-text-muted" />
-                    <span className="text-sm text-admin-text-secondary">Drop logo here</span>
-                    <span className="text-xs text-admin-text-muted">SVG or PNG (Max 2MB)</span>
-                  </>
-                )}
-              </label>
+            <div className="space-y-4">
+              <label className="block text-xs font-medium text-admin-text-secondary tracking-wider">Brand Logo URL *</label>
+              <input
+                type="url"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://example.com/logo.png"
+                className="w-full px-4 py-3.5 bg-admin-brand-bg border border-admin-border rounded-xl text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
+              />
+              {logoUrl && (
+                <div className="w-24 h-24 rounded-full border border-admin-border overflow-hidden">
+                  <img src={logoUrl} alt="Logo preview" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                </div>
+              )}
             </div>
           </div>
 
@@ -128,6 +162,7 @@ export default function AddStoreSection({ onBack }) {
                     onChange={(e) => setDiscountPercent(Number(e.target.value))}
                     className="w-full accent-admin-brand"
                   />
+                  <span className="text-xs text-admin-text-secondary mt-1 block">{discountPercent}%</span>
                 </div>
               </div>
               <div className="flex items-center gap-3 pb-1">
@@ -154,24 +189,23 @@ export default function AddStoreSection({ onBack }) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-5">
-          {/* Logo Upload */}
+          {/* Logo Preview */}
           <div className="flex flex-col items-center gap-3">
-            <label className="w-24 h-24 rounded-full border-2 border-dashed border-admin-text-muted bg-admin-input flex items-center justify-center cursor-pointer hover:border-admin-brand transition-colors">
-              <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-              {logo ? (
-                <img src={logo} alt="Logo preview" className="w-full h-full rounded-full object-cover" />
+            <div className="w-24 h-24 rounded-full border-2 border-dashed border-admin-text-muted bg-admin-input flex items-center justify-center overflow-hidden">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo preview" className="w-full h-full rounded-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
               ) : (
-                <Upload className="w-7 h-7 text-admin-text-muted" />
+                <ImageIcon className="w-7 h-7 text-admin-text-muted" />
               )}
-            </label>
-            <span className="text-xs font-medium text-admin-text-secondary">Upload Store Logo</span>
+            </div>
+            <span className="text-xs font-medium text-admin-text-secondary">Store Logo</span>
           </div>
 
           {/* Basic Information */}
           <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Store Name</label>
+                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Store Name *</label>
                 <input
                   type="text"
                   value={storeName}
@@ -181,7 +215,7 @@ export default function AddStoreSection({ onBack }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Description</label>
+                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Description *</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -191,12 +225,22 @@ export default function AddStoreSection({ onBack }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Website URL</label>
+                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Website URL *</label>
                 <input
                   type="text"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
                   placeholder="https://dolapy.com/store"
+                  className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Logo URL *</label>
+                <input
+                  type="url"
+                  value={logoUrl}
+                  onChange={(e) => setLogoUrl(e.target.value)}
+                  placeholder="https://example.com/logo.png"
                   className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted"
                 />
               </div>
@@ -253,9 +297,9 @@ export default function AddStoreSection({ onBack }) {
         </div>
 
         <div className="px-4 py-4 bg-white border-t border-admin-border/30">
-          <button className="w-full flex items-center justify-center gap-2 py-4 bg-admin-brand text-white rounded-2xl text-base font-medium shadow-md hover:bg-admin-brand-light transition-colors">
+          <button onClick={handleSubmit} disabled={submitting} className="w-full flex items-center justify-center gap-2 py-4 bg-admin-brand text-white rounded-2xl text-base font-medium shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50">
             <CheckCircle className="w-5 h-5" />
-            Save & Create Store
+            {submitting ? 'Creating…' : 'Save & Create Store'}
           </button>
         </div>
       </div>
