@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import DashboardSection from './sections/DashboardSection';
 import StoresSection from './sections/StoresSection';
+import AddStoreSection from './sections/AddStoreSection';
 import ProductsSection from './sections/ProductsSection';
+import AddProductSection from './sections/AddProductSection';
 import PromotionsSection from './sections/PromotionsSection';
 import NotificationsSection from './sections/NotificationsSection';
 import EmailCenterSection from './sections/EmailCenterSection';
@@ -10,23 +13,61 @@ import UsersSection from './sections/UsersSection';
 import ApiManagementSection from './sections/ApiManagementSection';
 import SettingsSection from './sections/SettingsSection';
 
-const sectionMap = {
-  dashboard: <DashboardSection />,
-  stores: <StoresSection />,
-  products: <ProductsSection />,
-  promotions: <PromotionsSection />,
-  notifications: <NotificationsSection />,
-  emailCenter: <EmailCenterSection />,
-  users: <UsersSection />,
-  apiManagement: <ApiManagementSection />,
-  settings: <SettingsSection />,
-};
-
 export default function AdminDashboardPage() {
   const [activePage, setActivePage] = useState('dashboard');
+  const [showAddStore, setShowAddStore] = useState(false);
+  const [showAddProduct, setShowAddProduct] = useState(false);
+
+  const handleAddStore = () => { setActivePage('stores'); setShowAddStore(true); };
+  const handleBackFromAddStore = () => setShowAddStore(false);
+
+  const handleAddProduct = () => { setActivePage('products'); setShowAddProduct(true); };
+  const handleBackFromAddProduct = () => setShowAddProduct(false);
+
+  const navigate = (page) => {
+    setActivePage(page);
+    setShowAddStore(false);
+    setShowAddProduct(false);
+  };
+
+  const sectionMap = {
+    dashboard: <DashboardSection />,
+    stores: <StoresSection onAddStore={handleAddStore} />,
+    products: <ProductsSection onAddProduct={handleAddProduct} />,
+    promotions: <PromotionsSection />,
+    notifications: <NotificationsSection />,
+    emailCenter: <EmailCenterSection />,
+    users: <UsersSection />,
+    apiManagement: <ApiManagementSection />,
+    settings: <SettingsSection />,
+  };
+
+  const topBarActions = activePage === 'stores' && !showAddStore ? (
+    <button onClick={handleAddStore} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
+      <Plus className="w-4 h-4" /> Add Store
+    </button>
+  ) : activePage === 'products' && !showAddProduct ? (
+    <button onClick={handleAddProduct} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
+      <Plus className="w-4 h-4" /> Add product
+    </button>
+  ) : activePage === 'notifications' ? (
+    <button className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
+      <Plus className="w-4 h-4" /> Add notifications
+    </button>
+  ) : null;
+
+  let currentSection;
+  if (showAddStore) {
+    currentSection = <AddStoreSection onBack={handleBackFromAddStore} />;
+  } else if (showAddProduct) {
+    currentSection = <AddProductSection onBack={handleBackFromAddProduct} />;
+  } else {
+    currentSection = sectionMap[activePage];
+  }
+
   return (
-    <AdminLayout activePage={activePage} setActivePage={setActivePage}>
-      {sectionMap[activePage]}
+    <AdminLayout activePage={activePage} setActivePage={navigate} topBarActions={topBarActions}>
+      {currentSection}
     </AdminLayout>
   );
 }
