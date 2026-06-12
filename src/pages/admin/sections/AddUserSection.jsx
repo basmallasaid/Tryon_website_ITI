@@ -1,19 +1,46 @@
 import { useState } from 'react';
-import { ArrowLeft, UserPlus, Shirt, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, User, Store, Star, Shirt, RefreshCw, Minus, Plus } from 'lucide-react';
+import AddIcon from '../../../icons/AddIcon';
+import ShieldCheckIcon from '../../../icons/ShieldCheckIcon';
+
+const roles = [
+  { id: 'User', icon: User, title: 'User', description: 'Standard enterprise access with individual limits.' },
+  { id: 'Store Owner', icon: Store, title: 'Store Owner', description: 'Management rights for a single store location.' },
+  { id: 'Premium', icon: Star, title: 'Premium', description: 'Advanced tools and unlimited catalog syncing.' },
+];
+
+function Stepper({ value, onChange, min = 0 }) {
+  return (
+    <div className="flex items-center gap-3">
+      <button
+        onClick={() => onChange(Math.max(min, value - 1))}
+        disabled={value <= min}
+        className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#C3C5D7] bg-white text-[#434654] hover:bg-[#FAF8FF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <Minus className="w-4 h-4" />
+      </button>
+      <span className="w-12 text-center text-xl font-semibold text-[#191B23]">{value}</span>
+      <button
+        onClick={() => onChange(value + 1)}
+        className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#C3C5D7] bg-white text-[#434654] hover:bg-[#FAF8FF] transition-colors"
+      >
+        <Plus className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
 
 export default function AddUserSection({ onBack }) {
   const [form, setForm] = useState({
     name: '',
     email: '',
+    employeeId: '',
     role: 'User',
-    tryOnUsed: 0,
-    tryOnTotal: 5,
-    recyclingUsed: 0,
-    recyclingTotal: 5,
-    status: 'Active',
+    tryOnLimit: 25,
+    recycleLimit: 10,
   });
 
-  const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+  const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
   return (
     <>
@@ -29,134 +56,127 @@ export default function AddUserSection({ onBack }) {
               <p className="text-sm text-admin-text-secondary mt-1">Create a new user account and assign access permissions.</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors">
-            <UserPlus className="w-4 h-4" />
-            Save User
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="px-8 py-3 border border-[#C3C5D7] text-[#434654] rounded-xl text-sm font-bold hover:bg-[#FAF8FF] transition-colors">
+              Cancel
+            </button>
+            <button className="flex items-center gap-2 px-8 py-3 bg-[#1550D3] text-white rounded-xl text-sm font-bold shadow-md hover:bg-[#1550D3]/90 transition-colors">
+              <Plus className="w-4 h-4" />
+              Add User
+            </button>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          {/* Profile */}
-          <div className="bg-white border border-admin-border/30 rounded-2xl p-8 shadow-sm">
+        <div className="flex flex-col gap-6">
+          {/* User Identity Card */}
+          <div className="bg-white border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-5 h-5 text-admin-brand"><UserPlus className="w-5 h-5" /></div>
-              <h2 className="text-xl font-medium text-admin-text-primary">User Profile</h2>
+              <AddIcon className="w-5 h-5 text-[#1550D3]" />
+              <h2 className="text-base text-[#191B23]">User Identity</h2>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Full Name</label>
+                <label className="block text-base text-[#434654] mb-2">Full Name</label>
                 <input
                   type="text"
                   value={form.name}
-                  onChange={(e) => update('name', e.target.value)}
-                  placeholder="e.g. Sara Al-Rashidi"
-                  className="w-full px-4 py-3.5 bg-admin-brand-bg border border-admin-border rounded-xl text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
+                  onChange={e => update('name', e.target.value)}
+                  placeholder="e.g. Alexander McQueen"
+                  className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Email Address</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => update('email', e.target.value)}
-                  placeholder="sara@example.com"
-                  className="w-full px-4 py-3.5 bg-admin-brand-bg border border-admin-border rounded-xl text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Role</label>
-                <select
-                  value={form.role}
-                  onChange={(e) => update('role', e.target.value)}
-                  className="w-full px-4 py-3.5 bg-admin-brand-bg border border-admin-border rounded-xl text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
-                >
-                  <option value="User">User</option>
-                  <option value="Premium">Premium</option>
-                  <option value="Store Owner">Store Owner</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Quotas */}
-          <div className="bg-white border border-admin-border/30 rounded-2xl p-8 shadow-sm">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-5 h-5 text-admin-brand"><ShieldCheck className="w-5 h-5" /></div>
-              <h2 className="text-xl font-medium text-admin-text-primary">Usage Quotas</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <Shirt className="w-4 h-4 text-brand-secondary" />
-                  <span className="text-xs font-medium text-admin-text-secondary tracking-wider">Virtual Try-On</span>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-base text-[#434654] mb-2">Email Address</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={e => update('email', e.target.value)}
+                    placeholder="alexander@dolapy.com"
+                    className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
+                  />
                 </div>
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Used</label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={form.tryOnUsed}
-                      onChange={(e) => update('tryOnUsed', Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Total</label>
-                    <input
-                      type="number"
-                      min={1}
-                      value={form.tryOnTotal}
-                      onChange={(e) => update('tryOnTotal', Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <RefreshCw className="w-4 h-4 text-[#2B7FFF]" />
-                  <span className="text-xs font-medium text-admin-text-secondary tracking-wider">Recycling</span>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Used</label>
-                    <input
-                      type="number"
-                      min={0}
-                      value={form.recyclingUsed}
-                      onChange={(e) => update('recyclingUsed', Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Total</label>
-                    <input
-                      type="number"
-                      min={1}
-                      value={form.recyclingTotal}
-                      onChange={(e) => update('recyclingTotal', Number(e.target.value))}
-                      className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-base text-[#434654] mb-2">Employee ID</label>
+                  <input
+                    type="text"
+                    value={form.employeeId}
+                    onChange={e => update('employeeId', e.target.value)}
+                    placeholder="DLP-9921-X"
+                    className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Status */}
-          <div className="bg-white border border-admin-border/30 rounded-2xl p-8 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-admin-text-primary">Account Status</p>
-                <p className="text-xs text-admin-text-secondary mt-0.5">Activate the user account immediately</p>
+          {/* Permissions & Limits Card */}
+          <div className="bg-white border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm space-y-8">
+            {/* Account Role */}
+            <div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-5 h-5 text-[#1550D3]"><ShieldCheckIcon className="w-5 h-5" /></div>
+                <h2 className="text-xl font-medium text-[#191B23]">Account Role</h2>
               </div>
-              <button
-                onClick={() => update('status', form.status === 'Active' ? 'Suspended' : 'Active')}
-                className={`relative w-12 h-7 rounded-full transition-colors ${form.status === 'Active' ? 'bg-admin-brand' : 'bg-admin-border'}`}
-              >
-                <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-sm transition-transform ${form.status === 'Active' ? 'translate-x-5' : ''}`} />
-              </button>
+              <div className="grid grid-cols-3 gap-4">
+                {roles.map(role => {
+                  const Icon = role.icon;
+                  const selected = form.role === role.id;
+                  return (
+                    <button
+                      key={role.id}
+                      onClick={() => update('role', role.id)}
+                      className={`relative flex items-center gap-4 text-left p-5 rounded-xl border transition-all ${
+                        selected
+                          ? 'border-[#1550D3] bg-[#FAF8FF] shadow-sm'
+                          : 'border-[#C3C5D7] bg-white hover:border-[#1550D3]/40'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${selected ? 'bg-[#1550D3] text-white' : 'bg-[#FAF8FF] text-[#434654]'}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className={`text-sm font-semibold mb-1 ${selected ? 'text-[#1550D3]' : 'text-[#191B23]'}`}>{role.title}</h3>
+                        <p className="text-xs text-[#434654] leading-relaxed">{role.description}</p>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selected ? 'border-[#1550D3]' : 'border-[#C3C5D7]'}`}>
+                        {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#1550D3]" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="border-t border-[#C3C5D7]/50" />
+
+            {/* Usage Limits */}
+            <div>
+              <h2 className="text-xl font-medium text-[#191B23] mb-6">Usage Limits</h2>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Shirt className="w-4 h-4 text-[#1550D3]" />
+                      <span className="text-sm font-medium text-[#191B23]">Try-On Limit</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md tracking-wider">MONTHLY</span>
+                  </div>
+                  <Stepper value={form.tryOnLimit} onChange={v => update('tryOnLimit', v)} min={0} />
+                  <p className="text-xs text-[#434654] mt-3">Maximum virtual fitting room sessions allowed.</p>
+                </div>
+                <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 text-[#1550D3]" />
+                      <span className="text-sm font-medium text-[#191B23]">Recycle Limit</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md tracking-wider">SUSTAINABILITY</span>
+                  </div>
+                  <Stepper value={form.recycleLimit} onChange={v => update('recycleLimit', v)} min={0} />
+                  <p className="text-xs text-[#434654] mt-3">Garment recycling program participation cap.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -172,104 +192,72 @@ export default function AddUserSection({ onBack }) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-5">
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Full Name</label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => update('name', e.target.value)}
-                  placeholder="e.g. Sara Al-Rashidi"
-                  className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Email Address</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => update('email', e.target.value)}
-                  placeholder="sara@example.com"
-                  className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Role</label>
-                <select
-                  value={form.role}
-                  onChange={(e) => update('role', e.target.value)}
-                  className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none"
+          <div className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Full Name</label>
+              <input type="text" value={form.name} onChange={e => update('name', e.target.value)} placeholder="e.g. Alexander McQueen" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Email Address</label>
+              <input type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="alexander@dolapy.com" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Employee ID</label>
+              <input type="text" value={form.employeeId} onChange={e => update('employeeId', e.target.value)} placeholder="DLP-9921-X" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+            </div>
+          </div>
+
+          <h3 className="text-xs font-bold text-[#191B23] tracking-widest uppercase">Account Role</h3>
+          <div className="space-y-3">
+            {roles.map(role => {
+              const Icon = role.icon;
+              const selected = form.role === role.id;
+              return (
+                <button
+                  key={role.id}
+                  onClick={() => update('role', role.id)}
+                  className={`w-full flex items-center gap-3 text-left p-4 rounded-xl border transition-all ${selected ? 'border-[#1550D3] bg-[#FAF8FF]' : 'border-[#C3C5D7] bg-white'}`}
                 >
-                  <option value="User">User</option>
-                  <option value="Premium">Premium</option>
-                  <option value="Store Owner">Store Owner</option>
-                </select>
-              </div>
-            </div>
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${selected ? 'bg-[#1550D3] text-white' : 'bg-[#FAF8FF] text-[#434654]'}`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className={`text-sm font-semibold ${selected ? 'text-[#1550D3]' : 'text-[#191B23]'}`}>{role.title}</span>
+                    <p className="text-xs text-[#434654] mt-0.5">{role.description}</p>
+                  </div>
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${selected ? 'border-[#1550D3]' : 'border-[#C3C5D7]'}`}>
+                    {selected && <div className="w-2 h-2 rounded-full bg-[#1550D3]" />}
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center gap-2 mb-5">
-              <ShieldCheck className="w-4 h-4 text-admin-brand" />
-              <h3 className="text-xs font-bold text-admin-text-primary tracking-widest uppercase">Usage Quotas</h3>
+          <h3 className="text-xs font-bold text-[#191B23] tracking-widest uppercase">Usage Limits</h3>
+          <div className="space-y-4">
+            <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-[#191B23]">Try-On Limit</span>
+                <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md">MONTHLY</span>
+              </div>
+              <Stepper value={form.tryOnLimit} onChange={v => update('tryOnLimit', v)} min={0} />
+              <p className="text-xs text-[#434654] mt-2">Maximum virtual fitting room sessions allowed.</p>
             </div>
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <Shirt className="w-3.5 h-3.5 text-brand-secondary" />
-                  <span className="text-xs font-medium text-admin-text-secondary">Virtual Try-On</span>
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Used</label>
-                    <input type="number" min={0} value={form.tryOnUsed} onChange={(e) => update('tryOnUsed', Number(e.target.value))} className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm outline-none text-admin-text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Total</label>
-                    <input type="number" min={1} value={form.tryOnTotal} onChange={(e) => update('tryOnTotal', Number(e.target.value))} className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm outline-none text-admin-text-primary" />
-                  </div>
-                </div>
+            <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-[#191B23]">Recycle Limit</span>
+                <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md">SUSTAINABILITY</span>
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-2">
-                  <RefreshCw className="w-3.5 h-3.5 text-[#2B7FFF]" />
-                  <span className="text-xs font-medium text-admin-text-secondary">Recycling</span>
-                </div>
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Used</label>
-                    <input type="number" min={0} value={form.recyclingUsed} onChange={(e) => update('recyclingUsed', Number(e.target.value))} className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm outline-none text-admin-text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-[10px] text-admin-text-muted mb-1">Total</label>
-                    <input type="number" min={1} value={form.recyclingTotal} onChange={(e) => update('recyclingTotal', Number(e.target.value))} className="w-full px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm outline-none text-admin-text-primary" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-admin-text-primary">Account Status</p>
-                <p className="text-xs text-admin-text-secondary">Activate the user account immediately</p>
-              </div>
-              <button
-                onClick={() => update('status', form.status === 'Active' ? 'Suspended' : 'Active')}
-                className={`relative w-12 h-7 rounded-full transition-colors ${form.status === 'Active' ? 'bg-admin-brand' : 'bg-admin-border'}`}
-              >
-                <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-sm transition-transform ${form.status === 'Active' ? 'translate-x-5' : ''}`} />
-              </button>
+              <Stepper value={form.recycleLimit} onChange={v => update('recycleLimit', v)} min={0} />
+              <p className="text-xs text-[#434654] mt-2">Garment recycling program participation cap.</p>
             </div>
           </div>
         </div>
 
         <div className="px-4 py-4 bg-white border-t border-admin-border/30">
-          <button className="w-full flex items-center justify-center gap-2 py-4 bg-admin-brand text-white rounded-2xl text-base font-medium shadow-md hover:bg-admin-brand-light transition-colors">
-            <UserPlus className="w-5 h-5" />
-            Save & Create User
+          <button className="w-full flex items-center justify-center gap-2 py-4 bg-[#1550D3] text-white rounded-2xl text-base font-medium shadow-md hover:bg-[#1550D3]/90 transition-colors">
+            <Plus className="w-5 h-5" />
+            Add
           </button>
         </div>
       </div>
