@@ -33,7 +33,7 @@ const AddItemModal = ({ isOpen, onClose }) => {
             const analysisResult = res.data;
             const analysisId = analysisResult.analysis_id || analysisResult.id || analysisResult._id;
             onClose();
-            navigate('/wardeobe/edit/new', {
+            navigate('/wardrobe/edit/new', {
                 state: { analysisId, analysisResult, imageFile: selectedFile }
             });
         } catch (err) {

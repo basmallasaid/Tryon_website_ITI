@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Sparkles, Shirt, Grid3x3, X, LogIn, Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import StepIndicator from "../recycle/components/StepIndicator";
 import UploadArea from "../recycle/components/UploadArea";
@@ -32,6 +32,14 @@ export default function TryOn() {
   const { user } = useAuth();
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const storeProduct = useMemo(
+    () => location.state?.productImage
+      ? { image: location.state.productImage, name: location.state.productName || 'Product' }
+      : null,
+    [location.state]
+  );
 
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(null);
   const [avatarBlob, setAvatarBlob] = useState(null);
@@ -47,6 +55,7 @@ export default function TryOn() {
   const [generateError, setGenerateError] = useState(null);
   const [userPhoto, setUserPhoto] = useState(null);
   const [userPhotoFile, setUserPhotoFile] = useState(null);
+  const [productImageFile, setProductImageFile] = useState(null);
 
   const resultRef = useRef(null);
   const galleryPreviewsRef = useRef([]);
@@ -90,6 +99,22 @@ export default function TryOn() {
       galleryPreviewsRef.current.forEach((u) => URL.revokeObjectURL(u));
     };
   }, []);
+
+  useEffect(() => {
+    if (!storeProduct) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(storeProduct.image);
+        if (!cancelled && res.ok) {
+          const blob = await res.blob();
+          setProductImageFile(blob);
+          setSelectedItems(['__product__']);
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [storeProduct]);
 
   useEffect(() => {
     if (selectedModel !== "avatar" || !user) return;
@@ -223,17 +248,26 @@ export default function TryOn() {
         }
       }
 
-      const selectedWardrobeItems = wardrobeItems.filter((item) =>
-        selectedItems.includes(item._id)
-      );
-
       const logDetails = { model: selectedModel, items: [] };
-      for (const [key, val] of formData.entries()) {
-        logDetails[key] = val instanceof File ? `File: ${val.name} (${val.size} bytes, ${val.type})` : val;
-      }
 
       let resultUrl;
-      if (selectedWardrobeItems.length === 1) {
+      if (storeProduct && productImageFile) {
+        formData.append("garmentImage", productImageFile, "product.jpg");
+        logDetails.garmentImage = `File: product.jpg (${productImageFile.size} bytes, ${productImageFile.type})`;
+        console.log("🚀 [TryOn] Sending request to POST /api/virtual-tryon (store product)", logDetails);
+        const res = await virtualTryOnApi(formData);
+        console.log("✅ [TryOn] Response:", res.data);
+        resultUrl = res.data?.imageUrl;
+      } else {
+        const selectedWardrobeItems = wardrobeItems.filter((item) =>
+          selectedItems.includes(item._id)
+        );
+
+        for (const [key, val] of formData.entries()) {
+          logDetails[key] = val instanceof File ? `File: ${val.name} (${val.size} bytes, ${val.type})` : val;
+        }
+
+        if (selectedWardrobeItems.length === 1) {
         const item = selectedWardrobeItems[0];
         const garmentFile = base64ToFile(item.image, "garment");
         formData.append("garmentImage", garmentFile);
@@ -254,6 +288,7 @@ export default function TryOn() {
         const res = await virtualTryOnOutfitApi(formData);
         console.log("✅ [TryOn] Response:", res.data);
         resultUrl = res.data?.imageUrl;
+      }
       }
 
       if (resultUrl) setGeneratedImageUrl(resultUrl);
@@ -414,7 +449,26 @@ export default function TryOn() {
         </section>
         )}
 
+        {/* Product Image Preview (from store) */}
+        {storeProduct && productImageFile && (
+          <section className="mt-12 sm:mt-16">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex gap-6 items-center p-6 rounded-2xl bg-white border border-gray-200 shadow-sm">
+                <div className="w-28 h-36 rounded-xl overflow-hidden border-2 border-blue-100 flex-shrink-0">
+                  <img src={URL.createObjectURL(productImageFile)} alt={storeProduct.name} className="w-full h-full object-cover" />
+                </div>
+                <div>
+                  <p className="font-bold text-lg text-gray-800">{storeProduct.name}</p>
+                  <p className="text-sm text-gray-500 mt-1">This product is pre-selected for try-on</p>
+                  <p className="text-xs text-gray-400 mt-1">Select your model above and generate</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Tabs */}
+        {!storeProduct && (
         <section className="mt-12 sm:mt-16">
           <div className="flex gap-4 max-w-6xl mx-auto">
           <button
@@ -439,8 +493,10 @@ export default function TryOn() {
           </button>
         </div>
         </section>
+        )}
 
         {/* Wardrobe / Gallery Content */}
+        {!storeProduct && (
         <section className="mt-12 sm:mt-16">
           <div className="max-w-6xl mx-auto">
           {activeTab === "wardrobe" ? (
@@ -506,6 +562,7 @@ export default function TryOn() {
           )}
         </div>
         </section>
+        )}
 
         {/* Status Bar */}
         <section className="mt-12 sm:mt-16">
