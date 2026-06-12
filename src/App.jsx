@@ -27,7 +27,8 @@ import AvatarGeneration from './pages/avatar/AvatarGeneration';
 import { CircularProgress, Box } from '@mui/material';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import Layout from './pages/Layout';
-import AdminLayout from './pages/AdminLayout';
+import AdminLayout from './pages/admin/AdminLayout';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import Dashboard from './pages/admin/Dashboard';
 import Products from './pages/admin/Products';
 import EditProfilePage from './pages/profile/EditProfilePage';
@@ -68,11 +69,7 @@ function AppContent() {
     },
     {
       path: '/admin',
-      element: <AdminLayout />,
-      children: [
-        { index: true, element: <Dashboard /> },
-        { path: 'products', element: <Products /> },
-      ],
+      element: <AdminDashboardPage />,
     },
   ]);
   return (

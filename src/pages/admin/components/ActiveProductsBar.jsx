@@ -1,0 +1,15 @@
+export default function ActiveProductsBar() {
+  return (
+    <div className="flex-1 h-[78px] bg-admin-brand-bg border border-admin-border rounded-card px-6 py-4 flex flex-col justify-between">
+      <div className="flex justify-between items-center">
+        <span className="text-xs font-medium text-admin-text-secondary" style={{ letterSpacing: '0.24px' }}>
+          Active Products
+        </span>
+        <div className="w-[146px] h-1 bg-admin-brand/20 rounded-full overflow-hidden">
+          <div className="h-full bg-admin-brand rounded-full" style={{ width: '80%' }} />
+        </div>
+      </div>
+      <p className="text-xl font-medium text-admin-text-primary tracking-[-0.2px]">38,200</p>
+    </div>
+  );
+}
