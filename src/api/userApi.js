@@ -14,3 +14,4 @@ export const deleteUserAccountApi = (email) =>
 
 export const addToLatestTryOnApi = (data) =>
   api.post("/users/latest-tryon", data);
+export const getProductMatchesApi = (productId) => api.post(`/matches/product/${productId}`);

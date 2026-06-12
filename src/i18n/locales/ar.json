@@ -81,6 +81,8 @@
   "pricing": {
     "title": "خطط الاشتراك",
     "subtitle": "اختر خطتك المفضلة للبدء",
+    "manageTitle": "إدارة اشتراكك",
+    "manageSubtitle": "عرض خطتك الحالية وإدارة إعدادات الاشتراك",
     "monthly": "شهري",
     "yearly": "سنوي",
     "perMonth": "/شهر",
@@ -123,7 +125,23 @@
       "yearlyTotal": "12.19$"
     },
     "subscribeNow": "اشترك في الخطة المدفوعة",
-    "terms": "بالاشتراك، أنت توافق على شروط الخدمة وسياسة الخصوصية الخاصة بـ Redolapy."
+    "terms": "بالاشتراك، أنت توافق على شروط الخدمة وسياسة الخصوصية الخاصة بـ Redolapy.",
+    "loginRequired": "يرجى تسجيل الدخول للاشتراك في خطة",
+    "loginButton": "تسجيل الدخول",
+    "active": "نشط",
+    "proStyle": "برو ستايل",
+    "billing": "الفواتير",
+    "renews": "التجديد",
+    "yourBenefits": "مزاياك",
+    "cancelSubscription": "إلغاء الاشتراك",
+    "cancelModalTitle": "إلغاء اشتراكك؟",
+    "cancelModalDesc": "ستحتفظ بالوصول إلى ميزات الخطة المدفوعة حتى",
+    "cancelModalEnd": "بعد ذلك، سيعود حسابك إلى الخطة الأساسية.",
+    "keepSubscription": "الاحتفاظ بالاشتراك",
+    "confirmCancellation": "تأكيد الإلغاء",
+    "subscriptionSuccess": "تم تفعيل الاشتراك بنجاح!",
+    "loginPromptTitle": "الاشتراك يتطلب تسجيل الدخول",
+    "loginPromptDesc": "أنشئ حساباً أو سجل الدخول للاشتراك في خطة وفتح الميزات المميزة."
   },
   "questions": {
     "title": "أسئلة عن التنسيق؟",

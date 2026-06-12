@@ -10,7 +10,7 @@
     "login": "Login",
     "signup": "Sign-up",
     "language": "Language",
-    "logout":"Logout"
+    "logout": "Logout"
   },
   "hero": {
     "yourPersonal": "Your Personal",
@@ -81,6 +81,8 @@
   "pricing": {
     "title": "Subscription Plans",
     "subtitle": "Pick your favourite plan to get started",
+    "manageTitle": "Manage Your Subscription",
+    "manageSubtitle": "View your current plan and manage your subscription settings",
     "monthly": "Monthly",
     "yearly": "Yearly",
     "perMonth": "/mo",
@@ -123,7 +125,23 @@
       "yearlyTotal": "$12.19"
     },
     "subscribeNow": "Subscribe to pro",
-    "terms": "By subscribing, you agree to Redolapy's Terms of Service and Privacy Policy."
+    "terms": "By subscribing, you agree to Redolapy's Terms of Service and Privacy Policy.",
+    "loginRequired": "Please log in to subscribe to a plan",
+    "loginButton": "Log In",
+    "active": "ACTIVE",
+    "proStyle": "Pro Style",
+    "billing": "Billing",
+    "renews": "Renews",
+    "yourBenefits": "Your benefits",
+    "cancelSubscription": "Cancel Subscription",
+    "cancelModalTitle": "Cancel your Subscription?",
+    "cancelModalDesc": "You'll keep access to pro plan features until",
+    "cancelModalEnd": "After that, your account will return to the Essential plan.",
+    "keepSubscription": "Keep Subscription",
+    "confirmCancellation": "Confirm Cancellation",
+    "subscriptionSuccess": "Subscription activated successfully!",
+    "loginPromptTitle": "Subscription Requires Login",
+    "loginPromptDesc": "Create an account or log in to subscribe to a plan and unlock premium features."
   },
   "questions": {
     "title": "Styling Questions?",

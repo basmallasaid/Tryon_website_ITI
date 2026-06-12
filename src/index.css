@@ -3,6 +3,10 @@
 @import '@fontsource/roboto/600.css';
 @import '@fontsource/roboto/700.css';
 @import '@fontsource/plus-jakarta-sans/700.css';
+@import '@fontsource/geist/400.css';
+@import '@fontsource/geist/500.css';
+@import '@fontsource/geist/600.css';
+@import '@fontsource/geist/700.css';
 
 :root {
   --primary-bgc: #f5f6f7;
@@ -30,6 +34,7 @@
 
 @theme {
   --font-roboto: 'Roboto', sans-serif;
+  --font-geist: 'Geist', system-ui, sans-serif;
   --color-text-primary: #121826;
   --color-text-secondary: #1e1e24;
   --color-text-disabled: #6b7280;
@@ -45,11 +50,27 @@
   --color-icon-disabled: #bec8d2;
   --color-bg-secondary: #f4f3f5;
   --color-bg-sustainability: #f1fffb33;
-  --color-border-strong: #d5d9de;
   --color-placeholder: #a0a6b2;
   --color-checkbox-border: #bec8d2;
   --color-primary-hover: #89d4ff;
   --color-accent-pink: #ff6b8a;
+  /* Admin tokens */
+  --color-admin-brand: #1550D3;
+  --color-admin-brand-light: #3C6BED;
+  --color-admin-brand-bg: #FAF8FF;
+  --color-admin-brand-activeBg: #F3F3FE;
+  --color-admin-page: #F5F6F7;
+  --color-admin-sidebar: #FAF8FF;
+  --color-admin-border: #C3C5D7;
+  --color-admin-text-primary: #191B23;
+  --color-admin-text-secondary: #434654;
+  --color-admin-text-muted: #6B7280;
+  --color-admin-success: #006C49;
+  --color-admin-amber: #825100;
+  --color-admin-danger: #BA1A1A;
+  --color-admin-input: #EDEEEF;
+  --color-admin-profile: #EDEDF8;
+  --color-admin-category: #E2E1ED;
 }
 
 *,

@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Check, CircleCheck, Loader2, X } from "lucide-react";
+import { Check, CircleCheck, Loader2, X, Lock } from "lucide-react";
+import Swal from "sweetalert2";
 import { useAuth } from "../../context/AuthContext";
 import {
   createCheckoutSessionApi,
@@ -9,6 +10,7 @@ import {
   syncSubscriptionApi,
 } from "../../api/paymentApi";
 import { getSettingsApi } from "../../api/userApi";
+import AuthModal from "../../components/AuthModal";
 
 const pricingKeys = {
   essential: {
@@ -28,40 +30,59 @@ const pricingKeys = {
   },
 };
 
-function CancelModal({ open, onClose, onConfirm, cancelling }) {
+function CancelModal({ open, onClose, onConfirm, cancelling, endDate }) {
   const { t } = useTranslation();
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-[420px] bg-surface-elevated rounded-[24px] p-8 relative animate-fadeInScale">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 cursor-pointer text-text-secondary hover:text-text-primary"
-        >
-          <X className="w-5 h-5" />
-        </button>
-        <h3 className="font-bold text-2xl leading-[38px] text-text-primary mb-2">
-          Cancel Subscription
-        </h3>
-        <p className="font-normal text-base leading-6 text-text-secondary mb-8">
-          Are you sure you want to cancel your Pro subscription? You&apos;ll
-          lose access to premium features at the end of your current billing
-          period.
-        </p>
-        <div className="flex gap-3">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-[500px] rounded-lg border border-border-strong p-4 gap-4 bg-surface-elevated animate-fadeInScale"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-full border-b border-border-strong pb-4 flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-2">
+            <h3 className="font-roboto font-bold text-[24px] leading-[38.4px] text-text-primary text-center">
+              {t("pricing.cancelModalTitle")}
+            </h3>
+            <p className="font-roboto text-[16px] leading-[17px] text-text-disabled text-center">
+              {t("pricing.cancelModalDesc")}{" "}
+              <span className="font-roboto font-medium text-[16px] leading-[17px] text-text-disabled">
+                {endDate
+                  ? new Date(endDate).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : ""}
+              </span>
+              . {t("pricing.cancelModalEnd")}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex justify-between pt-4 gap-4">
           <button
             onClick={onClose}
-            className="flex-1 h-12 rounded-lg border border-border-strong bg-transparent font-semibold text-base text-text-primary cursor-pointer hover:bg-gray-50 transition-all"
+            className="w-[226px] max-sm:flex-1 h-10 rounded-lg border border-brand-secondary px-2 py-2 gap-2 cursor-pointer bg-transparent transition-all"
           >
-            Keep Plan
+            <span className="font-roboto font-medium text-[14px] leading-[117%] text-brand-secondary">
+              {t("pricing.keepSubscription")}
+            </span>
           </button>
           <button
             onClick={onConfirm}
             disabled={cancelling}
-            className="flex-1 h-12 rounded-lg bg-red-500 font-semibold text-base text-white flex items-center justify-center gap-2 cursor-pointer hover:bg-red-600 transition-all disabled:opacity-50"
+            className="w-[226px] max-sm:flex-1 h-10 rounded-lg bg-accent-orange px-2 py-2 gap-2 flex items-center justify-center cursor-pointer hover:opacity-90 transition-all disabled:opacity-50"
           >
-            {cancelling && <Loader2 className="w-4 h-4 animate-spin" />}
-            Yes, Cancel
+            {cancelling && (
+              <Loader2 className="w-4 h-4 animate-spin text-surface-elevated" />
+            )}
+            <span className="font-roboto font-medium text-[14px] leading-[117%] text-surface-elevated">
+              {t("pricing.confirmCancellation")}
+            </span>
           </button>
         </div>
       </div>
@@ -70,71 +91,105 @@ function CancelModal({ open, onClose, onConfirm, cancelling }) {
 }
 
 export default function PricingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const isRtl = i18n.dir() === "rtl";
 
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [subscription, setSubscription] = useState(null);
-  const [message, setMessage] = useState(null);
   const [isMonthly, setIsMonthly] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [justSubscribed, setJustSubscribed] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [successPopupShown, setSuccessPopupShown] = useState(false);
+  const isPostPayment = useRef(false);
+  const retryIntervalRef = useRef(null);
 
-  const fetchSubscription = (retries = 5, delay = 1500) => {
-    if (!user) return;
+  const fetchSubscription = () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    const attempt = (remaining) => {
-      getSettingsApi({ email: user.email })
-        .then((res) => {
-          if (res.data.subscriptionStatus === "active") {
-            setSubscription({
-              status: res.data.subscriptionStatus,
-              subscriptionId: res.data.subscriptionId,
-              endDate: res.data.subscriptionEndDate,
-            });
-            setLoading(false);
-          } else if (remaining > 1) {
-            setTimeout(() => attempt(remaining - 1), delay);
-          } else {
-            setSubscription(null);
-            setLoading(false);
+    getSettingsApi({ email: user.email })
+      .then((res) => {
+        if (res.data.subscriptionStatus === "active") {
+          const storedInterval =
+            localStorage.getItem("selectedInterval") || "month";
+          setSubscription({
+            status: res.data.subscriptionStatus,
+            subscriptionId: res.data.subscriptionId,
+            endDate: res.data.subscriptionEndDate,
+            interval: res.data.subscriptionInterval || storedInterval,
+          });
+          setIsMonthly(
+            (res.data.subscriptionInterval || storedInterval) === "month",
+          );
+          if (retryIntervalRef.current) {
+            clearInterval(retryIntervalRef.current);
+            retryIntervalRef.current = null;
           }
-        })
-        .catch(() => {
-          if (remaining > 1) {
-            setTimeout(() => attempt(remaining - 1), delay);
-          } else {
-            setSubscription(null);
-            setLoading(false);
-          }
-        });
-    };
-    attempt(retries);
+        } else if (!isPostPayment.current) {
+          setSubscription(null);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
-      setMessage({ type: "success", text: "Subscription activated! Welcome to Pro." });
-      setSearchParams({}, { replace: true });
       if (user) {
+        setSearchParams({}, { replace: true });
+        Swal.fire({
+          icon: "success",
+          title: t("pricing.subscriptionSuccess"),
+          text: "Welcome to Pro!",
+          timer: 2000,
+          showConfirmButton: false,
+        });
         syncSubscriptionApi({ userId: user.id })
           .then(() => fetchSubscription(3, 1000))
           .catch(() => fetchSubscription(3, 1000));
+      } else {
+        setJustSubscribed(true);
       }
     } else if (searchParams.get("canceled") === "true") {
-      setMessage({ type: "error", text: "Payment was cancelled." });
+      Swal.fire({
+        icon: "error",
+        title: "Payment Cancelled",
+        text: "Payment was cancelled.",
+      });
       setSearchParams({}, { replace: true });
-    } else {
+    } else if (user) {
+      fetchSubscription();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user && !searchParams.get("success") && !searchParams.get("canceled")) {
       fetchSubscription();
     }
   }, [user]);
 
+  useEffect(() => {
+    if (justSubscribed && user) {
+      setJustSubscribed(false);
+      setSearchParams({}, { replace: true });
+      syncSubscriptionApi({ userId: user.id })
+        .then(() => fetchSubscription(3, 1000))
+        .catch(() => fetchSubscription(3, 1000));
+    }
+  }, [justSubscribed, user]);
+
   const handleSubscribe = async () => {
     if (!user) return;
+    localStorage.setItem("selectedInterval", isMonthly ? "month" : "year");
     setSubscribing(true);
-    setMessage(null);
     try {
       const res = await createCheckoutSessionApi({
         userId: user.id,
@@ -143,8 +198,9 @@ export default function PricingPage() {
       });
       window.location.href = res.data.url;
     } catch (err) {
-      setMessage({
-        type: "error",
+      Swal.fire({
+        icon: "error",
+        title: "Error",
         text: err.response?.data?.message || "Failed to start checkout.",
       });
     } finally {
@@ -155,15 +211,22 @@ export default function PricingPage() {
   const handleCancel = async () => {
     if (!user) return;
     setCancelling(true);
-    setMessage(null);
     try {
       await cancelSubscriptionApi({ userId: user.id });
-      setMessage({ type: "success", text: "Subscription cancelled." });
       setShowCancelModal(false);
       setSubscription(null);
+      localStorage.removeItem("selectedInterval");
+      Swal.fire({
+        icon: "success",
+        title: "Cancelled",
+        text: "Subscription cancelled.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (err) {
-      setMessage({
-        type: "error",
+      Swal.fire({
+        icon: "error",
+        title: "Error",
         text: err.response?.data?.message || "Cancellation failed.",
       });
     } finally {
@@ -173,11 +236,40 @@ export default function PricingPage() {
 
   if (!user) {
     return (
+      <>
+        <section className="w-full py-[110px] px-16 max-[1200px]:px-14 max-[900px]:px-8">
+          <div className="max-w-[1440px] mx-auto flex justify-center">
+            <div className="w-full max-w-[500px] rounded-[32px] p-12 shadow-[0px_0px_4px_0px_#00000026] bg-surface-elevated flex flex-col items-center gap-6 text-center">
+              <Lock className="w-16 h-16 text-primary" />
+              <h3 className="font-bold text-[28px] leading-[36px] text-text-primary">
+                {t("pricing.loginPromptTitle")}
+              </h3>
+              <p className="font-normal text-base leading-6 text-text-secondary">
+                {t("pricing.loginPromptDesc")}
+              </p>
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="w-full h-14 rounded-lg bg-gradient-to-r from-primary via-[#69C9AC] to-[#AAE338] font-semibold text-xl text-white cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+              >
+                {t("pricing.loginButton")}
+              </button>
+            </div>
+          </div>
+        </section>
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode="login"
+        />
+      </>
+    );
+  }
+
+  if (loading) {
+    return (
       <section className="w-full py-[110px] px-16 max-[1200px]:px-14 max-[900px]:px-8">
-        <div className="max-w-[1440px] mx-auto text-center">
-          <p className="text-xl text-text-secondary">
-            Please log in to subscribe.
-          </p>
+        <div className="max-w-[1440px] mx-auto flex items-center justify-center min-h-[300px]">
+          <Loader2 className="w-12 h-12 animate-spin text-primary" />
         </div>
       </section>
     );
@@ -188,69 +280,109 @@ export default function PricingPage() {
   return (
     <section className="w-full py-[110px] px-16 max-[1200px]:px-14 max-[900px]:px-8">
       <div className="max-w-[1440px] mx-auto">
-        {message && (
-          <div
-            className={`mb-12 px-6 py-4 rounded-lg text-center font-semibold text-lg ${
-              message.type === "success"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
-
         {subscribed ? (
-          <div className="flex justify-center">
-            <div className="relative w-[449px] max-w-full rounded-[32px] overflow-hidden">
-              <span
-                className="absolute inset-0 p-[4px] rounded-[32px] pointer-events-none"
-                style={{
-                  background:
-                    "linear-gradient(90deg, #FF8A3D 0%, #40B9FF 51.44%, #8ED321 100%)",
-                  WebkitMask:
-                    "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  WebkitMaskComposite: "xor",
-                  mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  maskComposite: "exclude",
-                }}
-              />
-              <div className="relative z-10 w-full flex flex-col items-center gap-8 py-12 px-10 text-center">
-                <CircleCheck className="w-14 h-14 text-brand-secondary" />
-                <div className="flex flex-col gap-2">
-                  <h3 className="font-bold text-[36px] leading-[38px] text-text-primary">
-                    {t("pricing.pro.name")}
-                  </h3>
-                  <p className="font-semibold text-xl text-text-secondary">
-                    You&apos;re subscribed to Pro!
-                  </p>
+          <div className="flex flex-col items-center gap-12">
+            <div className="flex flex-col items-center gap-4">
+              <h2 className="font-roboto font-bold text-[48px] leading-[58px] text-center bg-[linear-gradient(90deg,#40B9FF_2.4%,#8ED321_100%)] bg-clip-text text-transparent">
+                {t("pricing.manageTitle")}
+              </h2>
+              <p className="font-roboto font-semibold text-[20px] text-center text-text-secondary">
+                {t("pricing.manageSubtitle")}
+              </p>
+            </div>
+            <div className="flex justify-center w-full">
+              <div className="relative w-[900px] max-w-full rounded-[32px] overflow-hidden">
+                <span
+                  className="absolute inset-0 p-[4px] rounded-[32px] pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #FF8A3D 0%, #40B9FF 51.44%, #8ED321 100%)",
+                    WebkitMask:
+                      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    WebkitMaskComposite: "xor",
+                    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                    maskComposite: "exclude",
+                  }}
+                />
+                <div className="relative z-10 w-full flex flex-col gap-6 px-10 py-8 max-sm:px-6 max-sm:py-6">
+                  <div className="flex flex-col gap-6 w-full">
+                    <div className="w-fit py-1 px-3 rounded-full flex items-center justify-center bg-brand-secondary">
+                      <span className="font-roboto font-medium text-[14px] leading-[117%] text-surface-elevated text-center">
+                        {t("pricing.active")}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-1 pb-4 border-b border-border-strong">
+                      <span className="font-roboto font-bold text-[24px] leading-[38.4px] text-[#131e2b]">
+                        {t("pricing.proStyle")}
+                      </span>
+                      <span className="font-roboto font-normal text-[12px] text-border-disabled">
+                        {t("pricing.currentPlan")}
+                      </span>
+                    </div>
+
+                    <div className="w-full flex flex-col sm:flex-row gap-4 sm:justify-between">
+                      <div className="flex-1 h-[70px] rounded-[16px] border border-border-strong p-2 px-4 gap-2 bg-surface-elevated flex items-center">
+                        <div className="flex flex-col gap-2">
+                          <span className="font-roboto font-semibold text-[16px] text-text-secondary">
+                            {t("pricing.billing")}
+                          </span>
+                          <span className="font-roboto font-medium text-[14px] leading-[117%] text-text-secondary">
+                            {subscription?.interval === "year"
+                              ? t("pricing.proPricing.yearlyTotal") + "/Year"
+                              : t("pricing.proPricing.monthlyTotal") + "/Month"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 h-[70px] rounded-[16px] border border-border-strong p-2 px-4 gap-2 bg-surface-elevated flex items-center">
+                        <div className="flex flex-col gap-2">
+                          <span className="font-roboto font-semibold text-[16px] text-text-secondary">
+                            {t("pricing.renews")}
+                          </span>
+                          <span className="font-roboto font-medium text-[14px] leading-[117%] text-text-secondary">
+                            {subscription?.endDate
+                              ? new Date(
+                                  subscription.endDate,
+                                ).toLocaleDateString(isRtl ? "ar" : "en-US", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : "—"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full border-b border-border-strong pb-4 flex flex-col gap-4">
+                      <span className="font-roboto font-semibold text-[16px] text-text-primary">
+                        {t("pricing.yourBenefits")}
+                      </span>
+                      <div className="pb-2 flex flex-col gap-2">
+                        {pricingKeys.pro.items.map((key) => (
+                          <div key={key} className="flex items-center gap-3">
+                            <Check className="w-[14.34px] h-[10.79px] text-placeholder shrink-0" />
+                            <span className="font-roboto font-normal text-[15px] text-placeholder">
+                              {t(key)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {subscription?.subscriptionId !== "pending" && (
+                    <button
+                      onClick={() => setShowCancelModal(true)}
+                      className="w-full h-[65px] p-[10px] gap-[10px] rounded-lg bg-accent-orange cursor-pointer hover:scale-105 active:scale-95 transition-transform flex items-center justify-center"
+                    >
+                      <span className="font-roboto font-semibold text-[16px] text-surface-elevated">
+                        {t("pricing.cancelSubscription")}
+                      </span>
+                    </button>
+                  )}
                 </div>
-                <div className="w-full flex flex-col gap-2 py-4 px-6 rounded-[16px] bg-bg-primary">
-                  <div className="flex justify-between">
-                    <span className="font-normal text-base text-text-secondary">Plan</span>
-                    <span className="font-semibold text-base text-text-primary">Pro Stylist</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-normal text-base text-text-secondary">Billing</span>
-                    <span className="font-semibold text-base text-text-primary">
-                      {isMonthly ? "Monthly" : "Yearly"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-normal text-base text-text-secondary">Renewal date</span>
-                    <span className="font-semibold text-base text-text-primary">
-                      {subscription?.endDate
-                        ? new Date(subscription.endDate).toLocaleDateString()
-                        : "—"}
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setShowCancelModal(true)}
-                  className="w-full h-14 rounded-lg border-2 border-red-400 text-red-500 font-semibold text-lg cursor-pointer hover:bg-red-50 transition-all"
-                >
-                  Cancel Subscription
-                </button>
               </div>
             </div>
           </div>
@@ -266,26 +398,37 @@ export default function PricingPage() {
             </div>
 
             <div className="w-[798px] h-[94px] flex items-center justify-center max-[1100px]:w-full max-[1100px]:px-4">
-              <div className="flex items-center bg-[#ededed] rounded-full gap-1 p-1 w-full h-full">
+              <div className="relative flex items-center bg-[#ededed] rounded-full w-full h-full">
+                <span
+                  className="absolute rounded-full border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
+                  style={{
+                    top: "4px",
+                    bottom: "4px",
+                    width: "calc(50% - 6px)",
+                    insetInlineStart: isMonthly ? "4px" : "calc(50% + 2px)",
+                  }}
+                />
                 <button
                   onClick={() => setIsMonthly(true)}
                   disabled={subscribing}
-                  className={`w-1/2 h-full rounded-full px-6 font-roboto font-bold text-[24px] leading-[38.4px] transition-all cursor-pointer ${
-                    isMonthly
-                      ? "border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] text-text-primary"
-                      : "text-border-disabled"
-                  }`}
+                  className="relative z-10 w-1/2 h-full rounded-full font-roboto font-bold text-[24px] leading-[38.4px] transition-colors duration-300 cursor-pointer"
+                  style={{
+                    color: isMonthly
+                      ? "var(--color-text-primary)"
+                      : "var(--color-border-disabled)",
+                  }}
                 >
                   {t("pricing.monthly")}
                 </button>
                 <button
                   onClick={() => setIsMonthly(false)}
                   disabled={subscribing}
-                  className={`w-1/2 h-full rounded-full px-6 font-roboto font-bold text-[24px] leading-[38.4px] transition-all cursor-pointer ${
-                    !isMonthly
-                      ? "border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] text-text-primary"
-                      : "text-border-disabled"
-                  }`}
+                  className="relative z-10 w-1/2 h-full rounded-full font-roboto font-bold text-[24px] leading-[38.4px] transition-colors duration-300 cursor-pointer"
+                  style={{
+                    color: !isMonthly
+                      ? "var(--color-text-primary)"
+                      : "var(--color-border-disabled)",
+                  }}
                 >
                   {t("pricing.yearly")}
                 </button>
@@ -443,7 +586,9 @@ export default function PricingPage() {
                     disabled={subscribing}
                     className="w-full h-16 px-2 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xl text-[#F1F5F9] transition-all duration-300 bg-accent-orange cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50"
                   >
-                    {subscribing && <Loader2 className="w-5 h-5 animate-spin" />}
+                    {subscribing && (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    )}
                     {t("pricing.subscribeNow")}
                   </button>
 
@@ -461,6 +606,7 @@ export default function PricingPage() {
           onClose={() => setShowCancelModal(false)}
           onConfirm={handleCancel}
           cancelling={cancelling}
+          endDate={subscription?.endDate}
         />
       </div>
     </section>

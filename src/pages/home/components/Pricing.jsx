@@ -39,24 +39,27 @@ const Pricing = () => {
         </div>
 
         <div className="w-[798px] h-[94px] flex items-center justify-center max-[1100px]:w-full max-[1100px]:px-4">
-          <div className="flex items-center bg-[#ededed] rounded-full gap-1 p-1 w-full h-full">
+          <div className="relative flex items-center bg-[#ededed] rounded-full w-full h-full">
+            <span
+              className="absolute rounded-full border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
+              style={{
+                top: "4px",
+                bottom: "4px",
+                    width: "calc(50% - 6px)",
+                    insetInlineStart: isMonthly ? "4px" : "calc(50% + 2px)",
+              }}
+            />
             <button
               onClick={() => setIsMonthly(true)}
-              className={`w-1/2 h-full rounded-full px-6 font-roboto font-bold text-[24px] leading-[38.4px] transition-all cursor-pointer ${
-                isMonthly
-                  ? "border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] text-text-primary"
-                  : "text-border-disabled"
-              }`}
+              className="relative z-10 w-1/2 h-full rounded-full font-roboto font-bold text-[24px] leading-[38.4px] transition-colors duration-300 cursor-pointer"
+              style={{ color: isMonthly ? "var(--color-text-primary)" : "var(--color-border-disabled)" }}
             >
               {t("pricing.monthly")}
             </button>
             <button
               onClick={() => setIsMonthly(false)}
-              className={`w-1/2 h-full rounded-full px-6 font-roboto font-bold text-[24px] leading-[38.4px] transition-all cursor-pointer ${
-                !isMonthly
-                  ? "border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] text-text-primary"
-                  : "text-border-disabled"
-              }`}
+              className="relative z-10 w-1/2 h-full rounded-full font-roboto font-bold text-[24px] leading-[38.4px] transition-colors duration-300 cursor-pointer"
+              style={{ color: !isMonthly ? "var(--color-text-primary)" : "var(--color-border-disabled)" }}
             >
               {t("pricing.yearly")}
             </button>
