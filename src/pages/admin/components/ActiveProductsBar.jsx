@@ -1,4 +1,4 @@
-export default function ActiveProductsBar() {
+export default function ActiveProductsBar({ activeProducts = 0, totalProducts = 0, activePercent = 0, loading = false }) {
   return (
     <div className="flex-1 h-[78px] bg-admin-brand-bg border border-admin-border rounded-card px-6 py-4 flex flex-col justify-between">
       <div className="flex justify-between items-center">
@@ -6,10 +6,10 @@ export default function ActiveProductsBar() {
           Active Products
         </span>
         <div className="w-[146px] h-1 bg-admin-brand/20 rounded-full overflow-hidden">
-          <div className="h-full bg-admin-brand rounded-full" style={{ width: '80%' }} />
+          <div className="h-full bg-admin-brand rounded-full transition-all duration-500" style={{ width: loading ? '0%' : `${activePercent}%` }} />
         </div>
       </div>
-      <p className="text-xl font-medium text-admin-text-primary tracking-[-0.2px]">38,200</p>
+      <p className="text-xl font-medium text-admin-text-primary tracking-[-0.2px]">{loading ? '—' : activeProducts.toLocaleString()}</p>
     </div>
   );
 }

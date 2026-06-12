@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { loginApi, registerApi, sendVerificationApi, forgotPasswordApi, otpVerifyApi, resetPasswordApi } from "../../api/authApi";
 import { getUserApi, updateProfileApi } from "../../api/userApi";
@@ -11,6 +12,7 @@ import ResetPassword from "./ResetPassword";
 import SlidingOverlay from "../../components/SlidingOverlay";
 export default function AuthPage({ initialIsLogin = true, inModal = false, onClose }) {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [view, setView] = useState(initialIsLogin ? "login" : "register");
     const [forgotEmail, setForgotEmail] = useState("");
     const { login } = useAuth();
@@ -43,11 +45,15 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             const userData = event.data.payload;
             console.log("Google OAuth login successful", userData);
             login(userData);
-            onClose?.();
+            if (userData.role === "admin") {
+                navigate("/admin", { replace: true });
+            } else {
+                onClose?.();
+            }
         };
         window.addEventListener("message", handleMessage);
         return () => window.removeEventListener("message", handleMessage);
-    }, [login, onClose]);
+    }, [login, onClose, navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -56,7 +62,8 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
         try {
             const res = await loginApi({ email, password });
             console.log("Login successful", { response: res.data, email, timestamp: new Date().toISOString() });
-            login({ id: res.data._id, email: res.data.email, token: res.data.token });
+            const userRole = res.data.role;
+            login({ id: res.data._id, email: res.data.email, token: res.data.token, role: userRole });
             const userRes = await getUserApi(res.data._id);
             console.log("User profile data", { user: userRes.data, timestamp: new Date().toISOString() });
             const apiUser = userRes.data?.user || userRes.data;
@@ -67,10 +74,15 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
                 id: res.data._id,
                 email: res.data.email,
                 token: res.data.token,
+                role: userRole,
                 ...apiUser,
                 name: fullName,
             });
-            onClose?.();
+            if (userRole === "admin") {
+                navigate("/admin", { replace: true });
+            } else {
+                onClose?.();
+            }
         } catch (error) {
             alert(error.response?.data?.message || t("auth.loginFailed"));
         }

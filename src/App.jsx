@@ -6,8 +6,10 @@
 import { lazy, Suspense, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { BrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
+import { WardrobeProvider } from './context/WardrobeContext';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import AuthPage from './pages/Auth/AuthPage';
@@ -19,13 +21,13 @@ import TryOn from './pages/tryOn/TryOn';
 import StoresPage from './pages/store/StoresPage';
 import Navbar from './components/Navbar';
 import Recycle from './pages/recycle/Recycle';
+import Matching from './pages/matching/Matching';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 import AboutTryon from './pages/aboutTryOn/AboutTryon';
 import PricingPage from './pages/pricing/PricingPage';
 import AvatarGeneration from './pages/avatar/AvatarGeneration';
 
 import { CircularProgress, Box } from '@mui/material';
-import { createBrowserRouter, RouterProvider } from 'react-router';
 import Layout from './pages/Layout';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -50,11 +52,23 @@ const LoadingFallback = () => (
   </Box>
 );
 
+function AdminGuard() {
+  const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+  if (!auth || auth.role !== 'admin') return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
+function UserGuard() {
+  const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+  if (auth?.role === 'admin') return <Navigate to="/admin" replace />;
+  return <Outlet />;
+}
+
 function AppContent() {
   const router = createBrowserRouter([
     {
       path: '/',
-      element: <Layout />,
+      element: <UserGuard />,
       children: [
         { index: true, element: <Home /> },
         { path: 'tryOn', element: <TryOn /> },
@@ -65,15 +79,20 @@ function AppContent() {
         { path: 'avatar', element: <AvatarGeneration /> },
         { path: 'recycle', element: <Recycle /> },
         { path: 'about-recycle', element: <AboutRecycle /> },
+         { path: 'matching', element: <Matching /> },
         { path: 'contact-us', element: <ContactUs /> },
         {path:'editprofile',element:<EditProfilePage/>},
         {path:'wardeobe',element:<WardrobePage/>},
         {path:'wardeobe/edit/:id',element:<EditItemWardrobe/>}
+         
       ],
     },
     {
       path: '/admin',
-      element: <AdminDashboardPage />,
+      element: <AdminGuard />,
+      children: [
+        { index: true, element: <AdminDashboardPage /> },
+      ],
     },
   ]);
   return (
@@ -92,10 +111,12 @@ function App() {
   }, [i18n.language]);
   return (
     <AuthProvider>
-      {/* <Navbar />
+      <WardrobeProvider>
+        {/* <Navbar />
         <AuthPage /> */}
 
-      <AppContent />
+        <AppContent />
+      </WardrobeProvider>
     </AuthProvider>
   );
 }

@@ -1,6 +1,6 @@
 import { Search, Bell, Mail, Moon, ChevronDown } from 'lucide-react';
 
-export default function AdminTopBar({ className = '' }) {
+export default function AdminTopBar({ className = '', actions }) {
   return (
     <div className={`${className} items-center justify-between px-6 pt-10 pb-4`}>
       <div className="w-[412px] h-[54px] flex items-center gap-2 bg-admin-input border border-admin-border rounded-2xl px-4">
@@ -13,6 +13,8 @@ export default function AdminTopBar({ className = '' }) {
       </div>
 
       <div className="flex items-center gap-4">
+        {actions}
+
         <button className="p-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
           <Bell className="w-5 h-5" />
         </button>

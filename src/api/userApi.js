@@ -21,3 +21,7 @@ export const analyzeImageApi = (formData) =>
   api.post("/analyze", formData, { timeout: 60000 });
 export const getAnalysisApi = (id) => api.get(`/analyze/${id}`);
 export const updateAnalysisApi = (id, data) => api.put(`/analyze/${id}`, data);
+
+export const addToLatestTryOnApi = (data) =>
+  api.post("/users/latest-tryon", data);
+

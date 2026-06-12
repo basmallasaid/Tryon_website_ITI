@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-const StepIndicator = ({ currentStep = 1, steps: customSteps }) => {
+const StepIndicator = ({ currentStep = 1, steps: customSteps, containerClassName }) => {
   const { t } = useTranslation();
   const STEPS = customSteps || [
     { id: 1, title: t("recycle.step1Title"), subtitle: t("recycle.step1Subtitle") },
@@ -10,7 +10,7 @@ const StepIndicator = ({ currentStep = 1, steps: customSteps }) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto">
+    <div className={containerClassName || "grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto"}>
       {STEPS.map((step) => {
         const isActive = step.id === currentStep;
         const isCompleted = step.id < currentStep;

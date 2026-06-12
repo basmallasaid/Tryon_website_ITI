@@ -1,112 +1,270 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Upload, WandSparkles, X } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { Sparkles, Shirt, Grid3x3, X, LogIn, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import StepIndicator from "../recycle/components/StepIndicator";
 import UploadArea from "../recycle/components/UploadArea";
-import {
-  virtualTryOnApi,
-  virtualTryOnOutfitApi,
-} from "../../api/tryOnApi";
+import UploadedImageCard from "../recycle/components/UploadedImageCard";
+import ModelSelectionCard from "../../components/tryOn/ModelSelectionCard";
+import WardrobeItem from "../../components/tryOn/WardrobeItem";
+import { useAuth } from "../../context/AuthContext";
+import { useWardrobe } from "../../context/WardrobeContext";
+import { getAvatarByIdApi } from "../../api/avatarApi";
+import { virtualTryOnApi, virtualTryOnOutfitApi } from "../../api/tryOnApi";
+import { addToLatestTryOnApi } from "../../api/userApi";
+import { proxiedFetch } from "../../utils/proxiedFetch";
 
-const MAX_FILES = 3;
+const imgSrc = (image) =>
+  image?.startsWith("data:") ? image : `data:image/jpeg;base64,${image}`;
 
-const readFileAsDataUrl = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-
-const buildPreviews = async (files) => {
-  const results = await Promise.all(
-    Array.from(files).map(async (file) => ({
-      file,
-      preview: await readFileAsDataUrl(file),
-    }))
-  );
-  return results;
+const base64ToFile = (base64, filename) => {
+  const url = imgSrc(base64);
+  const [header, data] = url.split(",");
+  const mime = header.match(/:(.*?);/)[1];
+  const ext = mime.split("/")[1];
+  const bytes = atob(data);
+  const arr = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+  return new File([arr], `${filename}.${ext}`, { type: mime });
 };
 
 export default function TryOn() {
-  const { t } = useTranslation();
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [processing, setProcessing] = useState(false);
+  const { user } = useAuth();
+  const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
+  const navigate = useNavigate();
+
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(null);
+  const [avatarBlob, setAvatarBlob] = useState(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+
+  const [galleryFiles, setGalleryFiles] = useState([]);
+
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [activeTab, setActiveTab] = useState("wardrobe");
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [generating, setGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
-  const [apiError, setApiError] = useState("");
+  const [generateError, setGenerateError] = useState(null);
+  const [userPhoto, setUserPhoto] = useState(null);
+  const [userPhotoFile, setUserPhotoFile] = useState(null);
 
   const resultRef = useRef(null);
+  const galleryPreviewsRef = useRef([]);
+
+  const handlePhotoSelected = (files) => {
+    if (files && files.length > 0) {
+      if (userPhoto) URL.revokeObjectURL(userPhoto);
+      setUserPhoto(URL.createObjectURL(files[0]));
+      setUserPhotoFile(files[0]);
+    }
+  };
+
+  const MAX_GALLERY_FILES = 2;
+
+  const handleGalleryFilesSelected = (files) => {
+    setGalleryFiles((prev) => {
+      const remaining = MAX_GALLERY_FILES - prev.length;
+      if (remaining <= 0) return prev;
+      const toAdd = files.slice(0, remaining).map((f) => ({
+        file: f,
+        preview: URL.createObjectURL(f),
+      }));
+      const next = [...prev, ...toAdd];
+      galleryPreviewsRef.current = next.map((f) => f.preview);
+      return next;
+    });
+  };
+
+  const handleRemoveGalleryImage = (index) => {
+    setGalleryFiles((prev) => {
+      URL.revokeObjectURL(prev[index].preview);
+      const next = prev.filter((_, i) => i !== index);
+      galleryPreviewsRef.current = next.map((f) => f.preview);
+      return next;
+    });
+  };
 
   useEffect(() => {
     return () => {
-      uploadedImages.forEach((img) => {
-        if (img.preview && img.preview.startsWith("blob:")) {
-          URL.revokeObjectURL(img.preview);
-        }
-      });
+      if (userPhoto) URL.revokeObjectURL(userPhoto);
+      galleryPreviewsRef.current.forEach((u) => URL.revokeObjectURL(u));
     };
-  }, [uploadedImages]);
+  }, []);
 
   useEffect(() => {
-    if (generatedImageUrl && resultRef.current) {
+    if (selectedModel !== "avatar" || !user) return;
+    const ids = user.avatars;
+    if (!ids?.length) {
+      setAvatarPreviewUrl(null);
+      return;
+    }
+    let cancelled = false;
+    setAvatarLoading(true);
+    getAvatarByIdApi(ids[0])
+      .then(async (res) => {
+        if (cancelled) return;
+        const url = res.data?.avatar?.image_url ?? null;
+        setAvatarPreviewUrl(url);
+        if (url) {
+          try {
+            const imgRes = await proxiedFetch(url);
+            if (imgRes.ok) setAvatarBlob(await imgRes.blob());
+          } catch { /* store null, handleGenerate will show error */ }
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setAvatarPreviewUrl(null);
+      })
+      .finally(() => {
+        if (!cancelled) setAvatarLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [selectedModel, user]);
+
+  const steps = [
+    { id: 1, title: "Choose styling model", subtitle: "Upload 1-2 garment photos" },
+    { id: 2, title: "Choose Items", subtitle: "Pick your favorite design" },
+    { id: 3, title: "Generate", subtitle: "Visualize your upcycled piece" },
+  ];
+
+  const currentStep = generating || generatedImageUrl ? 3 : selectedModel ? 2 : 1;
+  const isReady = selectedModel && selectedItems.length > 0;
+
+  const MAX_SELECTION = 2;
+
+  const toggleItem = (id) => {
+    setSelectedItems((prev) =>
+      prev.includes(id)
+        ? prev.filter((item) => item !== id)
+        : prev.length >= MAX_SELECTION
+          ? prev
+          : [...prev, id]
+    );
+  };
+
+  useEffect(() => {
+    if ((generatedImageUrl || generateError) && resultRef.current) {
       setTimeout(() => {
         resultRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 300);
     }
-  }, [generatedImageUrl]);
+  }, [generatedImageUrl, generateError]);
 
-  const currentStep = generatedImageUrl ? 3 : uploadedImages.length > 0 ? 2 : 1;
-
-  const steps = [
-    { id: 1, title: t("tryOn.step1Title"), subtitle: t("tryOn.step1Subtitle") },
-    { id: 2, title: t("tryOn.step2Title"), subtitle: t("tryOn.step2Subtitle") },
-    { id: 3, title: t("tryOn.step3Title"), subtitle: t("tryOn.step3Subtitle") },
-  ];
-
-  const handleFilesSelected = async (files) => {
-    setApiError("");
-    const previews = await buildPreviews(files);
-    setUploadedImages((prev) => [...prev, ...previews]);
+  const handleReset = () => {
+    if (userPhoto) URL.revokeObjectURL(userPhoto);
+    galleryPreviewsRef.current.forEach((u) => URL.revokeObjectURL(u));
+    galleryPreviewsRef.current = [];
+    setSelectedModel(null);
+    setSelectedItems([]);
+    setGeneratedImageUrl(null);
+    setGenerateError(null);
+    setUserPhoto(null);
+    setUserPhotoFile(null);
+    setGalleryFiles([]);
+    setAvatarPreviewUrl(null);
+    setAvatarBlob(null);
   };
 
-  const handleRemoveImage = (index) => {
-    setApiError("");
-    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
-    if (uploadedImages.length <= 1) {
-      setGeneratedImageUrl(null);
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState(null);
+
+  const handleSave = async () => {
+    if (!generatedImageUrl) return;
+    setSaving(true);
+    setSaveMsg(null);
+    try {
+      await addToLatestTryOnApi({ imageUrl: generatedImageUrl, model: selectedModel });
+      setSaveMsg("saved");
+    } catch (err) {
+      setSaveMsg("error");
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleTryOn = async () => {
-    if (uploadedImages.length === 0) return;
-    setApiError("");
-    setProcessing(true);
+  const handleGenerate = async () => {
+    if (!isReady) return;
+
+    const details = {
+      model: selectedModel,
+      selectedItems: selectedItems,
+      userPhoto: userPhotoFile ? { name: userPhotoFile.name, size: userPhotoFile.size, type: userPhotoFile.type } : userPhoto ? "blob url" : null,
+      galleryFiles: galleryFiles.map((f) => ({ name: f.file.name, size: f.file.size, type: f.file.type })),
+      avatarBlob: avatarBlob ? { size: avatarBlob.size, type: avatarBlob.type } : null,
+      avatarPreviewUrl,
+    };
+    console.log("🚀 [TryOn] Generate button clicked with details:", details);
+
+    setGenerating(true);
     setGeneratedImageUrl(null);
+    setGenerateError(null);
+
     try {
       const formData = new FormData();
-      const [first, second, third] = uploadedImages;
 
-      formData.append("personImage", first.file);
-
-      if (uploadedImages.length === 3) {
-        formData.append("topImage", second.file);
-        formData.append("bottomImage", third.file);
-        const res = await virtualTryOnOutfitApi(formData);
-        setGeneratedImageUrl(res.data?.image_url || res.data?.result?.image_url);
-      } else {
-        formData.append("garmentImage", second.file);
-        const res = await virtualTryOnApi(formData);
-        setGeneratedImageUrl(res.data?.image_url || res.data?.result?.image_url);
+      if (selectedModel === "photo") {
+        if (userPhotoFile) {
+          formData.append("personImage", userPhotoFile, userPhotoFile.name);
+        } else if (userPhoto) {
+          const res = await proxiedFetch(userPhoto);
+          if (res.ok) {
+            const blob = await res.blob();
+            formData.append("personImage", blob, `photo.${(blob.type || "image/jpeg").split("/")[1]}`);
+          }
+        }
+      } else if (selectedModel === "avatar") {
+        if (avatarBlob) {
+          formData.append("personImage", avatarBlob, `avatar.${(avatarBlob.type || "image/jpeg").split("/")[1]}`);
+        } else if (avatarPreviewUrl) {
+          const res = await proxiedFetch(avatarPreviewUrl);
+          if (!res.ok) throw new Error(`Failed to fetch avatar image (${res.status})`);
+          const blob = await res.blob();
+          formData.append("personImage", blob, `avatar.${(blob.type || "image/jpeg").split("/")[1]}`);
+        }
       }
+
+      const selectedWardrobeItems = wardrobeItems.filter((item) =>
+        selectedItems.includes(item._id)
+      );
+
+      const logDetails = { model: selectedModel, items: [] };
+      for (const [key, val] of formData.entries()) {
+        logDetails[key] = val instanceof File ? `File: ${val.name} (${val.size} bytes, ${val.type})` : val;
+      }
+
+      let resultUrl;
+      if (selectedWardrobeItems.length === 1) {
+        const item = selectedWardrobeItems[0];
+        const garmentFile = base64ToFile(item.image, "garment");
+        formData.append("garmentImage", garmentFile);
+        logDetails.garmentImage = `File: ${garmentFile.name} (${garmentFile.size} bytes, ${garmentFile.type})`;
+        console.log("🚀 [TryOn] Sending request to POST /api/virtual-tryon", logDetails);
+        const res = await virtualTryOnApi(formData);
+        console.log("✅ [TryOn] Response:", res.data);
+        resultUrl = res.data?.imageUrl;
+      } else if (selectedWardrobeItems.length === 2) {
+        const [first, second] = selectedWardrobeItems;
+        const topFile = base64ToFile(first.image, "top");
+        const bottomFile = base64ToFile(second.image, "bottom");
+        formData.append("topImage", topFile);
+        formData.append("bottomImage", bottomFile);
+        logDetails.topImage = `File: ${topFile.name} (${topFile.size} bytes, ${topFile.type})`;
+        logDetails.bottomImage = `File: ${bottomFile.name} (${bottomFile.size} bytes, ${bottomFile.type})`;
+        console.log("🚀 [TryOn] Sending request to POST /api/virtual-tryon/outfit", logDetails);
+        const res = await virtualTryOnOutfitApi(formData);
+        console.log("✅ [TryOn] Response:", res.data);
+        resultUrl = res.data?.imageUrl;
+      }
+
+      if (resultUrl) setGeneratedImageUrl(resultUrl);
     } catch (err) {
-      setApiError(
-        err.response?.data?.error ||
-        err.message ||
-        t("tryOn.analysisFailed")
+      const errorPayload = err.response?.data || err.message || err;
+      console.error("❌ [TryOn] Error — model:", selectedModel, "items:", selectedItems, "|", errorPayload);
+      setGenerateError(
+        err.response?.data?.error || err.message || "Try-on failed"
       );
     } finally {
-      setProcessing(false);
+      setGenerating(false);
     }
   };
 
@@ -119,6 +277,7 @@ export default function TryOn() {
       }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        {/* Hero / Title */}
         <section className="text-center mt-2 sm:mt-6">
           <h1
             className="text-3xl sm:text-4xl md:text-5xl"
@@ -135,7 +294,7 @@ export default function TryOn() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              {t("tryOn.subtitle")}
+              Virtual Try-on
             </span>
           </h1>
           <p
@@ -146,245 +305,319 @@ export default function TryOn() {
               opacity: 0.85,
             }}
           >
-            {t("tryOn.heroDesc")}
+            Upload your pieces · Pick a style · See it come to life
           </p>
         </section>
 
+        {/* Step Indicator */}
         <section className="mt-8 sm:mt-10">
           <StepIndicator currentStep={currentStep} steps={steps} />
         </section>
 
+        {/* Model Selection */}
         <section className="mt-12 sm:mt-16">
-          <div className="flex flex-col items-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-[15px]">
-              <Upload
-                className="h-6 w-6 sm:h-7 sm:w-7"
-                style={{ color: "var(--Primary-Text-color)" }}
-              />
-              <div className="flex flex-col items-start gap-4">
-                <h2
-                  className="text-3xl sm:text-4xl"
-                  style={{
-                    color: "var(--Primary-Text-color)",
-                    fontWeight: "var(--Bold)",
-                    lineHeight: "38px",
-                  }}
-                >
-                  {t("tryOn.uploadGarments")}
-                </h2>
-                <p
-                  className="text-sm sm:text-base"
-                  style={{
-                    color: "var(--Primary-Text-color)",
-                    fontWeight: 400,
-                    lineHeight: "18px",
-                  }}
-                >
-                  {t("tryOn.uploadSupport")}
-                </p>
-              </div>
-            </div>
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-6xl mx-auto">
+            <ModelSelectionCard
+              selected={selectedModel === "avatar"}
+              onClick={() => setSelectedModel(selectedModel === "avatar" ? null : "avatar")}
+              media="/boyTryOn.png"
+            >
+              <h3 className="font-bold text-lg mt-2">Avatar</h3>
+              <span className="bg-[#40B9FF] text-white text-[10px] px-2 py-0.5 rounded-full uppercase font-semibold">
+                recommended
+              </span>
+              <p className="text-xs text-gray-500 max-w-[180px] mt-1">
+                Create your digital twin and try outfits instantly.
+              </p>
+            </ModelSelectionCard>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 max-w-6xl mx-auto items-start">
-            {uploadedImages.length < MAX_FILES && (
-              <UploadArea
-                onFilesSelected={handleFilesSelected}
-                disabled={processing}
-                maxFiles={MAX_FILES}
-              />
-            )}
-
-            {uploadedImages.length > 0 && (
-              <div
-                className="rounded-2xl p-4"
-                style={{ backgroundColor: "#E9EDFF" }}
-              >
-                <h4
-                  className="text-xs tracking-wider mb-4"
-                  style={{ color: "var(--Disabled-Text-color)" }}
-                >
-                  {t("tryOn.currentSelection")}
-                </h4>
-                <div className="flex flex-col gap-3">
-                  {uploadedImages.map((img, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-3 rounded-xl p-3"
-                      style={{ backgroundColor: "#FAF8FF" }}
-                    >
-                      <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-white">
-                        <img
-                          src={img.preview}
-                          alt={`${t("tryOn.piece")} ${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <strong
-                          className="block text-sm truncate"
-                          style={{
-                            color: "var(--Primary-Text-color)",
-                            fontWeight: "var(--Semi-Bold)",
-                          }}
-                        >
-                          {t("tryOn.piece")} {idx + 1}
-                        </strong>
-                        <span
-                          className="text-xs"
-                          style={{ color: "var(--Disabled-Text-color)" }}
-                        >
-                          {img.file.name}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(idx)}
-                        className="flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-md transition-all duration-200 hover:bg-red-500 hover:text-white hover:scale-110 shrink-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
+            <ModelSelectionCard
+              selected={selectedModel === "photo"}
+              onClick={() => setSelectedModel(selectedModel === "photo" ? null : "photo")}
+              media={
+                <div className="w-32 h-32 bg-blue-50 rounded-2xl flex flex-col items-center justify-center border border-dashed border-blue-200">
+                  <img src="/cameraFrame.png" alt="" className="w-12 h-12 object-contain" />
+                  <span className="text-[10px] mt-1 text-blue-400">Tap to upload</span>
                 </div>
-              </div>
-            )}
+              }
+            >
+              <h3 className="font-bold text-lg">Your Photo</h3>
+              <p className="text-xs text-gray-500 max-w-[180px] mt-1">
+                Upload your own photo for realistic try-on.
+              </p>
+            </ModelSelectionCard>
           </div>
-
-          {apiError && (
-            <div className="mt-4 max-w-6xl mx-auto rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              {apiError}
-            </div>
-          )}
         </section>
 
-        {uploadedImages.length > 0 && !generatedImageUrl && (
-          <div className="mt-8 flex justify-center">
-            <button
-              type="button"
-              onClick={handleTryOn}
-              disabled={processing}
-              className={`inline-flex items-center gap-3 sm:gap-6 rounded-lg px-8 sm:px-16 py-4 text-lg sm:text-2xl text-white transition-all duration-300 ${
-                processing
-                  ? "cursor-not-allowed"
-                  : "hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-              }`}
-              style={{
-                backgroundColor: processing
-                  ? "var(--Border-Strong)"
-                  : "var(--Secondary-Brand-color)",
-                fontWeight: "var(--Bold)",
-                minWidth: "320px",
-                maxWidth: "480px",
-                width: "100%",
-                justifyContent: "center",
-              }}
-            >
-              {processing ? (
-                <>
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                  {t("tryOn.processing")}
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-                  {t("tryOn.tryOn")}
-                </>
-              )}
-            </button>
+        {/* Model Preview */}
+        {selectedModel === "avatar" && (
+          <section className="mt-12 sm:mt-16">
+            <div className="flex justify-center transition-all duration-500">
+            {avatarLoading ? (
+              <div className="rounded-3xl shadow-xl h-[350px] sm:h-[450px] w-full max-w-[300px] bg-gray-100 flex items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+              </div>
+            ) : avatarPreviewUrl ? (
+              <img
+                src={avatarPreviewUrl}
+                alt="Avatar"
+                className="rounded-3xl shadow-xl h-[350px] sm:h-[450px] object-cover"
+              />
+            ) : (
+              <div
+                onClick={() => navigate("/avatar")}
+                className="rounded-3xl shadow-xl h-[350px] sm:h-[450px] w-full max-w-[300px] bg-gray-100 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
+              >
+                <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center border-2 border-dashed border-blue-200 mb-3">
+                  <Plus className="w-8 h-8 text-blue-400" strokeWidth={2} />
+                </div>
+                <p className="text-sm text-gray-500 font-medium">Create your Avatar</p>
+              </div>
+            )}
           </div>
+        </section>
         )}
 
-        {(generatedImageUrl || processing) && (
-          <section ref={resultRef} className="mt-14 sm:mt-20">
-            <div className="flex items-center gap-3 sm:gap-4 max-w-6xl mx-auto mb-6 sm:mb-8 px-1">
-              <WandSparkles
-                className="h-5 w-5 sm:h-6 sm:w-6"
-                style={{ color: "var(--Primary-Brand-color)" }}
-                strokeWidth={1.5}
-              />
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl"
-                style={{
-                  color: "var(--Secondary-Text-color)",
-                  fontWeight: "var(--Bold)",
-                  lineHeight: "1.05",
-                }}
-              >
-                {t("tryOn.yourResult")}
-              </h2>
-            </div>
-
-            <div
-              className="max-w-6xl mx-auto rounded-2xl flex items-center justify-center"
-              style={{
-                backgroundColor: "var(--Border-Disabled)",
-                minHeight: "400px",
-                padding: generatedImageUrl ? "0" : "40px",
-              }}
-            >
-              {processing ? (
-                <div
-                  className="flex items-center gap-3 text-sm"
-                  style={{ color: "var(--Disabled-Text-color)" }}
-                >
-                  <div
-                    className="h-5 w-5 animate-spin rounded-full border-2"
-                    style={{
-                      borderColor: "var(--Border-Strong)",
-                      borderTopColor: "var(--Secondary-Brand-color)",
-                    }}
-                  />
-                  {t("tryOn.generatingResult")}
-                </div>
-              ) : (
-                <img
-                  src={generatedImageUrl}
-                  alt="Try-on result"
-                  className="w-full h-full rounded-2xl shadow-lg"
-                  style={{ maxHeight: "600px", objectFit: "contain" }}
-                />
-              )}
+        {selectedModel === "photo" && !userPhoto && (
+          <section className="mt-12 sm:mt-16">
+            <div className="transition-all duration-500">
+              <UploadArea onFilesSelected={handlePhotoSelected} maxFiles={1} />
             </div>
           </section>
         )}
 
-        {/* Retry button when result exists */}
-        {generatedImageUrl && (
-          <div className="mt-6 flex justify-center">
-            <button
-              type="button"
-              onClick={handleTryOn}
-              disabled={processing}
-              className={`inline-flex items-center gap-3 sm:gap-6 rounded-lg px-8 sm:px-16 py-4 text-lg sm:text-2xl text-white transition-all duration-300 ${
-                processing
-                  ? "cursor-not-allowed"
-                  : "hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-              }`}
-              style={{
-                backgroundColor: processing
-                  ? "var(--Border-Strong)"
-                  : "var(--Secondary-Brand-color)",
-                fontWeight: "var(--Bold)",
-                minWidth: "320px",
-                maxWidth: "480px",
-                width: "100%",
-                justifyContent: "center",
-              }}
-            >
-              {processing ? (
-                <>
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                  {t("tryOn.processing")}
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-                  {t("tryOn.tryAgain")}
-                </>
-              )}
-            </button>
+        {selectedModel === "photo" && userPhoto && (
+          <section className="mt-12 sm:mt-16">
+            <div className="flex justify-center transition-all duration-500">
+            <div className="relative rounded-2xl p-4 sm:p-5 shadow-xl" style={{ backgroundColor: "#E9EDFF" }}>
+              <div className="relative overflow-hidden rounded-lg bg-white" style={{ width: "300px", aspectRatio: "3/4" }}>
+                <img
+                  src={userPhoto}
+                  alt="Uploaded"
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  onClick={() => { URL.revokeObjectURL(userPhoto); setUserPhoto(null); }}
+                  className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-md transition-all duration-200 hover:bg-red-500 hover:text-white hover:scale-110"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div
+                className="absolute left-6 bottom-6 inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium"
+                style={{ backgroundColor: "#FAF8FF" }}
+              >
+                Your Photo
+              </div>
+            </div>
           </div>
+        </section>
+        )}
+
+        {/* Tabs */}
+        <section className="mt-12 sm:mt-16">
+          <div className="flex gap-4 max-w-6xl mx-auto">
+          <button
+            onClick={() => setActiveTab("wardrobe")}
+            className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+              activeTab === "wardrobe"
+                ? "bg-blue-50 text-blue-600 border border-blue-200"
+                : "bg-[#E9EBEE] text-gray-400"
+            }`}
+          >
+            <span className="inline-flex items-center gap-1.5"><Shirt className="w-4 h-4" /> My Wardrobe</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("gallery")}
+            className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+              activeTab === "gallery"
+                ? "bg-blue-50 text-blue-600 border border-blue-200"
+                : "bg-[#E9EBEE] text-gray-400"
+            }`}
+          >
+            <span className="inline-flex items-center gap-1.5"><Grid3x3 className="w-4 h-4" /> Gallery</span>
+          </button>
+        </div>
+        </section>
+
+        {/* Wardrobe / Gallery Content */}
+        <section className="mt-12 sm:mt-16">
+          <div className="max-w-6xl mx-auto">
+          {activeTab === "wardrobe" ? (
+            <>
+              <div className="flex items-center justify-between mb-5" style={{ marginTop: "30px" }}>
+                <h3 style={{ color: "#1a202c", fontSize: "1.2rem", fontWeight: 700 }}>Active wardrobe</h3>
+                <a href="#" style={{ color: "#4a5568", fontSize: "0.9rem", fontWeight: 600, textDecoration: "none" }}>See All</a>
+              </div>
+
+              {!user ? (
+                <div className="bg-gray-100 rounded-xl p-8 text-center">
+                  <LogIn className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600 font-medium">Please sign in to view your wardrobe</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    <a href="/auth" className="text-blue-500 hover:underline">Sign in</a> to access your saved items
+                  </p>
+                </div>
+              ) : wardrobeLoading ? (
+                <div className="flex justify-center py-12">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+                </div>
+              ) : wardrobeItems.length === 0 ? (
+                <div className="bg-gray-100 rounded-xl p-8 text-center">
+                  <Shirt className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-600 font-medium">Your wardrobe is empty</p>
+                  <p className="text-xs text-gray-400 mt-1">Add items to your wardrobe to get started</p>
+                </div>
+              ) : (
+                <div className="flex gap-[15px] flex-wrap">
+                  {wardrobeItems.map((item) => (
+                    <WardrobeItem
+                      key={item._id}
+                      src={imgSrc(item.image)}
+                      alt={item.name || `Clothing item`}
+                      selected={selectedItems.includes(item._id)}
+                      disabled={!selectedItems.includes(item._id) && selectedItems.length >= MAX_SELECTION}
+                      onClick={() => toggleItem(item._id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {galleryFiles.length < 2 && (
+                <div className="mb-6">
+                  <UploadArea onFilesSelected={handleGalleryFilesSelected} maxFiles={2} />
+                </div>
+              )}
+              {galleryFiles.length > 0 && (
+                <div className="flex flex-wrap gap-4 sm:gap-6">
+                  {galleryFiles.map((img, i) => (
+                    <UploadedImageCard
+                      key={img.preview}
+                      image={img}
+                      index={i}
+                      onRemove={handleRemoveGalleryImage}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        </section>
+
+        {/* Status Bar */}
+        <section className="mt-12 sm:mt-16">
+          <div className="max-w-6xl mx-auto">
+          <div className="flex items-center mb-4">
+            <h3 style={{ color: "#1a202c", fontSize: "1.2rem", fontWeight: 700 }}>
+              {selectedItems.length > 0
+                ? `Selected Items (${selectedItems.length})`
+                : "Selected Items (0)"}
+            </h3>
+          </div>
+          <div
+            className="rounded-[15px] p-5 flex items-center gap-4"
+            style={{ backgroundColor: "#edf2ff" }}
+          >
+            <div className="w-[45px] h-[45px] rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "#dbeafe" }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e293b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 2c1 2 2.5 4 4.5 4a4.5 4.5 0 0 1 4.5 4.5V21a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V10.5A4.5 4.5 0 0 1 9.5 6c2 0 3.5-2 4.5-4" />
+                <path d="m18 21-6-4-6 4" />
+              </svg>
+            </div>
+            <div>
+              <p className="font-bold" style={{ color: "#1e293b", fontSize: "0.95rem" }}>
+                {selectedItems.length > 0
+                  ? "Items selected"
+                  : "No items selected yet"}
+              </p>
+              <p style={{ color: "#64748b", fontSize: "0.85rem" }}>
+                {selectedItems.length > 0
+                  ? "You can try them on now"
+                  : "Add items from above to try them on."}
+              </p>
+            </div>
+          </div>
+        </div>
+        </section>
+
+        {/* Generate Button */}
+        <section className="mt-12 sm:mt-16">
+          <div className="flex justify-center">
+          <button
+            onClick={handleGenerate}
+            disabled={!isReady || generating}
+            className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg w-full max-w-md justify-center ${
+              isReady && !generating
+                ? "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
+          >
+            {generating ? (
+              <>
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5" />
+                Generate Try-on
+              </>
+            )}
+          </button>
+        </div>
+        </section>
+
+        {/* Result */}
+        {(generating || generatedImageUrl || generateError) && (
+          <section ref={resultRef} className="mt-12 sm:mt-16">
+            {generating ? (
+              <div className="rounded-2xl shadow-xl bg-gray-100 flex flex-col items-center justify-center py-20">
+                <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
+                <p className="text-gray-500 font-medium">Generating your try-on...</p>
+              </div>
+            ) : generateError ? (
+              <div className="rounded-2xl shadow-xl bg-red-50 border border-red-200 p-8 text-center">
+                <p className="text-red-600 font-medium mb-2">Something went wrong</p>
+                <p className="text-sm text-red-500">{generateError}</p>
+                <button
+                  onClick={handleReset}
+                  className="mt-6 inline-flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 transition-all shadow-lg"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="rounded-2xl overflow-hidden shadow-xl bg-gray-100">
+                  <img
+                    src={generatedImageUrl}
+                    alt="Try-on result"
+                    className="w-full h-auto max-h-[600px] object-contain"
+                  />
+                </div>
+                <div className="flex justify-center gap-4 mt-6">
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg hover:scale-105 active:scale-95"
+                    style={{ backgroundColor: saving ? "#9ca3af" : "#3b82f6" }}
+                  >
+                    {saving ? "Saving..." : saveMsg === "saved" ? "Saved!" : saveMsg === "error" ? "Failed" : "Save"}
+                  </button>
+                  <button
+                    onClick={handleReset}
+                    className="inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                    Try Again
+                  </button>
+                </div>
+              </>
+            )}
+          </section>
         )}
       </div>
     </div>
