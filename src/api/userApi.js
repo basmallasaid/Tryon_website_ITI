@@ -5,6 +5,7 @@ export const updateUserSettingsLanguageApi = (language) =>
 export const updateUserSettingsNotificationsApi = (enabled) =>
   api.put("/users/settings/notifications", { enabled });
 export const updateProfileApi = (data) => api.put("/users/profile", data);
+export const getSettingsApi = (data) => api.post("/users/settings", data);
 export const getAllProducts = () => api.get("/products");
 export const getAllStores = () => api.get("/stores");
 export const getProductById = (id) => api.get(`/products/${id}`);

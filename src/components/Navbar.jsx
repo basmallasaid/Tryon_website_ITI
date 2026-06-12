@@ -29,30 +29,32 @@ const Navbar = ({ onOpenAuth }) => {
   const location = useLocation();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false); 
-  const [isProfileOpen, setIsProfileOpen] = useState(false); 
-  const [isNotifOpen, setIsNotifOpen] = useState(false); 
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const isArabic = i18n.language === "ar";
 
   const getUserFullName = (currentUser) => {
-  if (!currentUser) return "";
-  const profile = currentUser.profile || currentUser.user?.profile;
-  const firstName =
-    profile?.first_name ||
-    currentUser?.first_name ||
-    currentUser?.firstName ||
-    currentUser?.user?.firstName;
-  const lastName =
-    profile?.last_name ||
-    currentUser?.last_name ||
-    currentUser?.lastName ||
-    currentUser?.user?.lastName;
-  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+    if (!currentUser) return "";
+    const profile = currentUser.profile || currentUser.user?.profile;
+    const firstName =
+      profile?.first_name ||
+      currentUser?.first_name ||
+      currentUser?.firstName ||
+      currentUser?.user?.firstName;
+    const lastName =
+      profile?.last_name ||
+      currentUser?.last_name ||
+      currentUser?.lastName ||
+      currentUser?.user?.lastName;
+    const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
-  return fullName || currentUser.name || currentUser.user?.name || t("nav.user");
-};
+    return (
+      fullName || currentUser.name || currentUser.user?.name || t("nav.user")
+    );
+  };
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     setIsLangOpen(false);
@@ -89,7 +91,10 @@ const Navbar = ({ onOpenAuth }) => {
       className={`flex items-center justify-between bg-bg-secondary px-20 max-[1300px]:px-14 max-[1150px]:px-10 max-[1100px]:px-8 py-6 relative z-50 ${isArabic ? "rtl" : "ltr"}`}
     >
       {/* Logo */}
-      <Link to="/" className="flex items-center cursor-pointer transition-transform hover:scale-105">
+      <Link
+        to="/"
+        className="flex items-center cursor-pointer transition-transform hover:scale-105"
+      >
         <img src="/logo.svg" alt="Logo" className="w-[139px] h-10" />
       </Link>
 
@@ -107,7 +112,9 @@ const Navbar = ({ onOpenAuth }) => {
               }`}
             >
               {link.name}
-              <span className={`absolute -bottom-1 left-0 h-0.5 bg-brand-secondary transition-all duration-300 ${link.path === location.pathname ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+              <span
+                className={`absolute -bottom-1 left-0 h-0.5 bg-brand-secondary transition-all duration-300 ${link.path === location.pathname ? "w-full" : "w-0 group-hover:w-full"}`}
+              />
             </Link>
           ) : (
             <a
@@ -123,7 +130,6 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* Desktop Action Buttons & Icons */}
       <div className="hidden min-[1100px]:flex items-center gap-4">
-        
         {/* Utilities Center */}
         <div className="flex items-center bg-gray-100/50 p-1 rounded-xl gap-1">
           {user && (
@@ -177,7 +183,9 @@ const Navbar = ({ onOpenAuth }) => {
           </button>
 
           {isLangOpen && (
-            <div className={`absolute mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-xl py-1 z-10 ${isArabic ? "left-0" : "right-0"}`}>
+            <div
+              className={`absolute mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-xl py-1 z-10 ${isArabic ? "left-0" : "right-0"}`}
+            >
               {["en", "ar"].map((lang) => (
                 <button
                   key={lang}
@@ -185,7 +193,10 @@ const Navbar = ({ onOpenAuth }) => {
                   className="flex items-center justify-between w-full px-4 py-2.5 hover:bg-gray-50 text-sm font-medium transition-colors cursor-pointer"
                 >
                   <span>{lang === "en" ? "English" : "العربية"}</span>
-                  {((lang === "ar" && isArabic) || (lang === "en" && !isArabic)) && <Check size={14} className="text-brand-secondary" />}
+                  {((lang === "ar" && isArabic) ||
+                    (lang === "en" && !isArabic)) && (
+                    <Check size={14} className="text-brand-secondary" />
+                  )}
                 </button>
               ))}
             </div>
@@ -196,7 +207,7 @@ const Navbar = ({ onOpenAuth }) => {
         <div className="flex items-center gap-3 ml-2 relative">
           {user ? (
             <div className="relative">
-              <div 
+              <div
                 onClick={() => {
                   setIsProfileOpen(!isProfileOpen);
                   setIsNotifOpen(false);
@@ -204,25 +215,28 @@ const Navbar = ({ onOpenAuth }) => {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-100 transition-all border border-gray-100 cursor-pointer select-none"
               >
                 <div className="w-7 h-7 rounded-full bg-brand-secondary/10 flex items-center justify-center">
-                   <User className="w-4 h-4 text-brand-secondary" />
+                  <User className="w-4 h-4 text-brand-secondary" />
                 </div>
                 <span className="text-sm font-bold text-gray-700 max-w-[100px] truncate">
                   {getUserFullName(user)}
                 </span>
-                <ChevronDown size={14} className={`text-gray-400 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  size={14}
+                  className={`text-gray-400 transition-transform ${isProfileOpen ? "rotate-180" : ""}`}
+                />
               </div>
 
               {/* Profile Popup Design */}
               {isProfileOpen && (
-              <ProfilePopup
-                user={user}
-                logout={logout}
-                isArabic={isArabic}
-                isDarkMode={isDarkMode}
-                toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-                changeLanguage={changeLanguage}
-                onClose={() => setIsProfileOpen(false)}
-              />
+                <ProfilePopup
+                  user={user}
+                  logout={logout}
+                  isArabic={isArabic}
+                  isDarkMode={isDarkMode}
+                  toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+                  changeLanguage={changeLanguage}
+                  onClose={() => setIsProfileOpen(false)}
+                />
               )}
             </div>
           ) : (
@@ -283,17 +297,27 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* Mobile Menu Drawer */}
       {isMobileOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 min-[1100px]:hidden" onClick={() => setIsMobileOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 min-[1100px]:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
       )}
 
       <div
         className={`fixed top-0 ${isArabic ? "left-0" : "right-0"} h-full w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1100px]:hidden ${
-          isMobileOpen ? "translate-x-0" : isArabic ? "-translate-x-full" : "translate-x-full"
+          isMobileOpen
+            ? "translate-x-0"
+            : isArabic
+              ? "-translate-x-full"
+              : "translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100">
           <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
-          <button onClick={() => setIsMobileOpen(false)} className="p-2 rounded-full bg-gray-50 text-gray-500 transition-all hover:bg-gray-100 cursor-pointer">
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="p-2 rounded-full bg-gray-50 text-gray-500 transition-all hover:bg-gray-100 cursor-pointer"
+          >
             <X size={20} />
           </button>
         </div>
@@ -305,7 +329,9 @@ const Navbar = ({ onOpenAuth }) => {
               to={link.path || "#"}
               onClick={() => setIsMobileOpen(false)}
               className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
-                link.path === location.pathname ? "bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20" : "text-gray-600 hover:bg-gray-50"
+                link.path === location.pathname
+                  ? "bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20"
+                  : "text-gray-600 hover:bg-gray-50"
               }`}
             >
               {link.name}
@@ -315,28 +341,52 @@ const Navbar = ({ onOpenAuth }) => {
 
         <div className="absolute bottom-0 w-full p-6 border-t border-gray-100 bg-gray-50/50">
           <div className="flex gap-2 mb-4">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer">
-              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />} {isDarkMode ? "Light" : "Dark"}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer"
+            >
+              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}{" "}
+              {isDarkMode ? "Light" : "Dark"}
             </button>
-            <button onClick={() => changeLanguage(isArabic ? "en" : "ar")} className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer">
+            <button
+              onClick={() => changeLanguage(isArabic ? "en" : "ar")}
+              className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer"
+            >
               <Globe size={18} /> {isArabic ? "العربية" : "EN"}
             </button>
           </div>
 
           {user ? (
             <div className="space-y-3">
-               <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100">
-                  <div className="w-10 h-10 rounded-full bg-brand-secondary flex items-center justify-center text-white font-bold">{getUserFullName(user).charAt(0)}</div>
-                  <span className="font-bold text-gray-700 text-sm truncate">{getUserFullName(user)}</span>
-               </div>
-               <button onClick={logout} className="w-full py-3.5 bg-rose-50 text-rose-500 rounded-xl font-bold flex items-center justify-center gap-2 active:bg-rose-100 transition-colors cursor-pointer">
-                 <LogOut size={18} /> {t("nav.logout")}
-               </button>
+              <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100">
+                <div className="w-10 h-10 rounded-full bg-brand-secondary flex items-center justify-center text-white font-bold">
+                  {getUserFullName(user).charAt(0)}
+                </div>
+                <span className="font-bold text-gray-700 text-sm truncate">
+                  {getUserFullName(user)}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                className="w-full py-3.5 bg-rose-50 text-rose-500 rounded-xl font-bold flex items-center justify-center gap-2 active:bg-rose-100 transition-colors cursor-pointer"
+              >
+                <LogOut size={18} /> {t("nav.logout")}
+              </button>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              <button onClick={() => onOpenAuth?.("login")} className="w-full py-3 border-2 border-brand-secondary text-brand-secondary rounded-xl font-bold">{t("nav.login")}</button>
-              <button onClick={() => onOpenAuth?.("signup")} className="w-full py-3 bg-gradient-to-r from-brand-secondary to-[#AAE338] text-white rounded-xl font-bold shadow-lg shadow-brand-secondary/20">{t("nav.signup")}</button>
+              <button
+                onClick={() => onOpenAuth?.("login")}
+                className="w-full py-3 border-2 border-brand-secondary text-brand-secondary rounded-xl font-bold"
+              >
+                {t("nav.login")}
+              </button>
+              <button
+                onClick={() => onOpenAuth?.("signup")}
+                className="w-full py-3 bg-gradient-to-r from-brand-secondary to-[#AAE338] text-white rounded-xl font-bold shadow-lg shadow-brand-secondary/20"
+              >
+                {t("nav.signup")}
+              </button>
             </div>
           )}
         </div>

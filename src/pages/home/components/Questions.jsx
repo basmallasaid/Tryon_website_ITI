@@ -47,7 +47,7 @@ export default function Questions() {
 
                 <div className="relative z-10 w-full px-4 py-4">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="font-bold text-2xl leading-[38.4px] text-text-primary">
+                    <span className="font-semibold text-xl leading-[30px] text-text-primary">
                       {t(faq.question)}
                     </span>
                     <ChevronDown
