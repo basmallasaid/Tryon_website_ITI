@@ -12,7 +12,6 @@ import {
   Moon,
   Mail,
   CreditCard,
-  Heart,
   SquarePen,
 } from "lucide-react";
 import Button from "./Button";
@@ -338,6 +337,17 @@ const Navbar = ({ onOpenAuth }) => {
               {link.name}
             </Link>
           ))}
+          <Link
+            to="/favorites"
+            onClick={() => setIsMobileOpen(false)}
+            className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
+              location.pathname === "/favorites"
+                ? "bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            {t("nav.favorites")}
+          </Link>
         </div>
 
         <div className="absolute bottom-0 w-full p-6 border-t border-gray-100 bg-gray-50/50">

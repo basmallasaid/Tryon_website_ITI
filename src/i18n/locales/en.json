@@ -11,7 +11,8 @@
     "login": "Login",
     "signup": "Sign-up",
     "language": "Language",
-    "logout": "Logout"
+    "logout": "Logout",
+    "favorites": "Favorites"
   },
   "hero": {
     "yourPersonal": "Your Personal",
@@ -422,5 +423,17 @@
     "step2Desc": "Browse our collection or upload any garment you like. Our AI maps it onto your body.",
     "step3Title": "See It Instantly",
     "step3Desc": "Get a realistic preview in seconds. See exactly how the outfit looks on you with lifelike detail."
+  },
+  "fav": {
+    "title": "Favorites",
+    "subtitle": "Start exploring our curated collections to build your digital favorite screen.",
+    "emptyMessage": "Your favorites are lonely.",
+    "loginToView": "Log in to see your favorite items",
+    "retry": "Retry",
+    "all": "All",
+    "store": "Store",
+    "wardrobe": "Wardrobe",
+    "recentTryOn": "Recent Try-On",
+    "recentRecycle": "Recent Recycle"
   }
 }
