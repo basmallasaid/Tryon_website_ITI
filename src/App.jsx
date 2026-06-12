@@ -88,7 +88,7 @@ function AppContent() {
             { path: 'contact-us', element: <ContactUs /> },
             { path: 'editprofile', element: <EditProfilePage /> },
             { path: 'favorites', element: <Fav /> },
-            { path: 'wardeobe', element: <WardrobePage /> },
+            { path: 'wardrobe', element: <WardrobePage /> },
             { path: 'wardeobe/edit/:id', element: <EditItemWardrobe /> },
           ],
         },
