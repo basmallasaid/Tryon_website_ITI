@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import AdminSidebar from './AdminSidebar';
-import AdminTopBar from './AdminTopBar';
-import AdminMobileHeader from './AdminMobileHeader';
-import AdminBottomNav from './AdminBottomNav';
+import AdminSidebar from './components/AdminSidebar';
+import AdminTopBar from './components/AdminTopBar';
+import AdminMobileHeader from './components/AdminMobileHeader';
+import AdminBottomNav from './components/AdminBottomNav';
 
 export default function AdminLayout({ activePage, setActivePage, children }) {
   return (

@@ -1,9 +1,9 @@
 import { Store, Package, Shirt, RefreshCw, TrendingUp, CalendarDays } from 'lucide-react';
-import MetricCard from '../MetricCard';
-import ActiveProductsBar from '../ActiveProductsBar';
-import TotalUsersCard from '../TotalUsersCard';
-import QuickActionsPanel from '../QuickActionsPanel';
-import TopCategoriesChart from '../TopCategoriesChart';
+import MetricCard from '../components/MetricCard';
+import ActiveProductsBar from '../components/ActiveProductsBar';
+import TotalUsersCard from '../components/TotalUsersCard';
+import QuickActionsPanel from '../components/QuickActionsPanel';
+import TopCategoriesChart from '../components/TopCategoriesChart';
 
 const metrics = [
   { label: 'Total Stores', value: '128', icon: Store, iconColor: 'text-admin-brand', overlayBg: 'bg-admin-brand/10', badge: '+4.5%', badgeColor: 'text-admin-success' },
