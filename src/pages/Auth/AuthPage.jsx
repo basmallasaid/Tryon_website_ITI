@@ -12,7 +12,8 @@ import ResetPassword from "./ResetPassword";
 import SlidingOverlay from "../../components/SlidingOverlay";
 import { showToast } from "../../utils/toast";
 export default function AuthPage({ initialIsLogin = true, inModal = false, onClose }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isArabic = i18n.language === "ar";
     const navigate = useNavigate();
     const [view, setView] = useState(initialIsLogin ? "login" : "register");
     const [forgotEmail, setForgotEmail] = useState("");
@@ -166,7 +167,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
 
     return (
         <div className={`flex ${inModal ? '' : 'min-h-screen'} items-center justify-center ${inModal ? '' : 'bg-gray-100 p-4'} font-sans`}>
-            <div className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full ${inModal ? '' : 'max-w-6xl'} overflow-hidden rounded-[40px] bg-white shadow-2xl`}>
+            <div dir={isArabic ? 'rtl' : 'ltr'} className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full ${inModal ? '' : 'max-w-6xl'} overflow-hidden rounded-[40px] bg-white shadow-2xl`}>
                 
                 <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
                 

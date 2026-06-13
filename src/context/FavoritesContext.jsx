@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import {
   getFavorites,
   addFavorite,
@@ -9,6 +9,7 @@ import {
 import { useAuth } from "./AuthContext";
 import { showToast } from "../utils/toast";
 import Swal from "sweetalert2";
+import i18n from "../i18n/i18n";
 
 const FavoritesContext = createContext();
 
@@ -18,6 +19,7 @@ export const FavoritesProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [enrichmentMaps, setEnrichmentMaps] = useState(null);
+  const removingRef = useRef(new Set());
 
   const fetchAll = useCallback(async () => {
     if (!user?.token) return;
@@ -34,7 +36,7 @@ export const FavoritesProvider = ({ children }) => {
     } catch (e) {
       const msg = e.response?.data?.message || e.message || "Failed to load favorites.";
       setError(msg);
-      showToast('error', 'Unable to load favorites');
+      showToast('error', i18n.t('fav.loadError'));
     } finally {
       setLoading(false);
     }
@@ -55,33 +57,39 @@ export const FavoritesProvider = ({ children }) => {
         if (prev.some((i) => i.itemId === itemId)) return prev;
         return [...prev, newItem];
       });
-      showToast('success', 'Added to Favorites Successfully');
+      showToast('success', i18n.t('fav.addedSuccess'));
     } catch {
-      showToast('error', 'Failed to add item to favorites');
+      showToast('error', i18n.t('fav.addedError'));
     }
   };
 
   const removeItem = async (originalItemId) => {
     const match = items.find((i) => i.itemId === originalItemId);
     if (!match) return;
+    if (removingRef.current.has(originalItemId)) return;
+    removingRef.current.add(originalItemId);
 
     const result = await Swal.fire({
-      title: 'Remove from Favorites?',
-      text: 'This item will be removed from your favorites.',
+      title: i18n.t('fav.removeConfirmTitle'),
+      text: i18n.t('fav.removeConfirmText'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, remove',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: i18n.t('fav.removeConfirmButton'),
+      cancelButtonText: i18n.t('fav.removeCancelButton'),
     });
-    if (!result.isConfirmed) return;
+    if (!result.isConfirmed) {
+      removingRef.current.delete(originalItemId);
+      return;
+    }
 
     try {
       await removeFavorite(match._id);
       setItems((prev) => prev.filter((i) => i._id !== match._id));
-      showToast('success', 'Removed from Favorites Successfully');
+      showToast('success', i18n.t('fav.removedSuccess'));
+      removingRef.current.delete(originalItemId);
     } catch {
-      showToast('error', 'Failed to remove item from favorites');
-      throw new Error('Failed to remove item from favorites');
+      showToast('error', i18n.t('fav.removedError'));
+      removingRef.current.delete(originalItemId);
     }
   };
 

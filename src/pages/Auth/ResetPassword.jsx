@@ -35,7 +35,7 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
   };
 
   return (
-    <div className={`absolute left-0 top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ${
+    <div className={`absolute top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ltr:left-0 rtl:right-0 ${
       isVisible ? "z-10 opacity-100" : "z-0 opacity-0"
     } ${inModal ? "p-6 md:p-10" : "p-8 md:p-16"}`}>
       <div className="mx-auto w-full max-w-md">
@@ -53,11 +53,11 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder={t("auth.passwordPlaceholder")}
                 required
-                className={`w-full rounded-xl border border-gray-300 text-sm outline-none pr-11 ${
+                className={`w-full rounded-xl border border-gray-300 text-sm outline-none ltr:pr-11 rtl:pl-11 ${
                   inModal ? "p-3" : "p-4"
                 }`}
               />
-              <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <button type="button" onClick={() => setShowNew(!showNew)} className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-gray-400">
                 {showNew ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
@@ -87,11 +87,11 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder={t("auth.confirmPasswordPlaceholder")}
                 required
-                className={`w-full rounded-xl border border-gray-300 text-sm outline-none pr-11 ${
+                className={`w-full rounded-xl border border-gray-300 text-sm outline-none ltr:pr-11 rtl:pl-11 ${
                   inModal ? "p-3" : "p-4"
                 }`}
               />
-              <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-gray-400">
                 {showConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>

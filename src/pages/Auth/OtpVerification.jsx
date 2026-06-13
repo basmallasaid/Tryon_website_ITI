@@ -56,7 +56,7 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
   };
 
   return (
-    <div className={`absolute left-0 top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ${
+    <div className={`absolute top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ltr:left-0 rtl:right-0 ${
       isVisible ? "z-10 opacity-100" : "z-0 opacity-0"
     } ${inModal ? "p-6 md:p-10" : "p-8 md:p-16"}`}>
       <div className="mx-auto w-full max-w-md">
@@ -85,7 +85,7 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
           </div>
 
           <button type="submit" className={`w-full rounded-xl bg-[#40B9FF] font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-[#89D4FF] inline-flex items-center justify-center gap-2 ${inModal ? "py-3" : "py-4"}`}>
-            {t("auth.verifyContinue")} <span>→</span>
+            {t("auth.verifyContinue")} <span className="inline-block rtl:rotate-180">→</span>
           </button>
 
           <div className="mt-8 text-center space-y-4">
@@ -100,7 +100,7 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
 
             <div className="pt-2">
               <button type="button" onClick={onBackToLogin} className="inline-flex items-center gap-1 font-semibold text-[#A6E22E] border-b border-[#A6E22E] pb-0.5 text-sm hover:opacity-80">
-                <span>←</span> {t("auth.backToLogin")}
+                <span className="inline-block rtl:rotate-180">←</span> {t("auth.backToLogin")}
               </button>
             </div>
           </div>

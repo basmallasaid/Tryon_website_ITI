@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 export default function RegisterForm({ isVisible, onRegister, toggleAuth, onGoogleLogin, inModal }) {
   const { t } = useTranslation();
   return (
-    <div className={`absolute right-0 top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ${
-      isVisible ? "z-10 opacity-100 translate-x-0" : "z-0 opacity-0 translate-x-10"
+    <div className={`absolute top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ltr:right-0 rtl:left-0 ${
+      isVisible ? "z-10 opacity-100 translate-x-0" : "z-0 opacity-0 ltr:translate-x-10 rtl:-translate-x-10"
     } ${inModal ? 'p-6 md:p-10' : 'p-8 md:p-16'} bg-white`}>
       
       <div className="mx-auto w-full max-w-md">
@@ -21,8 +21,8 @@ export default function RegisterForm({ isVisible, onRegister, toggleAuth, onGoog
           {/* Name Fields */}
           <div className={`flex ${inModal ? 'gap-3' : 'gap-4'}`}>
             <div className="relative flex-1 group">
-              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={16} />
-              <input name="fname" placeholder={t("auth.firstName")} required className={`w-full pl-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
+              <User className="absolute ltr:left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={16} />
+              <input name="fname" placeholder={t("auth.firstName")} required className={`w-full ltr:pl-10 rtl:pr-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
             </div>
             <div className="relative flex-1 group">
               <input name="lname" placeholder={t("auth.lastName")} required className={`w-full px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
@@ -31,14 +31,14 @@ export default function RegisterForm({ isVisible, onRegister, toggleAuth, onGoog
 
           {/* Email */}
           <div className="relative group">
-            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={16} />
-            <input name="email" type="email" placeholder={t("auth.email")} required className={`w-full pl-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
+            <Mail className="absolute ltr:left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={16} />
+            <input name="email" type="email" placeholder={t("auth.email")} required className={`w-full ltr:pl-10 rtl:pr-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
           </div>
 
           {/* Passwords */}
           <div className="relative group">
-            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={16} />
-            <input name="password" type="password" placeholder={t("auth.password")} required className={`w-full pl-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
+            <Lock className="absolute ltr:left-3.5 rtl:right-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={16} />
+            <input name="password" type="password" placeholder={t("auth.password")} required className={`w-full ltr:pl-10 rtl:pr-10 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
           </div>
           
           <input name="confirmPassword" type="password" placeholder={t("auth.confirmPassword")} required className={`w-full px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-3.5'}`} />
