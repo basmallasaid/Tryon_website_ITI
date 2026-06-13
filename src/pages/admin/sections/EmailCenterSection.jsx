@@ -12,14 +12,14 @@ import adminI18n from '../../../i18n/admin/adminI18n';
 
 const ITEMS_PER_PAGE = 4;
 
-function timeAgo(dateStr) {
+function timeAgo(dateStr, t) {
   const d = new Date(dateStr);
   const now = Date.now();
   const diff = Math.floor((now - d.getTime()) / 1000);
   if (diff < 60) return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 172800) return 'Yesterday';
+  if (diff < 172800) return t('admin.emailCenter.yesterday');
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
@@ -36,7 +36,7 @@ function getInitials(name) {
   return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
-function mapEmailToCard(e) {
+function mapEmailToCard(e, t) {
   const senderName = e.senderUserId?.profile?.first_name
     ? `${e.senderUserId.profile.first_name} ${e.senderUserId.profile.last_name || ''}`.trim()
     : e.senderEmail || 'Unknown';
@@ -49,19 +49,19 @@ function mapEmailToCard(e) {
     subject: e.subject,
     preview: e.message?.slice(0, 120) || '',
     body: e.message || '',
-    time: timeAgo(e.created_at),
+    time: timeAgo(e.created_at, t),
     date: formatFullDate(e.created_at),
     timeDetail: formatTimeDetail(e.created_at),
     unread: !e.isRead,
     starred: false,
-    tag: e.emailType === 'USER_TO_ADMIN' ? 'Inbound' : e.emailType === 'ADMIN_TO_ALL' ? 'Broadcast' : null,
+    tag: e.emailType === 'USER_TO_ADMIN' ? t('admin.emailCenter.inbound') : e.emailType === 'ADMIN_TO_ALL' ? t('admin.emailCenter.broadcast') : null,
     emailType: e.emailType,
     threadId: e.parentEmailId?._id || e._id,
     _raw: e,
   };
 }
 
-function mapContactToCard(m) {
+function mapContactToCard(m, t) {
   const initials = getInitials(m.name);
   return {
     id: m._id,
@@ -69,15 +69,15 @@ function mapContactToCard(m) {
     initials,
     sender: m.name,
     email: m.email,
-    subject: `Contact from ${m.name}`,
+    subject: t('admin.emailCenter.contactFrom', { name: m.name }),
     preview: m.message?.slice(0, 120) || '',
     body: m.message || '',
-    time: timeAgo(m.created_at),
+    time: timeAgo(m.created_at, t),
     date: formatFullDate(m.created_at),
     timeDetail: formatTimeDetail(m.created_at),
     unread: !m.read,
     starred: false,
-    tag: 'Contact',
+    tag: t('admin.emailCenter.contact'),
     emailType: null,
     threadId: null,
     _raw: m,
@@ -107,8 +107,8 @@ export default function EmailCenterSection({ onReadChange }) {
       const rawEmails = Array.isArray(emailRes.data?.emails) ? emailRes.data.emails : [];
       const rawContacts = Array.isArray(contactRes.data) ? contactRes.data : [];
       const all = [
-        ...rawEmails.map(mapEmailToCard),
-        ...rawContacts.map(mapContactToCard),
+        ...rawEmails.map((e) => mapEmailToCard(e, t)),
+        ...rawContacts.map((m) => mapContactToCard(m, t)),
       ].sort((a, b) => {
         const da = new Date(a._raw.created_at);
         const db = new Date(b._raw.created_at);
@@ -120,7 +120,7 @@ export default function EmailCenterSection({ onReadChange }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => { fetchEmails(); }, [fetchEmails]);
 
@@ -302,14 +302,14 @@ export default function EmailCenterSection({ onReadChange }) {
               <th className="py-3 px-4 w-12">
                 <input type="checkbox" className="w-4 h-4 rounded border-admin-border accent-admin-brand" />
               </th>
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">SENDER</th>
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">SUBJECT & MESSAGE</th>
-              <th className="text-right text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">RECEIVED</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.emailCenter.sender')}</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.emailCenter.subjectMessage')}</th>
+              <th className="text-right text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.emailCenter.received')}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">Loading emails...</td></tr>
+              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.emailCenter.loading')}</td></tr>
             ) : currentItems.length > 0 ? (
               currentItems.map((email) => (
                 <EmailRow key={email.id} email={email} onSelect={handleSelectEmail} />
@@ -321,7 +321,7 @@ export default function EmailCenterSection({ onReadChange }) {
         </table>
         <div className="flex items-center justify-between px-6 py-4 border-t border-admin-border/40">
           <p className="text-xs text-admin-text-muted">
-            {loading ? 'Loading...' : `Showing ${filtered.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, filtered.length)} of ${filtered.length} messages`}
+            {loading ? t('admin.emailCenter.loading') : t('admin.emailCenter.showingMessages', { from: filtered.length === 0 ? 0 : startIdx + 1, to: Math.min(startIdx + ITEMS_PER_PAGE, filtered.length), total: filtered.length })}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -362,7 +362,7 @@ export default function EmailCenterSection({ onReadChange }) {
 
         <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
           {loading ? (
-            <p className="p-4 text-center text-sm text-admin-text-muted">Loading emails...</p>
+            <p className="p-4 text-center text-sm text-admin-text-muted">{t('admin.emailCenter.loading')}</p>
           ) : currentItems.length > 0 ? (
             currentItems.map((email) => (
               <EmailCard key={email.id} email={email} onSelect={handleSelectEmail} />
@@ -375,7 +375,7 @@ export default function EmailCenterSection({ onReadChange }) {
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4 px-1">
             <p className="text-xs text-admin-text-muted">
-              Page {currentPage} of {totalPages}
+              {t('admin.emailCenter.pageOf', { page: currentPage, totalPages })}
             </p>
             <div className="flex items-center gap-2">
               <button

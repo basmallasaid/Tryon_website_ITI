@@ -1,3 +1,8 @@
+// import { useState } from 'react'
+// import reactLogo from './assets/react.svg'
+// import viteLogo from './assets/vite.svg'
+// import heroImg from './assets/hero.png'
+// import './App.css'
 import { lazy, Suspense, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useNavigate } from 'react-router-dom';
@@ -144,13 +149,6 @@ function AppContent() {
 
 // Main App Component
 function App() {
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    document.documentElement.dir = i18n.dir();
-    document.documentElement.lang = i18n.language;
-  }, [i18n.language]);
-
   return (
     <AuthProvider>
       <WardrobeProvider>

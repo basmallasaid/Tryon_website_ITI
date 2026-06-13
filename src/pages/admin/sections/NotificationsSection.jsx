@@ -15,15 +15,17 @@ function formatTime(dateStr) {
   return new Date(dateStr).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
-const typeConfig = {
-  tryon: { label: 'Try-On', color: 'bg-admin-brand/10 text-admin-brand' },
-  recycle: { label: 'Recycle', color: 'bg-admin-amber/10 text-admin-amber' },
-  store: { label: 'Store', color: 'bg-admin-success/10 text-admin-success' },
-  pricing: { label: 'Pricing', color: 'bg-admin-danger/10 text-admin-danger' },
-  general: { label: 'General', color: 'bg-admin-border/20 text-admin-text-secondary' },
-};
+const getTypeConfig = (t) => ({
+  tryon: { label: t('admin.notifications.tryOn'), color: 'bg-admin-brand/10 text-admin-brand' },
+  recycle: { label: t('admin.notifications.recycle'), color: 'bg-admin-amber/10 text-admin-amber' },
+  store: { label: t('admin.notifications.store'), color: 'bg-admin-success/10 text-admin-success' },
+  pricing: { label: t('admin.notifications.pricing'), color: 'bg-admin-danger/10 text-admin-danger' },
+  general: { label: t('admin.notifications.general'), color: 'bg-admin-border/20 text-admin-text-secondary' },
+});
 
 function NotificationDetail({ notification, onBack, onDelete }) {
+  const { t } = adminI18n;
+  const typeConfig = getTypeConfig(t);
   const config = typeConfig[notification.type] || typeConfig.general;
   const userEmail = notification.userId?.email || 'Unknown';
   const userName = [notification.userId?.profile?.first_name, notification.userId?.profile?.last_name].filter(Boolean).join(' ') || userEmail;
@@ -34,7 +36,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
         <button onClick={onBack} className="p-2 hover:bg-admin-border/20 rounded-lg transition-colors">
           <ArrowLeft className="w-5 h-5 text-admin-text-primary" />
         </button>
-        <h1 className="text-[20px] font-bold text-admin-text-primary">Notification Details</h1>
+        <h1 className="text-[20px] font-bold text-admin-text-primary">{t('admin.notifications.notificationDetails')}</h1>
       </div>
 
       <div className="bg-white border border-admin-border/40 rounded-xl shadow-sm">
@@ -76,7 +78,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
             onClick={() => onDelete(notification._id)}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-admin-danger hover:bg-admin-danger/10 rounded-lg transition-colors"
           >
-            <Trash2 className="w-4 h-4" /> Delete
+            <Trash2 className="w-4 h-4" /> {t('admin.common.delete')}
           </button>
         </div>
       </div>
@@ -86,6 +88,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
 
 export default function NotificationsSection({ onAddNotification }) {
   const { t } = adminI18n;
+  const typeConfig = getTypeConfig(t);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -144,7 +147,7 @@ export default function NotificationsSection({ onAddNotification }) {
       {/* Desktop Table */}
       <div className="hidden md:block bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
         <div className="px-6 py-4 border-b border-admin-border/40 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-admin-text-primary">All Notifications</h2>
+          <h2 className="text-sm font-bold text-admin-text-primary">{t('admin.notifications.allNotifications')}</h2>
           <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
             <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
           </button>
@@ -152,16 +155,16 @@ export default function NotificationsSection({ onAddNotification }) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-admin-border/40">
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Title</th>
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Message</th>
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Sent To</th>
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Type</th>
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Date</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.notifications.titleCol')}</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.notifications.messageCol')}</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.notifications.sentTo')}</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.notifications.typeCol')}</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">{t('admin.notifications.date')}</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">Loading…</td></tr>
+              <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.notifications.loading')}</td></tr>
             ) : currentItems.length > 0 ? (
               currentItems.map((n) => {
                 const config = typeConfig[n.type] || typeConfig.general;
@@ -193,13 +196,13 @@ export default function NotificationsSection({ onAddNotification }) {
                 );
               })
             ) : (
-              <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">No notifications yet.</td></tr>
+              <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.notifications.noNotifications')}</td></tr>
             )}
           </tbody>
         </table>
         <div className="flex items-center justify-between px-6 py-4 border-t border-admin-border/40">
           <p className="text-xs text-admin-text-muted">
-            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length}`}
+            {loading ? t('admin.notifications.loading') : t('admin.notifications.showing', { from: notifications.length === 0 ? 0 : startIdx + 1, to: Math.min(startIdx + ITEMS_PER_PAGE, notifications.length), total: notifications.length })}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -229,7 +232,7 @@ export default function NotificationsSection({ onAddNotification }) {
         </div>
         <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
           {loading ? (
-            <p className="p-4 text-center text-sm text-admin-text-muted">Loading…</p>
+            <p className="p-4 text-center text-sm text-admin-text-muted">{t('admin.notifications.loading')}</p>
           ) : currentItems.length > 0 ? (
             currentItems.map((n) => {
               const config = typeConfig[n.type] || typeConfig.general;
@@ -258,12 +261,12 @@ export default function NotificationsSection({ onAddNotification }) {
               );
             })
           ) : (
-            <p className="p-4 text-center text-sm text-admin-text-muted">No notifications yet.</p>
+            <p className="p-4 text-center text-sm text-admin-text-muted">{t('admin.notifications.noNotifications')}</p>
           )}
         </div>
         <div className="flex items-center justify-between mt-4 px-1">
           <p className="text-xs text-admin-text-muted">
-            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length}`}
+            {loading ? t('admin.notifications.loading') : t('admin.notifications.showing', { from: notifications.length === 0 ? 0 : startIdx + 1, to: Math.min(startIdx + ITEMS_PER_PAGE, notifications.length), total: notifications.length })}
           </p>
           <div className="flex items-center gap-2">
             <button

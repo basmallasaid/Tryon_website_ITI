@@ -16,10 +16,14 @@ import SettingsSection from './sections/SettingsSection';
 import { getContactMessagesApi, getEmailUnreadCountApi } from '../../api/adminApi';
 import adminI18n from '../../i18n/admin/adminI18n';
 
-const ROLE_OPTIONS = ['All', 'Admin', 'Premium', 'User'];
-
 export default function AdminDashboardPage() {
   const { t } = adminI18n;
+  const getRoleOptions = () => [
+    { value: 'All', label: t('admin.stores.allStatuses') },
+    { value: 'Admin', label: t('admin.users.admin') },
+    { value: 'Premium', label: t('admin.users.premium') },
+    { value: 'User', label: t('admin.users.userRole') },
+  ];
   const [activePage, setActivePage] = useState('dashboard');
   const [showAddStore, setShowAddStore] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
@@ -183,7 +187,7 @@ export default function AdminDashboardPage() {
             {t('admin.topbar.filter')}
             {userRoleFilter !== 'All' && (
               <span className="ml-1 px-1.5 py-0.5 bg-admin-brand text-white rounded-full text-[10px]">
-                {userRoleFilter}
+                {getRoleOptions().find(o => o.value === userRoleFilter)?.label || userRoleFilter}
               </span>
             )}
             <ChevronDown className={`w-3 h-3 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
@@ -191,21 +195,21 @@ export default function AdminDashboardPage() {
           {showFilterDropdown && (
             <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-admin-border/40 rounded-xl shadow-lg z-50 py-1">
               <div className="px-3 py-2 border-b border-admin-border/30">
-                <span className="text-[10px] font-bold text-admin-text-muted uppercase tracking-wider">Role</span>
+                <span className="text-[10px] font-bold text-admin-text-muted uppercase tracking-wider">{t('admin.dashboard.role')}</span>
               </div>
-              {ROLE_OPTIONS.map((role) => (
+              {getRoleOptions().map((option) => (
                 <button
-                  key={role}
+                  key={option.value}
                   onClick={() => {
-                    setUserRoleFilter(role);
+                    setUserRoleFilter(option.value);
                     setShowFilterDropdown(false);
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 text-xs hover:bg-admin-brand-activeBg/50 transition-colors ${
-                    userRoleFilter === role ? 'text-admin-brand font-medium' : 'text-admin-text-secondary'
+                    userRoleFilter === option.value ? 'text-admin-brand font-medium' : 'text-admin-text-secondary'
                   }`}
                 >
-                  <span>{role}</span>
-                  {userRoleFilter === role && (
+                  <span>{option.label}</span>
+                  {userRoleFilter === option.value && (
                     <div className="w-1.5 h-1.5 rounded-full bg-admin-brand" />
                   )}
                 </button>
@@ -248,8 +252,8 @@ export default function AdminDashboardPage() {
       <AddNotificationSection
         onBack={handleBackFromAddNotification}
         prefillEmail={deletionNotificationUser?.email || ''}
-        prefillTitle="Account Deletion Warning"
-        prefillMessage={`Dear ${deletionNotificationUser?.name || 'User'},\n\nWe noticed that your account has been inactive. If you do not contact our support team within 30 days, your account and all associated data will be permanently deleted.\n\nIf you believe this is an error or wish to keep your account, please reach out to us as soon as possible.\n\nThank you,\nThe DOLAPY Team`}
+        prefillTitle={t('admin.dashboard.accountDeletionWarning')}
+        prefillMessage={t('admin.dashboard.deletionMessage', { name: deletionNotificationUser?.name || t('admin.users.userRole') })}
         prefillChannels={['app', 'email', 'website']}
       />
     );

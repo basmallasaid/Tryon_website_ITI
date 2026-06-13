@@ -17,20 +17,20 @@ function getAvatarColor(name) {
   return avatarColors[Math.abs(hash) % avatarColors.length];
 }
 
-function mapRole(user) {
-  if (user.role === 'admin') return 'Admin';
-  if (user.subscriptionStatus === 'active') return 'Premium';
-  return 'User';
+function mapRole(user, t) {
+  if (user.role === 'admin') return t('admin.users.admin');
+  if (user.subscriptionStatus === 'active') return t('admin.users.premium');
+  return t('admin.users.userRole');
 }
 
-function getStatus(user) {
-  return user.is_verified ? 'Active' : 'Inactive';
+function getStatus(user, t) {
+  return user.is_verified ? t('admin.users.active') : t('admin.users.inactive');
 }
 
 const TRYON_LIMIT = 50;
 const RECYCLE_LIMIT = 30;
 
-function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete }) {
+function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete, t }) {
   const notified = user?.deletionNotified || false;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -42,18 +42,18 @@ function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete }) {
               <AlertTriangle className="w-5 h-5 text-admin-danger" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-admin-text-primary">Delete User</h3>
+              <h3 className="text-lg font-bold text-admin-text-primary">{t('admin.users.deleteUser')}</h3>
               <p className="text-sm text-admin-text-secondary">{user?.email}</p>
             </div>
           </div>
 
           {notified ? (
             <p className="text-sm text-admin-text-secondary mb-6">
-              This user has been notified about account deletion. Are you sure you want to permanently delete this user?
+              {t('admin.users.deleteUserDesc')}
             </p>
           ) : (
             <p className="text-sm text-admin-text-secondary mb-6">
-              Before deleting this user, you should send them a notification informing them their account will be deleted if they don't contact support.
+              {t('admin.users.deleteUserWarning')}
             </p>
           )}
         </div>
@@ -63,21 +63,21 @@ function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete }) {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-admin-text-secondary hover:text-admin-text-primary transition-colors"
           >
-            Cancel
+            {t('admin.users.cancel')}
           </button>
           {notified ? (
             <button
               onClick={onDelete}
               className="px-4 py-2 bg-admin-danger text-white rounded-lg text-sm font-medium hover:bg-admin-danger/90 transition-colors"
             >
-              Delete User
+              {t('admin.users.deleteUser')}
             </button>
           ) : (
             <button
               onClick={onSendNotification}
               className="px-4 py-2 bg-admin-brand text-white rounded-lg text-sm font-medium hover:bg-admin-brand-light transition-colors"
             >
-              Send Notification
+              {t('admin.users.sendNotification')}
             </button>
           )}
         </div>
@@ -115,7 +115,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
 
   const mapped = users.map((u) => {
     const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email;
-    const role = mapRole(u);
+    const role = mapRole(u, t);
     return {
       id: u._id,
       initials: getInitials(u.profile?.first_name, u.profile?.last_name),
@@ -125,7 +125,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
       role,
       tryOn: { used: u.latestTryOn?.length || 0, total: TRYON_LIMIT },
       recycling: { used: u.latestRecycle?.length || 0, total: RECYCLE_LIMIT },
-      status: getStatus(u),
+      status: getStatus(u, t),
       deletionNotified: u.deletionNotified || false,
     };
   });
@@ -261,7 +261,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
               className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border text-admin-text-secondary rounded-lg text-xs font-medium hover:bg-admin-brand-activeBg transition-colors"
             >
               <Pencil className="w-3.5 h-3.5" />
-              Edit
+              {t('admin.users.selectEdit')}
             </button>
           )}
           {selectedIds.size > 0 && (
@@ -270,7 +270,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
               className="flex items-center gap-2 px-4 py-2 bg-admin-danger text-white rounded-lg text-xs font-medium hover:bg-admin-danger/90 transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              Delete ({selectedIds.size})
+              {t('admin.users.selectDelete', { count: selectedIds.size })}
             </button>
           )}
         </div>
@@ -288,16 +288,16 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
                     className="w-4 h-4 rounded border-admin-border accent-admin-brand cursor-pointer"
                   />
                 </th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">User</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Role</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Virtual Try-On</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Recycling</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Status</th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.userCol')}</th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.roleCol')}</th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.virtualTryOn')}</th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.recycling')}</th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.statusCol')}</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">Loading users…</td></tr>
+                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.users.loadingUsers')}</td></tr>
               ) : filtered.length > 0 ? (
                 filtered.map((user) => (
                   <UserRow
@@ -340,7 +340,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
           <Filter className="w-3.5 h-3.5 text-admin-text-secondary" />
           <input
             type="text"
-            placeholder="Search users..."
+            placeholder={t('admin.users.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
@@ -357,7 +357,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-admin-brand-bg border border-admin-border text-admin-text-secondary rounded-xl text-xs font-medium"
           >
             <Pencil className="w-3.5 h-3.5" />
-            Edit User
+            {t('admin.users.selectEdit')}
           </button>
         )}
         {selectedIds.size > 0 && (
@@ -366,14 +366,14 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-admin-danger text-white rounded-xl text-xs font-medium"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            Delete ({selectedIds.size})
+            {t('admin.users.selectDelete', { count: selectedIds.size })}
           </button>
         )}
 
         {/* Mobile Cards */}
         <div className="flex flex-col gap-3">
           {loading ? (
-            <p className="text-center text-sm text-admin-text-muted py-8">Loading users…</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.users.loadingUsers')}</p>
           ) : filtered.length > 0 ? (
             filtered.map((user) => (
               <UserRow
@@ -401,6 +401,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
           onClose={() => setDeleteTarget(null)}
           onSendNotification={handleSendNotification}
           onDelete={handleConfirmDelete}
+          t={t}
         />
       )}
     </>

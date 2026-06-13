@@ -36,8 +36,8 @@ export default function StoresSection({ onAddStore, onEditStore }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [page, setPage] = useState(1);
 
-  const tabs = ['All Stores', 'Performance', 'Growth'];
-  const [tabFilter, setTabFilter] = useState('All Stores');
+  const tabs = [t('admin.stores.allStores'), t('admin.stores.performance'), t('admin.stores.growth')];
+  const [tabFilter, setTabFilter] = useState(t('admin.stores.allStores'));
 
   const fetchData = async () => {
     try {
@@ -78,7 +78,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
     couponCode: s.discount_code || '—',
     discountDescription: s.description || '',
     products: productCounts[s._id] || 0,
-    status: s.is_active ? 'Active' : 'Inactive',
+    status: s.is_active ? t('admin.stores.active') : t('admin.stores.inactive'),
     joined: formatDate(s.created_at),
     rawDiscount: s.discount_percent || 0,
     rawProducts: productCounts[s._id] || 0,
@@ -88,7 +88,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
   const filtered = mapped.filter((s) => {
     const matchesSearch = s.name.toLowerCase().includes(filter.toLowerCase()) || s.id.toLowerCase().includes(filter.toLowerCase());
     const matchesStatus = statusFilter === 'All' || s.status === statusFilter;
-    const matchesTab = tabFilter === 'All Stores' || (tabFilter === 'Performance' && s.rawProducts >= 10) || (tabFilter === 'Growth' && s.isActive);
+    const matchesTab = tabFilter === t('admin.stores.allStores') || (tabFilter === t('admin.stores.performance') && s.rawProducts >= 10) || (tabFilter === t('admin.stores.growth') && s.isActive);
     const matchDiscountMin = discountMin === '' || s.rawDiscount >= Number(discountMin);
     const matchDiscountMax = discountMax === '' || s.rawDiscount <= Number(discountMax);
     return matchesSearch && matchesStatus && matchesTab && matchDiscountMin && matchDiscountMax;
@@ -105,7 +105,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const hasFilters = filter !== '' || statusFilter !== 'All' || discountMin !== '' || discountMax !== '' || sortBy !== 'none' || tabFilter !== 'All Stores';
+  const hasFilters = filter !== '' || statusFilter !== 'All' || discountMin !== '' || discountMax !== '' || sortBy !== 'none' || tabFilter !== t('admin.stores.allStores');
 
   const resetFilters = () => {
     setFilter('');
@@ -114,7 +114,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
     setDiscountMax('');
     setSortBy('none');
     setSortDir('asc');
-    setTabFilter('All Stores');
+    setTabFilter(t('admin.stores.allStores'));
     setPage(1);
   };
 
@@ -192,9 +192,9 @@ export default function StoresSection({ onAddStore, onEditStore }) {
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             className="px-4 py-2.5 bg-admin-input border border-admin-border rounded-xl text-xs text-admin-text-secondary outline-none"
           >
-            <option value="All">All Statuses</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+            <option value="All">{t('admin.stores.allStatuses')}</option>
+            <option value="Active">{t('admin.stores.active')}</option>
+            <option value="Inactive">{t('admin.stores.inactive')}</option>
           </select>
 
           <button
@@ -206,7 +206,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
 
           {hasFilters && (
             <button onClick={resetFilters} className="flex items-center gap-1 text-xs font-medium text-admin-brand hover:underline ml-1">
-              <X className="w-3 h-3" /> Reset Filters
+              <X className="w-3 h-3" /> {t('admin.stores.resetFilters')}
             </button>
           )}
 
@@ -214,11 +214,11 @@ export default function StoresSection({ onAddStore, onEditStore }) {
             <div className="flex items-center gap-2 ml-auto">
               {selectedIds.size === 1 && (
                 <button onClick={handleEdit} className="flex items-center gap-1.5 px-4 py-2 bg-admin-brand/10 text-admin-brand rounded-lg text-xs font-medium hover:bg-admin-brand/20 transition-colors">
-                  <Pencil className="w-3.5 h-3.5" /> Edit
+                  <Pencil className="w-3.5 h-3.5" /> {t('admin.stores.selectEdit')}
                 </button>
               )}
               <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-admin-danger/10 text-admin-danger rounded-lg text-xs font-medium hover:bg-admin-danger/20 transition-colors">
-                <Trash2 className="w-3.5 h-3.5" /> Delete ({selectedIds.size})
+                <Trash2 className="w-3.5 h-3.5" /> {t('admin.stores.selectDelete', { count: selectedIds.size })}
               </button>
             </div>
           )}
@@ -228,12 +228,12 @@ export default function StoresSection({ onAddStore, onEditStore }) {
           <div className="bg-white border border-admin-border/40 rounded-xl p-4 mb-6 shadow-sm">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <label className="text-xs font-medium text-admin-text-secondary">Discount Range:</label>
+                <label className="text-xs font-medium text-admin-text-secondary">{t('admin.stores.discountRange')}</label>
                 <input
                   type="number"
                   value={discountMin}
                   onChange={(e) => setDiscountMin(e.target.value)}
-                  placeholder="Min %"
+                  placeholder={t('admin.stores.min')}
                   className="w-24 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
                 />
                 <span className="text-admin-text-muted">—</span>
@@ -241,22 +241,22 @@ export default function StoresSection({ onAddStore, onEditStore }) {
                   type="number"
                   value={discountMax}
                   onChange={(e) => setDiscountMax(e.target.value)}
-                  placeholder="Max %"
+                  placeholder={t('admin.stores.max')}
                   className="w-24 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
                 />
               </div>
               <div className="w-px h-8 bg-admin-border" />
               <div className="flex items-center gap-3">
-                <label className="text-xs font-medium text-admin-text-secondary">Sort by:</label>
+                <label className="text-xs font-medium text-admin-text-secondary">{t('admin.stores.sortBy')}</label>
                 <select
                   value={sortBy}
                   onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
                   className="px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
                 >
-                  <option value="none">None</option>
-                  <option value="discount">Discount</option>
-                  <option value="name">Name</option>
-                  <option value="products">Products</option>
+                  <option value="none">{t('admin.stores.none')}</option>
+                  <option value="discount">{t('admin.stores.discount')}</option>
+                  <option value="name">{t('admin.stores.name')}</option>
+                  <option value="products">{t('admin.stores.products')}</option>
                 </select>
                 {sortBy !== 'none' && (
                   <button
@@ -283,24 +283,24 @@ export default function StoresSection({ onAddStore, onEditStore }) {
                     className="w-4 h-4 rounded border-admin-border accent-admin-brand"
                   />
                 </th>
-                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">Store & Logo</th>
-                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">Website</th>
-                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">Discount Details</th>
-                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">Products</th>
-                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">Status</th>
-                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">Joined</th>
+                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">{t('admin.stores.storeAndLogo')}</th>
+                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">{t('admin.stores.website')}</th>
+                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">{t('admin.stores.discountDetails')}</th>
+                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">{t('admin.stores.products')}</th>
+                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">{t('admin.stores.status')}</th>
+                <th className="py-3 px-4 text-[11px] font-semibold text-admin-text-secondary uppercase tracking-wider">{t('admin.stores.joined')}</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">Loading stores…</td></tr>
+                <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.stores.loadingStores')}</td></tr>
               ) : paginated.length > 0 ? (
                 paginated.map((store) => (
                   <StoreRow key={store.id} store={store} selected={selectedIds.has(store.id)} onToggle={toggleSelect} />
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">No stores match your filters.</td>
+                  <td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.stores.noStoresMatch')}</td>
                 </tr>
               )}
             </tbody>
@@ -308,7 +308,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
         </div>
 
         <div className="flex items-center justify-between text-xs text-admin-text-secondary">
-          <span>{loading ? 'Loading…' : `Showing ${filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1} - ${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length} stores`}</span>
+          <span>{loading ? 'Loading…' : t('admin.stores.showingStores', { from: filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1, to: Math.min(page * PAGE_SIZE, filtered.length), total: filtered.length })}</span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -367,7 +367,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
             <Filter className="w-3.5 h-3.5 text-admin-text-secondary" />
             <input
               type="text"
-              placeholder="Filter stores..."
+              placeholder={t('admin.stores.filterStores')}
               value={filter}
               onChange={(e) => { setFilter(e.target.value); setPage(1); }}
               className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
@@ -378,9 +378,9 @@ export default function StoresSection({ onAddStore, onEditStore }) {
             onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
             className="px-3 py-2.5 bg-admin-input border border-admin-border rounded-xl text-xs text-admin-text-secondary outline-none"
           >
-            <option value="All">All</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+            <option value="All">{t('admin.stores.allStatuses')}</option>
+            <option value="Active">{t('admin.stores.active')}</option>
+            <option value="Inactive">{t('admin.stores.inactive')}</option>
           </select>
           <button
             onClick={() => setShowFilterPanel(!showFilterPanel)}
@@ -392,19 +392,19 @@ export default function StoresSection({ onAddStore, onEditStore }) {
 
         {hasFilters && (
           <button onClick={resetFilters} className="flex items-center justify-center gap-1 text-xs font-medium text-admin-brand">
-            <X className="w-3 h-3" /> Reset Filters
+            <X className="w-3 h-3" /> {t('admin.stores.resetFilters')}
           </button>
         )}
 
         {showFilterPanel && (
           <div className="bg-white border border-admin-border/40 rounded-xl p-4 shadow-sm space-y-3">
             <div className="flex items-center gap-3">
-              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">Discount:</label>
+              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">{t('admin.stores.discountRange')}</label>
               <input
                 type="number"
                 value={discountMin}
                 onChange={(e) => setDiscountMin(e.target.value)}
-                placeholder="Min %"
+                placeholder={t('admin.stores.min')}
                 className="flex-1 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
               />
               <span className="text-admin-text-muted">—</span>
@@ -412,21 +412,21 @@ export default function StoresSection({ onAddStore, onEditStore }) {
                 type="number"
                 value={discountMax}
                 onChange={(e) => setDiscountMax(e.target.value)}
-                placeholder="Max %"
+                placeholder={t('admin.stores.max')}
                 className="flex-1 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
               />
             </div>
             <div className="flex items-center gap-3">
-              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">Sort:</label>
+              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">{t('admin.stores.sortBy')}</label>
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
                 className="flex-1 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
               >
-                <option value="none">None</option>
-                <option value="discount">Discount</option>
-                <option value="name">Name</option>
-                <option value="products">Products</option>
+                <option value="none">{t('admin.stores.none')}</option>
+                <option value="discount">{t('admin.stores.discount')}</option>
+                <option value="name">{t('admin.stores.name')}</option>
+                <option value="products">{t('admin.stores.products')}</option>
               </select>
               {sortBy !== 'none' && (
                 <button
@@ -448,17 +448,17 @@ export default function StoresSection({ onAddStore, onEditStore }) {
               onChange={toggleSelectAll}
               className="w-4 h-4 rounded border-admin-border accent-admin-brand"
             />
-            <span className="text-xs text-admin-text-secondary">Select all</span>
+            <span className="text-xs text-admin-text-secondary">{t('admin.stores.selectAll')}</span>
           </div>
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2">
               {selectedIds.size === 1 && (
                 <button onClick={handleEdit} className="flex items-center gap-1.5 px-4 py-2 bg-admin-brand/10 text-admin-brand rounded-xl text-xs font-medium">
-                  <Pencil className="w-3.5 h-3.5" /> Edit
+                  <Pencil className="w-3.5 h-3.5" /> {t('admin.stores.selectEdit')}
                 </button>
               )}
               <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-admin-danger/10 text-admin-danger rounded-xl text-xs font-medium">
-                <Trash2 className="w-3.5 h-3.5" /> Delete ({selectedIds.size})
+                <Trash2 className="w-3.5 h-3.5" /> {t('admin.stores.selectDelete', { count: selectedIds.size })}
               </button>
             </div>
           )}
@@ -466,13 +466,13 @@ export default function StoresSection({ onAddStore, onEditStore }) {
 
         <div className="flex flex-col gap-3">
           {loading ? (
-            <p className="text-center text-sm text-admin-text-muted py-8">Loading stores…</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.stores.loadingStores')}</p>
           ) : paginated.length > 0 ? (
             paginated.map((store) => (
               <StoreCard key={store.id} store={store} selected={selectedIds.has(store.id)} onToggle={toggleSelect} />
             ))
           ) : (
-            <p className="text-center text-sm text-admin-text-muted py-8">No stores match your filters.</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.stores.noStoresMatch')}</p>
           )}
         </div>
 
@@ -485,7 +485,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="px-2">Page {page} of {totalPages}</span>
+            <span className="px-2">{t('admin.stores.pageOf', { page, totalPages })}</span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}

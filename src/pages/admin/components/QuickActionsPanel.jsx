@@ -1,16 +1,19 @@
 import { Store, Package, KeyRound, Bell } from 'lucide-react';
-
-const actions = [
-  { icon: Store, label: 'Add Store' },
-  { icon: Package, label: 'Add Product' },
-  { icon: KeyRound, label: 'API Key' },
-  { icon: Bell, label: 'Notify Users' },
-];
+import adminI18n from '../../../i18n/admin/adminI18n';
 
 export default function QuickActionsPanel() {
+  const { t } = adminI18n;
+
+  const actions = [
+    { icon: Store, label: t('admin.dashboard.addStore') },
+    { icon: Package, label: t('admin.dashboard.addProduct') },
+    { icon: KeyRound, label: t('admin.dashboard.apiKey') },
+    { icon: Bell, label: t('admin.dashboard.notifyUsers') },
+  ];
+
   return (
     <div className="flex-1 bg-admin-brand-light rounded-panel p-6 flex flex-col gap-4">
-      <h3 className="text-xl font-medium text-white tracking-[-0.2px]">Quick Actions</h3>
+      <h3 className="text-xl font-medium text-white tracking-[-0.2px]">{t('admin.dashboard.quickActions')}</h3>
       <div className="grid grid-cols-2 gap-3">
         {actions.map(({ icon: Icon, label }) => (
           <button
