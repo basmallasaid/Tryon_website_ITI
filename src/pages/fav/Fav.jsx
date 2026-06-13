@@ -3,6 +3,7 @@ import { Heart, HeartOff, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { useFavorites } from "../../context/FavoritesContext";
+import { showToast } from "../../utils/toast";
 
 const SOURCE_LABELS = {
   Wardrobe: "WARDROBE",
@@ -75,8 +76,8 @@ function FavoritesList({ items, removeItem }) {
     setRemovingIds((prev) => new Set(prev).add(id));
     try {
       await removeItem(item.itemId || item.item_id || id);
-    } catch (err) {
-      console.error("Failed to remove favorite:", err);
+    } catch {
+      showToast('error', 'Failed to remove item from favorites');
     } finally {
       setRemovingIds((prev) => {
         const next = new Set(prev);

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Check, CircleCheck, Loader2, X, Lock } from "lucide-react";
-import Swal from "sweetalert2";
+import { showToast } from "../../utils/toast";
 import { useAuth } from "../../context/AuthContext";
 import {
   createCheckoutSessionApi,
@@ -145,13 +145,7 @@ export default function PricingPage() {
     if (searchParams.get("success") === "true") {
       if (user) {
         setSearchParams({}, { replace: true });
-        Swal.fire({
-          icon: "success",
-          title: t("pricing.subscriptionSuccess"),
-          text: "Welcome to Pro!",
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        showToast("success", t("pricing.subscriptionSuccess"));
         syncSubscriptionApi({ userId: user.id })
           .then(() => fetchSubscription(3, 1000))
           .catch(() => fetchSubscription(3, 1000));
@@ -159,11 +153,7 @@ export default function PricingPage() {
         setJustSubscribed(true);
       }
     } else if (searchParams.get("canceled") === "true") {
-      Swal.fire({
-        icon: "error",
-        title: "Payment Cancelled",
-        text: "Payment was cancelled.",
-      });
+      showToast("info", "Payment was cancelled.");
       setSearchParams({}, { replace: true });
     } else if (user) {
       fetchSubscription();
@@ -198,11 +188,7 @@ export default function PricingPage() {
       });
       window.location.href = res.data.url;
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err.response?.data?.message || "Failed to start checkout.",
-      });
+      showToast("error", err.response?.data?.message || "Failed to start checkout.");
     } finally {
       setSubscribing(false);
     }
@@ -216,19 +202,9 @@ export default function PricingPage() {
       setShowCancelModal(false);
       setSubscription(null);
       localStorage.removeItem("selectedInterval");
-      Swal.fire({
-        icon: "success",
-        title: "Cancelled",
-        text: "Subscription cancelled.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      showToast("success", "Subscription cancelled.");
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: err.response?.data?.message || "Cancellation failed.",
-      });
+      showToast("error", err.response?.data?.message || "Cancellation failed.");
     } finally {
       setCancelling(false);
     }

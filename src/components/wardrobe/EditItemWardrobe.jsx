@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import {
     Shirt, CloudSun, Trash2, ArrowLeft, Check,
-    Layers, User, Loader2, Palette, Sparkles
+    Layers, User, Loader2, Palette, Sparkles, Heart
 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { showToast } from '../../utils/toast';
 
+import { useFavorites } from '../../context/FavoritesContext';
 import { getCategoriesByGender } from '../../constants/wardrobeCategories';
 import { getWardrobeApi, deleteWardrobeItemApi, getAnalysisApi, addWardrobeItemFromAnalysisApi, updateAnalysisApi } from '../../api/userApi';
 
@@ -37,6 +39,8 @@ const EditItemWardrobe = () => {
     const [imageUrl, setImageUrl] = useState('');
     const [saving, setSaving] = useState(false);
     const isNew = id === 'new';
+    const { isFavorite, addItem, removeItem } = useFavorites();
+    const favorited = !isNew && isFavorite(id);
 
     const isMatching = (val1, val2) => {
         return val1?.toLowerCase() === val2?.toLowerCase();
@@ -147,11 +151,11 @@ const EditItemWardrobe = () => {
                     }]
                 });
                 await addWardrobeItemFromAnalysisApi(analysisId, { garment_index: 0 });
-                Swal.fire({ icon: 'success', title: t('wardrobe.addedSuccess'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                showToast('success', t('wardrobe.addedSuccess'));
                 navigate('/wardrobe');
             }
         } catch (err) {
-            Swal.fire({ icon: 'error', title: t('wardrobe.addFailed'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            showToast('error', t('wardrobe.addFailed'));
         } finally {
             setSaving(false);
         }
@@ -169,10 +173,19 @@ const EditItemWardrobe = () => {
         if (!result.isConfirmed) return;
         try {
             await deleteWardrobeItemApi(id);
-            Swal.fire({ icon: 'success', title: t('wardrobe.deletedSuccess'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            showToast('success', t('wardrobe.deletedSuccess'));
             navigate('/wardrobe');
         } catch (err) {
-            Swal.fire({ icon: 'error', title: t('wardrobe.deleteFailed'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            showToast('error', t('wardrobe.deleteFailed'));
+        }
+    };
+
+    const handleFavorite = (e) => {
+        e.stopPropagation();
+        if (favorited) {
+            removeItem(id);
+        } else {
+            addItem(id, 'WARDROBE');
         }
     };
 
@@ -206,9 +219,14 @@ const EditItemWardrobe = () => {
                         {t('wardrobe.backToWardrobe')}
                     </button>
                     {!isNew && (
-                        <button onClick={handleDelete} className="p-2.5 bg-red-50 text-[var(--color-accent-orange)] rounded-xl hover:bg-red-100">
-                            <Trash2 size={20} />
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button onClick={handleFavorite} className={`p-2.5 rounded-xl transition-all ${favorited ? 'bg-rose-50 text-rose-500' : 'bg-white text-gray-400 hover:text-rose-500 hover:bg-rose-50'} shadow-sm`}>
+                                <Heart size={20} className={favorited ? 'fill-rose-500' : ''} />
+                            </button>
+                            <button onClick={handleDelete} className="p-2.5 bg-red-50 text-[var(--color-accent-orange)] rounded-xl hover:bg-red-100">
+                                <Trash2 size={20} />
+                            </button>
+                        </div>
                     )}
                 </div>
 

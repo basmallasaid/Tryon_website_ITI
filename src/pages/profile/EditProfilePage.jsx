@@ -5,6 +5,7 @@ import { getUserApi, updateProfileApi, deleteUserAccountApi, updateUserImageApi,
 import { getAvatarByIdApi } from '../../api/avatarApi';
 import { Camera, UserPlus, Lock, SquarePen, AlertTriangle, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { showToast } from '../../utils/toast';
 export default function EditProfilePage() {
     const { user, login, logout } = useAuth();
     const navigate = useNavigate();
@@ -113,22 +114,12 @@ export default function EditProfilePage() {
                 login({ ...user, userImage: newImageUrl });
             }
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Profile image updated',
-                timer: 2000,
-                showConfirmButton: false,
-            });
+            showToast('success', 'Profile image updated');
         } catch (error) {
             console.error('Failed to upload image:', error);
             URL.revokeObjectURL(previewUrl);
             setImagePreview(userImage || '');
-            Swal.fire({
-                icon: 'error',
-                title: 'Upload Failed',
-                text: error.response?.data?.message || 'Failed to upload image',
-            });
+            showToast('error', error.response?.data?.message || 'Failed to upload image');
         } finally {
             setUploadingImage(false);
             event.target.value = '';
@@ -154,20 +145,10 @@ export default function EditProfilePage() {
             setUserImageFile(null);
             login({ ...user, userImage: '' });
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Removed',
-                text: 'Profile image removed',
-                timer: 2000,
-                showConfirmButton: false,
-            });
+            showToast('success', 'Profile image removed');
         } catch (error) {
             console.error('Failed to remove image:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Remove Failed',
-                text: error.response?.data?.message || 'Failed to remove image',
-            });
+            showToast('error', error.response?.data?.message || 'Failed to remove image');
         }
     };
 
@@ -198,23 +179,13 @@ export default function EditProfilePage() {
         setDeleting(true);
         try {
             await deleteUserAccountApi(email);
-            await Swal.fire({
-                icon: 'success',
-                title: 'Deleted!',
-                text: 'Your account has been deleted successfully.',
-                timer: 2000,
-                showConfirmButton: false,
-            });
+            showToast('success', 'Your account has been deleted successfully.');
 
             logout();
             navigate('/');
         } catch (error) {
             console.error('Failed to delete account:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Delete Failed',
-                text: error.response?.data?.message || 'Failed to delete account',
-            });
+            showToast('error', error.response?.data?.message || 'Failed to delete account');
         } finally {
             setDeleting(false);
         }
@@ -273,20 +244,10 @@ export default function EditProfilePage() {
                 });
             }
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Profile updated successfully',
-                timer: 2000,
-                showConfirmButton: false,
-            });
+            showToast('success', 'Profile updated successfully');
         } catch (error) {
             console.error('Failed to save profile:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Save Failed',
-                text: error.response?.data?.message || 'Failed to save profile',
-            });
+            showToast('error', error.response?.data?.message || 'Failed to save profile');
         } finally {
             setSaving(false);
         }
