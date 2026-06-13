@@ -4,7 +4,7 @@ import EmailRow from '../components/EmailRow';
 import EmailCard from '../components/EmailCard';
 import EmailDetailDesktop from '../components/EmailDetailDesktop';
 import EmailDetailMobile from '../components/EmailDetailMobile';
-import { getNotificationsApi } from '../../../api/adminApi';
+import { getNotificationsApi, getContactMessagesApi, markContactReadApi, deleteContactApi } from '../../../api/adminApi';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -31,6 +31,7 @@ function mapNotificationToEmail(n) {
 
   return {
     id: n._id,
+    source: 'notification',
     initials,
     sender: sender.name,
     email: sender.email,
@@ -48,7 +49,40 @@ function mapNotificationToEmail(n) {
   };
 }
 
-export default function EmailCenterSection() {
+function mapContactToEmail(m) {
+  const nameWords = m.name.split(' ');
+  const initials = nameWords.map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+  const d = new Date(m.created_at);
+  const now = Date.now();
+  const diff = Math.floor((now - d.getTime()) / 1000);
+  let time;
+  if (diff < 60) time = `${diff}s ago`;
+  else if (diff < 3600) time = `${Math.floor(diff / 60)}m ago`;
+  else if (diff < 86400) time = `${Math.floor(diff / 3600)}h ago`;
+  else if (diff < 172800) time = 'Yesterday';
+  else time = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  return {
+    id: m._id,
+    source: 'contact',
+    initials,
+    sender: m.name,
+    email: m.email,
+    subject: `Contact from ${m.name}`,
+    preview: m.message,
+    body: m.message,
+    time,
+    date: d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+    timeDetail: d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+    unread: !m.read,
+    starred: false,
+    tag: 'Contact',
+    attachment: null,
+    previousReply: null,
+  };
+}
+
+export default function EmailCenterSection({ onReadChange }) {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmail, setSelectedEmail] = useState(null);
@@ -58,9 +92,21 @@ export default function EmailCenterSection() {
   useEffect(() => {
     const fetchEmails = async () => {
       try {
-        const res = await getNotificationsApi();
-        const notifs = Array.isArray(res.data?.notifications) ? res.data.notifications : [];
-        setEmails(notifs.map(mapNotificationToEmail));
+        const [notifRes, contactRes] = await Promise.all([
+          getNotificationsApi(),
+          getContactMessagesApi(),
+        ]);
+        const notifs = Array.isArray(notifRes.data?.notifications) ? notifRes.data.notifications : [];
+        const contacts = Array.isArray(contactRes.data) ? contactRes.data : [];
+        const allEmails = [
+          ...notifs.map(mapNotificationToEmail),
+          ...contacts.map(mapContactToEmail),
+        ].sort((a, b) => {
+          const da = new Date(a.timeDetail || a.date);
+          const db = new Date(b.timeDetail || b.date);
+          return db - da;
+        });
+        setEmails(allEmails);
       } catch (err) {
         console.error('Failed to fetch emails:', err);
       } finally {
@@ -69,6 +115,36 @@ export default function EmailCenterSection() {
     };
     fetchEmails();
   }, []);
+
+  useEffect(() => {
+    if (!loading && onReadChange) {
+      onReadChange();
+    }
+  }, [loading, onReadChange]);
+
+  const handleMarkRead = async (id, source) => {
+    if (source !== 'contact') return;
+    try {
+      await markContactReadApi(id);
+      setEmails((prev) => prev.map((e) => e.id === id ? { ...e, unread: false } : e));
+      if (onReadChange) onReadChange();
+    } catch (err) {
+      console.error('Failed to mark as read:', err);
+    }
+  };
+
+  const handleDelete = async (id, source) => {
+    if (source !== 'contact') return;
+    if (!confirm('Delete this contact message?')) return;
+    try {
+      await deleteContactApi(id);
+      setEmails((prev) => prev.filter((e) => e.id !== id));
+      if (selectedEmail?.id === id) setSelectedEmail(null);
+      if (onReadChange) onReadChange();
+    } catch (err) {
+      console.error('Failed to delete:', err);
+    }
+  };
 
   const filtered = emails.filter((e) => {
     if (activeFilter === 'Unread') return e.unread;
@@ -84,9 +160,19 @@ export default function EmailCenterSection() {
     return (
       <>
         <div className="hidden lg:block">
-          <EmailDetailDesktop email={selectedEmail} onBack={() => setSelectedEmail(null)} />
+          <EmailDetailDesktop
+            email={selectedEmail}
+            onBack={() => setSelectedEmail(null)}
+            onMarkRead={() => handleMarkRead(selectedEmail.id, selectedEmail.source)}
+            onDelete={() => handleDelete(selectedEmail.id, selectedEmail.source)}
+          />
         </div>
-        <EmailDetailMobile email={selectedEmail} onBack={() => setSelectedEmail(null)} />
+        <EmailDetailMobile
+          email={selectedEmail}
+          onBack={() => setSelectedEmail(null)}
+          onMarkRead={() => handleMarkRead(selectedEmail.id, selectedEmail.source)}
+          onDelete={() => handleDelete(selectedEmail.id, selectedEmail.source)}
+        />
       </>
     );
   }

@@ -6,7 +6,7 @@ const avatarColors = {
   MK: 'bg-admin-success text-white',
 };
 
-export default function EmailDetailMobile({ email, onBack }) {
+export default function EmailDetailMobile({ email, onBack, onMarkRead, onDelete }) {
   const colorClass = avatarColors[email?.initials] || 'bg-admin-text-primary text-white';
 
   return (

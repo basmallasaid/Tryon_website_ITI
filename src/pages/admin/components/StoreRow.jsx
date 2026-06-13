@@ -1,8 +1,16 @@
 import { ExternalLink } from 'lucide-react';
 
-export default function StoreRow({ store }) {
+export default function StoreRow({ store, selected, onToggle }) {
   return (
     <tr className="border-b border-admin-border/40 hover:bg-admin-brand-activeBg/30 transition-colors">
+      <td className="py-3 px-4 w-12">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => onToggle(store.id)}
+          className="w-4 h-4 rounded border-admin-border accent-admin-brand"
+        />
+      </td>
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
           {store.logo ? (

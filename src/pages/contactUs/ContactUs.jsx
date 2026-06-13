@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Questions from "../home/components/Questions";
+import { submitContactApi } from "../../api/adminApi";
 
 const contactCards = [
   {
@@ -50,15 +51,31 @@ function ContactIcon({ type, className }) {
 export default function ContactUs() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormData({ name: "", email: "", message: "" });
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
+    setSubmitting(true);
+    try {
+      await submitContactApi({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        message: formData.message.trim(),
+      });
+      setSubmitted(true);
+      setFormData({ name: "", email: "", message: "" });
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send message. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -107,53 +124,72 @@ export default function ContactUs() {
 
           {/* Right Column: Contact Form */}
           <div className="flex flex-col justify-start lg:pt-16">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-[#121826] mb-2">
-                  {t("contactUs.nameLabel")}
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder={t("contactUs.namePlaceholder")}
-                  className="w-full h-12 px-4 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
-                />
+            {submitted ? (
+              <div className="bg-white rounded-xl border border-[#d5d9de] p-10 text-center">
+                <div className="w-16 h-16 bg-[#a6e22e]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-[#69C9AC]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-[#121826] mb-2">{t("contactUs.sendButton")}!</h3>
+                <p className="text-sm text-[#6b7280] mb-6">We'll get back to you soon.</p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="px-6 py-2.5 rounded-lg bg-[#40b9ff] hover:bg-[#33a8f0] text-white text-sm font-semibold transition-all"
+                >
+                  Send Another Message
+                </button>
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-[#121826] mb-2">
-                  {t("contactUs.emailLabel")}
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t("contactUs.emailPlaceholder")}
-                  className="w-full h-12 px-4 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-[#121826] mb-2">
-                  {t("contactUs.messageLabel")}
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder={t("contactUs.messagePlaceholder")}
-                  rows={7}
-                  className="w-full px-4 py-3 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none resize-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full h-12 rounded-lg bg-[#40b9ff] hover:bg-[#33a8f0] active:scale-[0.98] text-white text-base font-semibold transition-all cursor-pointer"
-              >
-                {t("contactUs.sendButton")}
-              </button>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-sm font-semibold text-[#121826] mb-2">
+                    {t("contactUs.nameLabel")}
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder={t("contactUs.namePlaceholder")}
+                    className="w-full h-12 px-4 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-[#121826] mb-2">
+                    {t("contactUs.emailLabel")}
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder={t("contactUs.emailPlaceholder")}
+                    className="w-full h-12 px-4 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-[#121826] mb-2">
+                    {t("contactUs.messageLabel")}
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder={t("contactUs.messagePlaceholder")}
+                    rows={7}
+                    className="w-full px-4 py-3 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none resize-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={submitting || !formData.name.trim() || !formData.email.trim() || !formData.message.trim()}
+                  className="w-full h-12 rounded-lg bg-[#40b9ff] hover:bg-[#33a8f0] active:scale-[0.98] text-white text-base font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? "Sending..." : t("contactUs.sendButton")}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>

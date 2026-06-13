@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, SlidersHorizontal, UserPlus } from 'lucide-react';
 import AdminLayout from './AdminLayout';
 import DashboardSection from './sections/DashboardSection';
@@ -14,6 +14,7 @@ import UsersSection from './sections/UsersSection';
 import AddUserSection from './sections/AddUserSection';
 import ApiManagementSection from './sections/ApiManagementSection';
 import SettingsSection from './sections/SettingsSection';
+import { getContactMessagesApi } from '../../api/adminApi';
 
 export default function AdminDashboardPage() {
   const [activePage, setActivePage] = useState('dashboard');
@@ -21,12 +22,37 @@ export default function AdminDashboardPage() {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddNotification, setShowAddNotification] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [editingStore, setEditingStore] = useState(null);
+  const [unreadContacts, setUnreadContacts] = useState(0);
+
+  const fetchCounts = useCallback(async () => {
+    try {
+      const contactRes = await getContactMessagesApi();
+      const contacts = Array.isArray(contactRes.data) ? contactRes.data : [];
+      setUnreadContacts(contacts.filter((c) => !c.read).length);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCounts();
+  }, [fetchCounts]);
 
   const handleAddStore = () => {
     setActivePage('stores');
+    setEditingStore(null);
     setShowAddStore(true);
   };
-  const handleBackFromAddStore = () => setShowAddStore(false);
+  const handleBackFromAddStore = () => {
+    setShowAddStore(false);
+    setEditingStore(null);
+  };
+  const handleEditStore = (store) => {
+    setEditingStore(store);
+    setShowAddStore(true);
+  };
 
   const handleAddProduct = () => {
     setActivePage('products');
@@ -44,6 +70,14 @@ export default function AdminDashboardPage() {
     setShowAddUser(true);
   };
   const handleBackFromAddUser = () => setShowAddUser(false);
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setShowAddProduct(true);
+  };
+  const handleBackFromEditProduct = () => {
+    setEditingProduct(null);
+    setShowAddProduct(false);
+  };
 
   const navigate = page => {
     setActivePage(page);
@@ -51,17 +85,19 @@ export default function AdminDashboardPage() {
     setShowAddProduct(false);
     setShowAddNotification(false);
     setShowAddUser(false);
+    setEditingProduct(null);
+    setEditingStore(null);
   };
 
   const sectionMap = {
     dashboard: <DashboardSection />,
-    stores: <StoresSection onAddStore={handleAddStore} />,
-    products: <ProductsSection onAddProduct={handleAddProduct} />,
+    stores: <StoresSection onAddStore={handleAddStore} onEditStore={handleEditStore} />,
+    products: <ProductsSection onAddProduct={handleAddProduct} onEditProduct={handleEditProduct} />,
     promotions: <PromotionsSection />,
     notifications: (
       <NotificationsSection onAddNotification={handleAddNotification} />
     ),
-    emailCenter: <EmailCenterSection />,
+    emailCenter: <EmailCenterSection onReadChange={fetchCounts} />,
     users: <UsersSection onAddUser={handleAddUser} />,
     apiManagement: <ApiManagementSection />,
     settings: <SettingsSection />,
@@ -89,10 +125,6 @@ export default function AdminDashboardPage() {
       >
         <Plus className="w-4 h-4" /> Add notifications
       </button>
-    ) : activePage === 'apiManagement' ? (
-      <button className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
-        <Plus className="w-4 h-4" /> Add API Key
-      </button>
     ) : activePage === 'users' && !showAddUser ? (
       <div className="flex items-center gap-2">
         <button className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg transition-colors">
@@ -111,9 +143,9 @@ export default function AdminDashboardPage() {
 
   let currentSection;
   if (showAddStore) {
-    currentSection = <AddStoreSection onBack={handleBackFromAddStore} />;
+    currentSection = <AddStoreSection onBack={handleBackFromAddStore} editingStore={editingStore} />;
   } else if (showAddProduct) {
-    currentSection = <AddProductSection onBack={handleBackFromAddProduct} />;
+    currentSection = <AddProductSection onBack={handleBackFromAddProduct} editingProduct={editingProduct} />;
   } else if (showAddNotification) {
     currentSection = (
       <AddNotificationSection onBack={handleBackFromAddNotification} />
@@ -129,6 +161,7 @@ export default function AdminDashboardPage() {
       activePage={activePage}
       setActivePage={navigate}
       topBarActions={topBarActions}
+      unreadContacts={unreadContacts}
     >
       {currentSection}
     </AdminLayout>

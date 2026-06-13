@@ -1,39 +1,91 @@
-import { Shirt, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shirt, RefreshCw, Plus, Trash2, Filter } from 'lucide-react';
 import UserRow from '../components/UserRow';
 import QuotaBar from '../components/QuotaBar';
+import { getUsersApi, getUserStatsApi, deleteProductApi } from '../../../api/adminApi';
 
-const users = [
-  { id: 1, initials: 'SA', name: 'Sara Al-Rashidi', email: 'sara@example.com', avatarBg: '#8ED321', role: 'Premium', tryOn: { used: 48, total: 50 }, recycling: { used: 22, total: 30 }, status: 'Active' },
-  { id: 2, initials: 'AH', name: 'Ahmed Hassan', email: 'ahmed@example.com', avatarBg: '#3B82F6', role: 'Store Owner', tryOn: { used: 10, total: 20 }, recycling: { used: 6, total: 10 }, status: 'Active' },
-  { id: 3, initials: 'LN', name: 'Layla Nasser', email: 'layla@example.com', avatarBg: '#8B5CF6', role: 'User', tryOn: { used: 5, total: 5 }, recycling: { used: 3, total: 5 }, status: 'Active' },
-  { id: 4, initials: 'KO', name: 'Khalid Omar', email: 'khalid@example.com', avatarBg: '#F97316', role: 'Premium', tryOn: { used: 28, total: 50 }, recycling: { used: 14, total: 30 }, status: 'Active' },
-  { id: 5, initials: 'MI', name: 'Mona Ibrahim', email: 'mona@example.com', avatarBg: '#EC4899', role: 'User', tryOn: { used: 5, total: 5 }, recycling: { used: 5, total: 5 }, status: 'Suspended' },
-  { id: 6, initials: 'YK', name: 'Yusuf Karim', email: 'yusuf@example.com', avatarBg: '#14B8A6', role: 'Store Owner', tryOn: { used: 8, total: 20 }, recycling: { used: 4, total: 10 }, status: 'Active' },
-];
+const avatarColors = ['#8ED321', '#3B82F6', '#8B5CF6', '#F97316', '#EC4899', '#14B8A6', '#EF4444', '#06B6D4'];
 
-const stats = [
-  { label: 'TOTAL USERS', value: '1,284', valueColor: 'text-admin-text-primary' },
-  { label: 'ACTIVE NOW', value: '422', valueColor: 'text-admin-success' },
-  { label: 'ROLES ASSIGNED', value: '12', valueColor: 'text-admin-text-primary' },
-  { label: 'PENDING INVITES', value: '28', valueColor: 'text-admin-amber' },
-];
+function getInitials(first, last) {
+  return ((first?.[0] || '') + (last?.[0] || '')).toUpperCase() || '?';
+}
 
-const statusStyles = {
-  Active: 'bg-[rgba(142,211,33,0.1)] text-[#5A8A10]',
-  Suspended: 'bg-[#FFE2E2] text-[#FB2C36]',
-};
+function getAvatarColor(name) {
+  let hash = 0;
+  for (let i = 0; i < (name || '').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return avatarColors[Math.abs(hash) % avatarColors.length];
+}
 
-const roleStyles = {
-  Premium: { bg: 'rgba(139,92,246,0.082)', color: '#8B5CF6' },
-  'Store Owner': { bg: 'rgba(59,130,246,0.082)', color: '#3B82F6' },
-  User: { bg: 'rgba(107,114,128,0.082)', color: '#6B7280' },
-};
+function mapRole(user) {
+  if (user.role === 'admin') return 'Admin';
+  if (user.subscriptionStatus === 'active') return 'Premium';
+  return 'User';
+}
+
+function getStatus(user) {
+  return user.is_verified ? 'Active' : 'Inactive';
+}
+
+const TRYON_LIMIT = 50;
+const RECYCLE_LIMIT = 30;
 
 export default function UsersSection({ onAddUser }) {
-  // TODO: Replace mock data and handlers with actual API integration
-  const handleFilter = () => { };
-  const handleAssign = (userId) => { };
-  const handleDelete = (userId) => { };
+  const [users, setUsers] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('All');
+
+  const fetchData = async () => {
+    try {
+      const [usersRes, statsRes] = await Promise.all([
+        getUsersApi(),
+        getUserStatsApi(),
+      ]);
+      setUsers(Array.isArray(usersRes.data) ? usersRes.data : []);
+      setStats(statsRes.data || null);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  const mapped = users.map((u) => {
+    const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email;
+    const role = mapRole(u);
+    return {
+      id: u._id,
+      initials: getInitials(u.profile?.first_name, u.profile?.last_name),
+      name,
+      email: u.email,
+      avatarBg: getAvatarColor(name),
+      role,
+      tryOn: { used: u.latestTryOn?.length || 0, total: TRYON_LIMIT },
+      recycling: { used: u.latestRecycle?.length || 0, total: RECYCLE_LIMIT },
+      status: getStatus(u),
+    };
+  });
+
+  const filtered = mapped.filter((u) => {
+    const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
+    const matchRole = roleFilter === 'All' || u.role === roleFilter;
+    return matchSearch && matchRole;
+  });
+
+  const statCards = stats ? [
+    { label: 'TOTAL USERS', value: stats.total.toLocaleString(), valueColor: 'text-admin-text-primary' },
+    { label: 'VERIFIED', value: stats.active.toLocaleString(), valueColor: 'text-admin-success' },
+    { label: 'ADMINS', value: stats.admins.toLocaleString(), valueColor: 'text-admin-text-primary' },
+    { label: 'NEW (7 DAYS)', value: stats.recentWeek.toLocaleString(), valueColor: 'text-admin-amber' },
+  ] : [
+    { label: 'TOTAL USERS', value: '—', valueColor: 'text-admin-text-primary' },
+    { label: 'VERIFIED', value: '—', valueColor: 'text-admin-success' },
+    { label: 'ADMINS', value: '—', valueColor: 'text-admin-text-primary' },
+    { label: 'NEW (7 DAYS)', value: '—', valueColor: 'text-admin-amber' },
+  ];
 
   return (
     <>
@@ -46,7 +98,7 @@ export default function UsersSection({ onAddUser }) {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat) => (
+          {statCards.map((stat) => (
             <div
               key={stat.label}
               className="bg-admin-brand-activeBg border border-admin-border/30 rounded-xl p-4 flex flex-col gap-1"
@@ -55,6 +107,30 @@ export default function UsersSection({ onAddUser }) {
               <span className={`text-xl font-bold tracking-[-0.2px] ${stat.valueColor}`}>{stat.value}</span>
             </div>
           ))}
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-admin-input border border-admin-border rounded-xl w-[220px]">
+            <Filter className="w-[14px] h-[14px] text-admin-text-secondary" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
+            />
+          </div>
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value)}
+            className="px-4 py-2.5 bg-admin-input border border-admin-border rounded-xl text-xs text-admin-text-secondary outline-none"
+          >
+            <option value="All">All Roles</option>
+            <option value="Admin">Admin</option>
+            <option value="Premium">Premium</option>
+            <option value="User">User</option>
+          </select>
         </div>
 
         {/* Users Table */}
@@ -67,13 +143,18 @@ export default function UsersSection({ onAddUser }) {
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Virtual Try-On</th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Recycling</th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Status</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] text-right whitespace-nowrap sticky right-0 bg-[#F5F7FA] after:absolute after:inset-y-0 after:-left-3 after:w-3 after:bg-gradient-to-r after:from-transparent after:to-[#F5F7FA]">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <UserRow key={user.id} user={user} />
-              ))}
+              {loading ? (
+                <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">Loading users…</td></tr>
+              ) : filtered.length > 0 ? (
+                filtered.map((user) => (
+                  <UserRow key={user.id} user={user} />
+                ))
+              ) : (
+                <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">No users found.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -88,7 +169,7 @@ export default function UsersSection({ onAddUser }) {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 gap-3">
-          {stats.map((stat) => (
+          {statCards.map((stat) => (
             <div
               key={stat.label}
               className="bg-admin-brand-activeBg border border-admin-border/30 rounded-xl p-4 flex flex-col gap-1"
@@ -99,75 +180,29 @@ export default function UsersSection({ onAddUser }) {
           ))}
         </div>
 
+        {/* Search */}
+        <div className="flex items-center gap-2 px-3 py-2.5 bg-admin-input border border-admin-border rounded-xl">
+          <Filter className="w-3.5 h-3.5 text-admin-text-secondary" />
+          <input
+            type="text"
+            placeholder="Search users..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
+          />
+        </div>
+
         {/* Mobile Cards */}
         <div className="flex flex-col gap-3">
-          {users.map((user) => {
-            const roleStyle = roleStyles[user.role] || roleStyles.User;
-            return (
-              <div key={user.id} className="bg-white rounded-xl border border-admin-border/40 shadow-sm p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className="w-9 h-9 rounded-[14px] flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: user.avatarBg }}
-                    >
-                      <span className="text-xs font-bold text-white">{user.initials}</span>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-[#1E1E24] leading-5 truncate">{user.name}</p>
-                      <p className="text-xs text-[#99A1AF] leading-4 truncate">{user.email}</p>
-                    </div>
-                  </div>
-                  <span
-                    className={`shrink-0 px-2.5 py-0.5 text-xs font-medium rounded-full ${statusStyles[user.status] || 'bg-admin-border/20 text-admin-text-muted'}`}
-                  >
-                    {user.status}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1 mb-3">
-                  <span
-                    className="inline-block px-2 py-0.5 text-[11px] font-medium rounded-full"
-                    style={{ backgroundColor: roleStyle.bg, color: roleStyle.color }}
-                  >
-                    {user.role}
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <QuotaBar
-                    icon={Shirt}
-                    iconColor="text-brand-secondary"
-                    used={user.tryOn.used}
-                    total={user.tryOn.total}
-                    barColor="bg-brand-secondary"
-                  />
-                  <QuotaBar
-                    icon={RefreshCw}
-                    iconColor="text-[#2B7FFF]"
-                    used={user.recycling.used}
-                    total={user.recycling.total}
-                    barColor="bg-[#3B82F6]"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-admin-border/20">
-                  <button
-                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-[#99A1AF]"
-                    title="Assign role"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-[#99A1AF]"
-                    title="Delete user"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+          {loading ? (
+            <p className="text-center text-sm text-admin-text-muted py-8">Loading users…</p>
+          ) : filtered.length > 0 ? (
+            filtered.map((user) => (
+              <UserRow key={user.id} user={user} mobile />
+            ))
+          ) : (
+            <p className="text-center text-sm text-admin-text-muted py-8">No users found.</p>
+          )}
         </div>
 
         <button onClick={onAddUser} className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full bg-admin-brand text-white shadow-lg flex items-center justify-center hover:bg-admin-brand-light transition-colors">
