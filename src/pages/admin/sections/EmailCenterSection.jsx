@@ -1,67 +1,67 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Mail } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight, Mail, CheckCheck } from 'lucide-react';
 import EmailRow from '../components/EmailRow';
 import EmailCard from '../components/EmailCard';
 import EmailDetailDesktop from '../components/EmailDetailDesktop';
 import EmailDetailMobile from '../components/EmailDetailMobile';
-import { getNotificationsApi, getContactMessagesApi, markContactReadApi, deleteContactApi } from '../../../api/adminApi';
+import {
+  getEmailsApi, getEmailThreadApi, markEmailReadApi, markAllEmailsReadApi, replyToEmailApi,
+  getContactMessagesApi, markContactReadApi,
+} from '../../../api/adminApi';
 
 const ITEMS_PER_PAGE = 4;
 
-const typeSenders = {
-  tryon: { name: 'Try-On System', email: 'tryon@redolapy.com' },
-  recycle: { name: 'Recycle System', email: 'recycle@redolapy.com' },
-  store: { name: 'Store Updates', email: 'stores@redolapy.com' },
-  pricing: { name: 'Pricing Alerts', email: 'pricing@redolapy.com' },
-  general: { name: 'ReDolapy Team', email: 'admin@redolapy.com' },
-};
-
-function mapNotificationToEmail(n) {
-  const sender = typeSenders[n.type] || typeSenders.general;
-  const initials = sender.name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
-  const d = new Date(n.createdAt);
+function timeAgo(dateStr) {
+  const d = new Date(dateStr);
   const now = Date.now();
   const diff = Math.floor((now - d.getTime()) / 1000);
-  let time;
-  if (diff < 60) time = `${diff}s ago`;
-  else if (diff < 3600) time = `${Math.floor(diff / 60)}m ago`;
-  else if (diff < 86400) time = `${Math.floor(diff / 3600)}h ago`;
-  else if (diff < 172800) time = 'Yesterday';
-  else time = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 172800) return 'Yesterday';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
+function formatFullDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
+function formatTimeDetail(dateStr) {
+  return new Date(dateStr).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+function getInitials(name) {
+  if (!name) return '??';
+  return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function mapEmailToCard(e) {
+  const senderName = e.senderUserId?.profile?.first_name
+    ? `${e.senderUserId.profile.first_name} ${e.senderUserId.profile.last_name || ''}`.trim()
+    : e.senderEmail || 'Unknown';
   return {
-    id: n._id,
-    source: 'notification',
-    initials,
-    sender: sender.name,
-    email: sender.email,
-    subject: n.title,
-    preview: n.body,
-    body: n.body,
-    time,
-    date: d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    timeDetail: d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
-    unread: !n.read,
+    id: e._id,
+    source: 'email',
+    initials: getInitials(senderName),
+    sender: senderName,
+    email: e.senderEmail,
+    subject: e.subject,
+    preview: e.message?.slice(0, 120) || '',
+    body: e.message || '',
+    time: timeAgo(e.created_at),
+    date: formatFullDate(e.created_at),
+    timeDetail: formatTimeDetail(e.created_at),
+    unread: !e.isRead,
     starred: false,
-    tag: n.type !== 'general' ? n.type.charAt(0).toUpperCase() + n.type.slice(1) : null,
-    attachment: null,
-    previousReply: null,
+    tag: e.emailType === 'USER_TO_ADMIN' ? 'Inbound' : e.emailType === 'ADMIN_TO_ALL' ? 'Broadcast' : null,
+    emailType: e.emailType,
+    threadId: e.parentEmailId?._id || e._id,
+    _raw: e,
   };
 }
 
-function mapContactToEmail(m) {
-  const nameWords = m.name.split(' ');
-  const initials = nameWords.map((w) => w[0]).join('').slice(0, 2).toUpperCase();
-  const d = new Date(m.created_at);
-  const now = Date.now();
-  const diff = Math.floor((now - d.getTime()) / 1000);
-  let time;
-  if (diff < 60) time = `${diff}s ago`;
-  else if (diff < 3600) time = `${Math.floor(diff / 60)}m ago`;
-  else if (diff < 86400) time = `${Math.floor(diff / 3600)}h ago`;
-  else if (diff < 172800) time = 'Yesterday';
-  else time = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
+function mapContactToCard(m) {
+  const initials = getInitials(m.name);
   return {
     id: m._id,
     source: 'contact',
@@ -69,16 +69,17 @@ function mapContactToEmail(m) {
     sender: m.name,
     email: m.email,
     subject: `Contact from ${m.name}`,
-    preview: m.message,
-    body: m.message,
-    time,
-    date: d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-    timeDetail: d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+    preview: m.message?.slice(0, 120) || '',
+    body: m.message || '',
+    time: timeAgo(m.created_at),
+    date: formatFullDate(m.created_at),
+    timeDetail: formatTimeDetail(m.created_at),
     unread: !m.read,
     starred: false,
     tag: 'Contact',
-    attachment: null,
-    previousReply: null,
+    emailType: null,
+    threadId: null,
+    _raw: m,
   };
 }
 
@@ -86,69 +87,135 @@ export default function EmailCenterSection({ onReadChange }) {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmail, setSelectedEmail] = useState(null);
+  const [thread, setThread] = useState(null);
+  const [loadingThread, setLoadingThread] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('Inbox');
+  const [replyText, setReplyText] = useState('');
+  const [sending, setSending] = useState(false);
+  const [markingAll, setMarkingAll] = useState(false);
 
-  useEffect(() => {
-    const fetchEmails = async () => {
-      try {
-        const [notifRes, contactRes] = await Promise.all([
-          getNotificationsApi(),
-          getContactMessagesApi(),
-        ]);
-        const notifs = Array.isArray(notifRes.data?.notifications) ? notifRes.data.notifications : [];
-        const contacts = Array.isArray(contactRes.data) ? contactRes.data : [];
-        const allEmails = [
-          ...notifs.map(mapNotificationToEmail),
-          ...contacts.map(mapContactToEmail),
-        ].sort((a, b) => {
-          const da = new Date(a.timeDetail || a.date);
-          const db = new Date(b.timeDetail || b.date);
-          return db - da;
-        });
-        setEmails(allEmails);
-      } catch (err) {
-        console.error('Failed to fetch emails:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEmails();
+  const fetchEmails = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [emailRes, contactRes] = await Promise.all([
+        getEmailsApi().catch(() => ({ data: { emails: [] } })),
+        getContactMessagesApi().catch(() => ({ data: [] })),
+      ]);
+      const rawEmails = Array.isArray(emailRes.data?.emails) ? emailRes.data.emails : [];
+      const rawContacts = Array.isArray(contactRes.data) ? contactRes.data : [];
+      const all = [
+        ...rawEmails.map(mapEmailToCard),
+        ...rawContacts.map(mapContactToCard),
+      ].sort((a, b) => {
+        const da = new Date(a._raw.created_at);
+        const db = new Date(b._raw.created_at);
+        return db - da;
+      });
+      setEmails(all);
+    } catch (err) {
+      console.error('Failed to fetch emails:', err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  useEffect(() => { fetchEmails(); }, [fetchEmails]);
+
   useEffect(() => {
-    if (!loading && onReadChange) {
-      onReadChange();
-    }
+    if (!loading && onReadChange) onReadChange();
   }, [loading, onReadChange]);
 
-  const handleMarkRead = async (id, source) => {
-    if (source !== 'contact') return;
+  const handleSelectEmail = async (email) => {
+    setSelectedEmail(email);
+    setReplyText('');
+    setThread(null);
+
+    if (email.source === 'contact') {
+      if (email.unread) {
+        try {
+          await markContactReadApi(email.id);
+          setEmails((prev) => prev.map((e) => e.id === email.id ? { ...e, unread: false } : e));
+          setSelectedEmail((prev) => prev ? { ...prev, unread: false } : prev);
+          if (onReadChange) onReadChange();
+        } catch (err) {
+          console.error('Failed to mark contact as read:', err);
+        }
+      }
+      return;
+    }
+
+    setLoadingThread(true);
     try {
-      await markContactReadApi(id);
-      setEmails((prev) => prev.map((e) => e.id === id ? { ...e, unread: false } : e));
-      if (onReadChange) onReadChange();
+      const res = await getEmailThreadApi(email.threadId);
+      setThread(res.data);
+      if (email.unread) {
+        await markEmailReadApi(email.id, true);
+        setEmails((prev) => prev.map((e) => e.id === email.id ? { ...e, unread: false } : e));
+        setSelectedEmail((prev) => prev ? { ...prev, unread: false } : prev);
+        if (onReadChange) onReadChange();
+      }
     } catch (err) {
-      console.error('Failed to mark as read:', err);
+      console.error('Failed to load thread:', err);
+    } finally {
+      setLoadingThread(false);
     }
   };
 
-  const handleDelete = async (id, source) => {
-    if (source !== 'contact') return;
-    if (!confirm('Delete this contact message?')) return;
+  const handleMarkRead = async (email) => {
+    if (!email) return;
     try {
-      await deleteContactApi(id);
-      setEmails((prev) => prev.filter((e) => e.id !== id));
-      if (selectedEmail?.id === id) setSelectedEmail(null);
+      if (email.source === 'contact') {
+        await markContactReadApi(email.id);
+      } else {
+        await markEmailReadApi(email.id, !email.unread);
+      }
+      setEmails((prev) => prev.map((e) => e.id === email.id ? { ...e, unread: !email.unread } : e));
+      setSelectedEmail((prev) => prev ? { ...prev, unread: !prev.unread } : prev);
       if (onReadChange) onReadChange();
     } catch (err) {
-      console.error('Failed to delete:', err);
+      console.error('Failed to toggle read:', err);
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    setMarkingAll(true);
+    try {
+      await markAllEmailsReadApi();
+      const contactRes = await getContactMessagesApi().catch(() => ({ data: [] }));
+      const contacts = Array.isArray(contactRes.data) ? contactRes.data : [];
+      const unreadContacts = contacts.filter((c) => !c.read);
+      await Promise.all(unreadContacts.map((c) => markContactReadApi(c._id).catch(() => {})));
+      setEmails((prev) => prev.map((e) => ({ ...e, unread: false })));
+      if (onReadChange) onReadChange();
+    } catch (err) {
+      console.error('Failed to mark all as read:', err);
+    } finally {
+      setMarkingAll(false);
+    }
+  };
+
+  const handleReply = async () => {
+    if (!replyText.trim() || !selectedEmail || !selectedEmail.threadId) return;
+    setSending(true);
+    try {
+      await replyToEmailApi(selectedEmail.threadId, { message: replyText.trim() });
+      setReplyText('');
+      const res = await getEmailThreadApi(selectedEmail.threadId);
+      setThread(res.data);
+    } catch (err) {
+      console.error('Failed to send reply:', err);
+    } finally {
+      setSending(false);
     }
   };
 
   const filtered = emails.filter((e) => {
+    if (activeFilter === 'Inbox') {
+      if (e.source === 'contact') return true;
+      return e.emailType !== 'ADMIN_TO_USER' && e.emailType !== 'ADMIN_TO_ALL';
+    }
     if (activeFilter === 'Unread') return e.unread;
-    if (activeFilter === 'Important') return e.starred;
     return true;
   });
 
@@ -162,16 +229,26 @@ export default function EmailCenterSection({ onReadChange }) {
         <div className="hidden lg:block">
           <EmailDetailDesktop
             email={selectedEmail}
-            onBack={() => setSelectedEmail(null)}
-            onMarkRead={() => handleMarkRead(selectedEmail.id, selectedEmail.source)}
-            onDelete={() => handleDelete(selectedEmail.id, selectedEmail.source)}
+            thread={thread}
+            loadingThread={loadingThread}
+            replyText={replyText}
+            onReplyTextChange={setReplyText}
+            onSendReply={handleReply}
+            sending={sending}
+            onBack={() => { setSelectedEmail(null); setThread(null); }}
+            onMarkRead={() => handleMarkRead(selectedEmail)}
           />
         </div>
         <EmailDetailMobile
           email={selectedEmail}
-          onBack={() => setSelectedEmail(null)}
-          onMarkRead={() => handleMarkRead(selectedEmail.id, selectedEmail.source)}
-          onDelete={() => handleDelete(selectedEmail.id, selectedEmail.source)}
+          thread={thread}
+          loadingThread={loadingThread}
+          replyText={replyText}
+          onReplyTextChange={setReplyText}
+          onSendReply={handleReply}
+          sending={sending}
+          onBack={() => { setSelectedEmail(null); setThread(null); }}
+          onMarkRead={() => handleMarkRead(selectedEmail)}
         />
       </>
     );
@@ -180,16 +257,43 @@ export default function EmailCenterSection({ onReadChange }) {
   return (
     <div className="p-4 sm:p-8">
       <div className="mb-8">
-        <h1 className="text-[28px] sm:text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">
-          Email Center
-        </h1>
-        <p className="text-sm text-admin-text-secondary mt-2">
-          Manage your inbox and respond to customer inquiries
-        </p>
+        <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
+          <div>
+            <h1 className="text-[28px] sm:text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">
+              Email Center
+            </h1>
+            <p className="text-sm text-admin-text-secondary mt-2">
+              Manage your inbox and respond to customer inquiries
+            </p>
+          </div>
+          <button
+            onClick={handleMarkAllRead}
+            disabled={markingAll}
+            className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg transition-colors disabled:opacity-50 shrink-0"
+          >
+            <CheckCheck className="w-4 h-4" />
+            {markingAll ? 'Marking...' : 'Mark All Read'}
+          </button>
+        </div>
       </div>
 
       {/* Desktop Table */}
       <div className="hidden md:block bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
+        <div className="flex items-center gap-2 px-6 py-3 border-b border-admin-border/40">
+          {['Inbox', 'Unread', 'All'].map((filter) => (
+            <button
+              key={filter}
+              onClick={() => { setActiveFilter(filter); setCurrentPage(1); }}
+              className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                activeFilter === filter
+                  ? 'bg-admin-brand text-white'
+                  : 'bg-admin-border/30 text-admin-text-secondary hover:bg-admin-border/50'
+              }`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
         <table className="w-full">
           <thead>
             <tr className="bg-admin-brand-bg/50 border-b border-admin-border/40">
@@ -203,10 +307,10 @@ export default function EmailCenterSection({ onReadChange }) {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">Loading emails…</td></tr>
+              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">Loading emails...</td></tr>
             ) : currentItems.length > 0 ? (
               currentItems.map((email) => (
-                <EmailRow key={email.id} email={email} onSelect={setSelectedEmail} />
+                <EmailRow key={email.id} email={email} onSelect={handleSelectEmail} />
               ))
             ) : (
               <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">No emails yet.</td></tr>
@@ -215,7 +319,7 @@ export default function EmailCenterSection({ onReadChange }) {
         </table>
         <div className="flex items-center justify-between px-6 py-4 border-t border-admin-border/40">
           <p className="text-xs text-admin-text-muted">
-            {loading ? 'Loading…' : `Showing ${filtered.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, filtered.length)} of ${filtered.length} messages`}
+            {loading ? 'Loading...' : `Showing ${filtered.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, filtered.length)} of ${filtered.length} messages`}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -238,9 +342,8 @@ export default function EmailCenterSection({ onReadChange }) {
 
       {/* Mobile View */}
       <div className="md:hidden">
-        {/* Filter Tabs */}
         <div className="flex items-center gap-2 mb-4 overflow-x-auto">
-          {['All', 'Unread', 'Important'].map((filter) => (
+          {['Inbox', 'Unread', 'All'].map((filter) => (
             <button
               key={filter}
               onClick={() => { setActiveFilter(filter); setCurrentPage(1); }}
@@ -255,20 +358,18 @@ export default function EmailCenterSection({ onReadChange }) {
           ))}
         </div>
 
-        {/* Email List */}
         <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
           {loading ? (
-            <p className="p-4 text-center text-sm text-admin-text-muted">Loading emails…</p>
+            <p className="p-4 text-center text-sm text-admin-text-muted">Loading emails...</p>
           ) : currentItems.length > 0 ? (
             currentItems.map((email) => (
-              <EmailCard key={email.id} email={email} onSelect={setSelectedEmail} />
+              <EmailCard key={email.id} email={email} onSelect={handleSelectEmail} />
             ))
           ) : (
             <p className="p-4 text-center text-sm text-admin-text-muted">No emails yet.</p>
           )}
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4 px-1">
             <p className="text-xs text-admin-text-muted">
@@ -293,7 +394,6 @@ export default function EmailCenterSection({ onReadChange }) {
           </div>
         )}
 
-        {/* Mobile FAB */}
         <button className="fixed bottom-20 right-6 w-14 h-14 bg-admin-brand text-white rounded-2xl shadow-lg flex items-center justify-center hover:bg-admin-brand-light transition-colors z-10">
           <Mail className="w-5 h-5" />
         </button>

@@ -1,13 +1,33 @@
-import { ArrowLeft, Bell, Paperclip, Smile, Send } from 'lucide-react';
+import { ArrowLeft, Bell, Paperclip, Send } from 'lucide-react';
 
-const avatarColors = {
-  JV: 'bg-admin-text-primary text-white',
-  JS: 'bg-admin-brand text-white',
-  MK: 'bg-admin-success text-white',
-};
+function getInitials(name) {
+  if (!name) return '??';
+  return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
 
-export default function EmailDetailMobile({ email, onBack, onMarkRead, onDelete }) {
-  const colorClass = avatarColors[email?.initials] || 'bg-admin-text-primary text-white';
+const avatarColors = [
+  'bg-admin-brand text-white',
+  'bg-admin-success text-white',
+  'bg-admin-amber text-white',
+  'bg-admin-text-primary text-white',
+];
+
+function getAvatarColor(initials) {
+  if (!initials) return avatarColors[0];
+  const code = initials.charCodeAt(0) % avatarColors.length;
+  return avatarColors[code];
+}
+
+export default function EmailDetailMobile({ email, thread, loadingThread, replyText, onReplyTextChange, onSendReply, sending, onBack, onMarkRead }) {
+  const root = thread?.root;
+  const replies = thread?.replies || [];
+  const senderName = root?.senderUserId?.profile?.first_name
+    ? `${root.senderUserId.profile.first_name} ${root.senderUserId.profile.last_name || ''}`.trim()
+    : email?.sender || 'Unknown';
+  const senderEmail = root?.senderEmail || email?.email || '';
+  const subject = root?.subject || email?.subject || '';
+  const body = root?.message || email?.body || '';
+  const colorClass = getAvatarColor(email?.initials);
 
   return (
     <div className="lg:hidden min-h-screen bg-admin-brand-bg flex flex-col">
@@ -18,96 +38,100 @@ export default function EmailDetailMobile({ email, onBack, onMarkRead, onDelete 
             <ArrowLeft className="w-5 h-5 text-admin-brand" />
           </button>
           <h1 className="text-lg font-bold text-admin-brand">Email Center</h1>
-          <button className="p-1">
-            <Bell className="w-5 h-5 text-admin-brand" />
+          <button onClick={onMarkRead} className="p-1">
+            <Bell className={`w-5 h-5 ${email?.unread ? 'text-admin-brand' : 'text-admin-text-muted'}`} />
           </button>
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {/* Sender Info */}
-        <div className="flex items-center gap-3">
-          <div className={`w-12 h-12 rounded-full ${colorClass} flex items-center justify-center shrink-0`}>
-            <span className="text-sm font-bold">{email?.initials || 'JV'}</span>
-          </div>
-          <div>
-            <p className="text-base font-bold text-admin-text-primary">{email?.sender || 'Julian Vance'}</p>
-            <p className="text-sm text-admin-text-muted">{email?.to || 'To: logistics@dolapy.com'}</p>
-          </div>
-        </div>
+        {loadingThread ? (
+          <p className="text-center text-sm text-admin-text-muted py-8">Loading thread...</p>
+        ) : (
+          <>
+            {/* Sender Info */}
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-full ${colorClass} flex items-center justify-center shrink-0`}>
+                <span className="text-sm font-bold">{email?.initials || '??'}</span>
+              </div>
+              <div>
+                <p className="text-base font-bold text-admin-text-primary">{senderName}</p>
+                <p className="text-sm text-admin-text-muted">{senderEmail}</p>
+              </div>
+            </div>
 
-        {/* Message Card */}
-        <div className="bg-white border border-admin-border/40 rounded-xl p-4 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <span className="px-3 py-1 text-xs font-bold bg-admin-brand/10 text-admin-brand rounded">
-              {email?.tag || 'Shipment Update'}
-            </span>
-            <span className="text-xs text-admin-text-muted">{email?.time || '10:42 AM'}</span>
-          </div>
-          <div className="space-y-3 text-sm text-admin-text-primary leading-relaxed">
-            <p>Hello Team,</p>
-            <p>
-              {email?.body || "We noticed a slight delay in the Q3 inventory arrival for the Luxury Capsule collection. Could you confirm if the logistics hub in Milan has cleared the latest customs batch?"}
-            </p>
-            <p>
-              {email?.body2 || "Our retail directors are requesting an updated timeline for the storefront launch."}
-            </p>
-          </div>
-        </div>
+            {/* Root Message */}
+            <div className="bg-white border border-admin-border/40 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <span className="px-3 py-1 text-xs font-bold bg-admin-brand/10 text-admin-brand rounded">
+                  {email?.tag || 'Message'}
+                </span>
+                <span className="text-xs text-admin-text-muted">{email?.time || ''}</span>
+              </div>
+              <p className="text-sm font-semibold text-admin-brand mb-3">{subject}</p>
+              <div className="space-y-3 text-sm text-admin-text-primary leading-relaxed whitespace-pre-wrap">
+                {body}
+              </div>
+            </div>
 
-        {/* Thread Connector */}
-        <div className="flex justify-center">
-          <div className="w-px h-4 bg-admin-border/40" />
-        </div>
+            {/* Thread Replies */}
+            {replies.length > 0 && (
+              <div className="space-y-3">
+                <p className="text-xs font-bold text-admin-text-muted uppercase tracking-wider px-1">
+                  {replies.length} {replies.length === 1 ? 'Reply' : 'Replies'}
+                </p>
+                {replies.map((reply) => {
+                  const replyName = reply.senderUserId?.profile?.first_name
+                    ? `${reply.senderUserId.profile.first_name} ${reply.senderUserId.profile.last_name || ''}`.trim()
+                    : reply.senderEmail;
+                  const isFromAdmin = reply.emailType === 'ADMIN_TO_USER';
+                  return (
+                    <div key={reply._id} className={`border-l-4 ${isFromAdmin ? 'border-admin-brand bg-admin-brand-bg/50' : 'border-admin-border bg-white'} rounded-r-lg p-3`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-admin-text-primary">{replyName}</span>
+                          {isFromAdmin && (
+                            <span className="px-1.5 py-0.5 text-[8px] font-bold uppercase bg-admin-brand/10 text-admin-brand rounded">Admin</span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-admin-text-muted">
+                          {new Date(reply.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-admin-text-primary leading-relaxed whitespace-pre-wrap">{reply.message}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
-        {/* Previous Reply */}
-        <div className="border-l-4 border-admin-brand bg-admin-brand-bg/50 rounded-r-lg p-3 opacity-75">
-          <p className="text-sm text-admin-text-muted italic">
-            "{email?.previousReply || 'Initial check shows batch #4401 is pending clearance...'}"
-          </p>
-        </div>
+            {/* Reply Area */}
+            <div className="bg-white border border-admin-border/40 rounded-xl overflow-hidden shadow-sm">
+              <textarea
+                rows={6}
+                value={replyText}
+                onChange={(e) => onReplyTextChange(e.target.value)}
+                placeholder="Type your reply..."
+                className="w-full px-4 py-4 bg-admin-brand-bg text-sm text-admin-text-primary outline-none resize-none placeholder:text-admin-text-muted"
+              />
+              <div className="flex items-center justify-end gap-2 px-4 py-2 border-t border-admin-border/30">
+                <button className="p-1.5 text-admin-text-muted hover:text-admin-text-primary transition-colors">
+                  <Paperclip className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
 
-        {/* Reply Area */}
-        <div className="bg-white border border-admin-border/40 rounded-xl overflow-hidden shadow-sm">
-          <textarea
-            rows={6}
-            placeholder="Type your reply..."
-            className="w-full px-4 py-4 bg-admin-brand-bg text-sm text-admin-text-primary outline-none resize-none placeholder:text-admin-text-muted"
-          />
-          <div className="flex items-center justify-end gap-2 px-4 py-2 border-t border-admin-border/30">
-            <button className="p-1.5 text-admin-text-muted hover:text-admin-text-primary transition-colors">
-              <Paperclip className="w-5 h-5" />
+            {/* Send Button */}
+            <button
+              onClick={onSendReply}
+              disabled={!replyText.trim() || sending}
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-admin-brand text-white rounded-xl text-base font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50"
+            >
+              <Send className="w-5 h-5" /> {sending ? 'Sending...' : 'Send Reply'}
             </button>
-            <button className="p-1.5 text-admin-text-muted hover:text-admin-text-primary transition-colors">
-              <Smile className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Send Button */}
-        <button className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-admin-brand text-white rounded-xl text-base font-bold shadow-md hover:bg-admin-brand-light transition-colors">
-          <Send className="w-5 h-5" /> Send Message
-        </button>
-      </div>
-
-      {/* Bottom Nav */}
-      <div className="sticky bottom-0 bg-admin-brand-bg border-t border-admin-border/30">
-        <div className="flex items-center justify-around py-3">
-          {[
-            { label: 'Inbox', icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', active: true },
-            { label: 'Sent', icon: 'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z' },
-            { label: 'Drafts', icon: 'M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8' },
-            { label: 'Settings', icon: 'M12 15a3 3 0 100-6 3 3 0 000 6z M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z' },
-          ].map((item) => (
-            <button key={item.label} className={`flex flex-col items-center gap-1 px-4 py-1 rounded-full ${item.active ? 'bg-admin-brand text-white' : 'text-admin-text-muted'}`}>
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d={item.icon} />
-              </svg>
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </button>
-          ))}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Shirt, RefreshCw, Plus, Trash2, Filter } from 'lucide-react';
+import { Shirt, RefreshCw, Plus, Trash2, Filter, X, AlertTriangle, RotateCcw, Pencil } from 'lucide-react';
 import UserRow from '../components/UserRow';
 import QuotaBar from '../components/QuotaBar';
-import { getUsersApi, getUserStatsApi, deleteProductApi } from '../../../api/adminApi';
+import { getUsersApi, getUserStatsApi, deleteUserApi, markUserNotifiedApi } from '../../../api/adminApi';
 
 const avatarColors = ['#8ED321', '#3B82F6', '#8B5CF6', '#F97316', '#EC4899', '#14B8A6', '#EF4444', '#06B6D4'];
 
@@ -29,12 +29,70 @@ function getStatus(user) {
 const TRYON_LIMIT = 50;
 const RECYCLE_LIMIT = 30;
 
-export default function UsersSection({ onAddUser }) {
+function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete }) {
+  const notified = user?.deletionNotified || false;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-full bg-admin-danger/10 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-5 h-5 text-admin-danger" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-admin-text-primary">Delete User</h3>
+              <p className="text-sm text-admin-text-secondary">{user?.email}</p>
+            </div>
+          </div>
+
+          {notified ? (
+            <p className="text-sm text-admin-text-secondary mb-6">
+              This user has been notified about account deletion. Are you sure you want to permanently delete this user?
+            </p>
+          ) : (
+            <p className="text-sm text-admin-text-secondary mb-6">
+              Before deleting this user, you should send them a notification informing them their account will be deleted if they don't contact support.
+            </p>
+          )}
+        </div>
+
+        <div className="flex items-center justify-end gap-3 px-6 py-4 bg-admin-brand-bg/50 border-t border-admin-border/30">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-admin-text-secondary hover:text-admin-text-primary transition-colors"
+          >
+            Cancel
+          </button>
+          {notified ? (
+            <button
+              onClick={onDelete}
+              className="px-4 py-2 bg-admin-danger text-white rounded-lg text-sm font-medium hover:bg-admin-danger/90 transition-colors"
+            >
+              Delete User
+            </button>
+          ) : (
+            <button
+              onClick={onSendNotification}
+              className="px-4 py-2 bg-admin-brand text-white rounded-lg text-sm font-medium hover:bg-admin-brand-light transition-colors"
+            >
+              Send Notification
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFilter, onSendDeletionNotification, onEditUser }) {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('All');
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -66,6 +124,7 @@ export default function UsersSection({ onAddUser }) {
       tryOn: { used: u.latestTryOn?.length || 0, total: TRYON_LIMIT },
       recycling: { used: u.latestRecycle?.length || 0, total: RECYCLE_LIMIT },
       status: getStatus(u),
+      deletionNotified: u.deletionNotified || false,
     };
   });
 
@@ -74,6 +133,65 @@ export default function UsersSection({ onAddUser }) {
     const matchRole = roleFilter === 'All' || u.role === roleFilter;
     return matchSearch && matchRole;
   });
+
+  const handleToggle = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map((u) => u.id)));
+    }
+  };
+
+  const handleDeleteClick = () => {
+    if (selectedIds.size === 1) {
+      const userId = [...selectedIds][0];
+      const user = mapped.find((u) => u.id === userId);
+      setDeleteTarget(user);
+    }
+  };
+
+  const handleSendNotification = async () => {
+    if (deleteTarget) {
+      try {
+        await markUserNotifiedApi(deleteTarget.id);
+        setUsers((prev) => prev.map((u) =>
+          u._id === deleteTarget.id ? { ...u, deletionNotified: true } : u
+        ));
+      } catch (err) {
+        console.error('Failed to mark user as notified:', err);
+      }
+      onSendDeletionNotification?.(deleteTarget);
+      setDeleteTarget(null);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await deleteUserApi(deleteTarget.id);
+      setUsers((prev) => prev.filter((u) => u._id !== deleteTarget.id));
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(deleteTarget.id);
+        return next;
+      });
+      setDeleteTarget(null);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete user.');
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const statCards = stats ? [
     { label: 'TOTAL USERS', value: stats.total.toLocaleString(), valueColor: 'text-admin-text-primary' },
@@ -121,16 +239,38 @@ export default function UsersSection({ onAddUser }) {
               className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
             />
           </div>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-4 py-2.5 bg-admin-input border border-admin-border rounded-xl text-xs text-admin-text-secondary outline-none"
-          >
-            <option value="All">All Roles</option>
-            <option value="Admin">Admin</option>
-            <option value="Premium">Premium</option>
-            <option value="User">User</option>
-          </select>
+          {roleFilter !== 'All' && (
+            <button
+              onClick={onResetFilter}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-admin-brand bg-admin-brand-bg border border-admin-brand/30 rounded-lg hover:bg-admin-brand-activeBg transition-colors"
+            >
+              <RotateCcw className="w-3 h-3" />
+              {roleFilter}
+              <X className="w-3 h-3 ml-1" />
+            </button>
+          )}
+          {selectedIds.size === 1 && (
+            <button
+              onClick={() => {
+                const userId = [...selectedIds][0];
+                const user = mapped.find((u) => u.id === userId);
+                onEditUser?.(user);
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border text-admin-text-secondary rounded-lg text-xs font-medium hover:bg-admin-brand-activeBg transition-colors"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+              Edit
+            </button>
+          )}
+          {selectedIds.size > 0 && (
+            <button
+              onClick={handleDeleteClick}
+              className="flex items-center gap-2 px-4 py-2 bg-admin-danger text-white rounded-lg text-xs font-medium hover:bg-admin-danger/90 transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Delete ({selectedIds.size})
+            </button>
+          )}
         </div>
 
         {/* Users Table */}
@@ -138,6 +278,14 @@ export default function UsersSection({ onAddUser }) {
           <table className="w-full text-left min-w-[700px] md:min-w-0">
             <thead>
               <tr className="bg-[#F5F7FA] border-b border-[#F3F4F6]">
+                <th className="py-2.5 px-4 w-12">
+                  <input
+                    type="checkbox"
+                    checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 rounded border-admin-border accent-admin-brand cursor-pointer"
+                  />
+                </th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">User</th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Role</th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">Virtual Try-On</th>
@@ -147,13 +295,18 @@ export default function UsersSection({ onAddUser }) {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">Loading users…</td></tr>
+                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">Loading users…</td></tr>
               ) : filtered.length > 0 ? (
                 filtered.map((user) => (
-                  <UserRow key={user.id} user={user} />
+                  <UserRow
+                    key={user.id}
+                    user={user}
+                    selected={selectedIds.has(user.id)}
+                    onToggle={handleToggle}
+                  />
                 ))
               ) : (
-                <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">No users found.</td></tr>
+                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">No users found.</td></tr>
               )}
             </tbody>
           </table>
@@ -192,13 +345,42 @@ export default function UsersSection({ onAddUser }) {
           />
         </div>
 
+        {selectedIds.size === 1 && (
+          <button
+            onClick={() => {
+              const userId = [...selectedIds][0];
+              const user = mapped.find((u) => u.id === userId);
+              onEditUser?.(user);
+            }}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-admin-brand-bg border border-admin-border text-admin-text-secondary rounded-xl text-xs font-medium"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+            Edit User
+          </button>
+        )}
+        {selectedIds.size > 0 && (
+          <button
+            onClick={handleDeleteClick}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-admin-danger text-white rounded-xl text-xs font-medium"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Delete ({selectedIds.size})
+          </button>
+        )}
+
         {/* Mobile Cards */}
         <div className="flex flex-col gap-3">
           {loading ? (
             <p className="text-center text-sm text-admin-text-muted py-8">Loading users…</p>
           ) : filtered.length > 0 ? (
             filtered.map((user) => (
-              <UserRow key={user.id} user={user} mobile />
+              <UserRow
+                key={user.id}
+                user={user}
+                mobile
+                selected={selectedIds.has(user.id)}
+                onToggle={handleToggle}
+              />
             ))
           ) : (
             <p className="text-center text-sm text-admin-text-muted py-8">No users found.</p>
@@ -209,6 +391,16 @@ export default function UsersSection({ onAddUser }) {
           <Plus className="w-6 h-6" />
         </button>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      {deleteTarget && (
+        <DeleteConfirmDialog
+          user={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onSendNotification={handleSendNotification}
+          onDelete={handleConfirmDelete}
+        />
+      )}
     </>
   );
 }

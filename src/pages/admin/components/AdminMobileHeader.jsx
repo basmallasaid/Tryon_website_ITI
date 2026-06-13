@@ -2,8 +2,8 @@ import { Bell, Mail, Moon } from 'lucide-react';
 
 export default function AdminMobileHeader({ className = '', unreadContacts = 0 }) {
   return (
-    <div className={`${className} sticky top-0 z-10 bg-[rgba(250,248,255,0.8)] backdrop-blur-md shadow-sm pt-6`}>
-      <div className="flex justify-between items-center px-4 h-16">
+    <div className={`${className} sticky top-0 z-10 bg-[rgba(250,248,255,0.8)] backdrop-blur-md shadow-sm pt-1`}>
+      <div className="flex justify-between items-center px-4 h-10">
         <div className="w-[160px] h-[37px] flex items-center">
           <span className="text-xl font-bold text-admin-brand">Redolapy</span>
         </div>

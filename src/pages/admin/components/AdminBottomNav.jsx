@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, Store, Package, Bell, Menu, Tag, Mail, Users, KeyRound, Settings, X, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Store, Package, Bell, Menu, Mail, Users, KeyRound, Settings, X, ChevronRight } from 'lucide-react';
 
 const tabs = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -10,7 +10,6 @@ const tabs = [
 ];
 
 const moreItems = [
-  { id: 'promotions', label: 'Promotions', icon: Tag },
   { id: 'emailCenter', label: 'Email Center', icon: Mail },
   { id: 'users', label: 'Users', icon: Users },
   { id: 'apiManagement', label: 'API Management', icon: KeyRound },

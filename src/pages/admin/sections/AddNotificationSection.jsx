@@ -215,11 +215,11 @@ function MobileTargetSection({ sendMode, setSendMode, emailSearch, setEmailSearc
   );
 }
 
-export default function AddNotificationSection({ onBack }) {
-  const [sendMode, setSendMode] = useState('broadcast');
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [targetEmail, setTargetEmail] = useState('');
+export default function AddNotificationSection({ onBack, prefillEmail = '', prefillTitle = '', prefillMessage = '', prefillChannels = ['app'] }) {
+  const [sendMode, setSendMode] = useState(prefillEmail ? 'individual' : 'broadcast');
+  const [title, setTitle] = useState(prefillTitle);
+  const [message, setMessage] = useState(prefillMessage);
+  const [targetEmail, setTargetEmail] = useState(prefillEmail);
   const [emailSearch, setEmailSearch] = useState('');
   const [users, setUsers] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -227,7 +227,7 @@ export default function AddNotificationSection({ onBack }) {
   const [success, setSuccess] = useState(false);
   const [sentCount, setSentCount] = useState(0);
   const [successMessage, setSuccessMessage] = useState('');
-  const [channels, setChannels] = useState(['app']);
+  const [channels, setChannels] = useState(prefillChannels);
 
   const toggleChannel = (id) => {
     setChannels((prev) => {

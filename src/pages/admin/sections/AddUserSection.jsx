@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, User, Store, Star, Shirt, RefreshCw, Minus, Plus, CheckCircle } from 'lucide-react';
-import { createAdminUserApi } from '../../../api/adminApi';
+import { createAdminUserApi, updateUserApi } from '../../../api/adminApi';
 import AddIcon from '../../../icons/AddIcon';
 import ShieldCheckIcon from '../../../icons/ShieldCheckIcon';
 
@@ -10,13 +10,14 @@ const roles = [
   { id: 'premium', icon: Store, title: 'Premium', description: 'Advanced tools and unlimited catalog syncing.' },
 ];
 
-export default function AddUserSection({ onBack }) {
+export default function AddUserSection({ onBack, editingUser }) {
+  const isEditing = !!editingUser;
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
+    firstName: editingUser?.profile?.first_name || '',
+    lastName: editingUser?.profile?.last_name || '',
+    email: editingUser?.email || '',
     password: '',
-    role: 'user',
+    role: editingUser?.role || 'user',
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -24,22 +25,43 @@ export default function AddUserSection({ onBack }) {
   const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
 
   const handleSubmit = async () => {
-    if (!form.email.trim() || !form.password.trim()) {
-      alert('Email and password are required.');
+    if (!form.email.trim()) {
+      alert('Email is required.');
+      return;
+    }
+    if (!isEditing && !form.password.trim()) {
+      alert('Password is required.');
+      return;
+    }
+    if (isEditing && form.password.trim() && form.password.trim().length < 6) {
+      alert('Password must be at least 6 characters.');
       return;
     }
     setSubmitting(true);
     try {
-      await createAdminUserApi({
-        email: form.email.trim(),
-        password: form.password,
-        first_name: form.firstName.trim() || null,
-        last_name: form.lastName.trim() || null,
-        role: form.role,
-      });
+      if (isEditing) {
+        const payload = {
+          email: form.email.trim(),
+          first_name: form.firstName.trim() || null,
+          last_name: form.lastName.trim() || null,
+          role: form.role,
+        };
+        if (form.password.trim()) {
+          payload.password = form.password.trim();
+        }
+        await updateUserApi(editingUser.id, payload);
+      } else {
+        await createAdminUserApi({
+          email: form.email.trim(),
+          password: form.password,
+          first_name: form.firstName.trim() || null,
+          last_name: form.lastName.trim() || null,
+          role: form.role,
+        });
+      }
       setSuccess(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create user.');
+      alert(err.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} user.`);
     } finally {
       setSubmitting(false);
     }
@@ -48,23 +70,21 @@ export default function AddUserSection({ onBack }) {
   if (success) {
     return (
       <>
-        {/* Desktop */}
         <div className="hidden lg:flex items-center justify-center min-h-screen p-8">
           <div className="text-center max-w-md">
             <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">User Created!</h2>
-            <p className="text-sm text-admin-text-secondary mb-6">{form.email} has been added.</p>
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">{isEditing ? 'User Updated!' : 'User Created!'}</h2>
+            <p className="text-sm text-admin-text-secondary mb-6">{form.email} has been {isEditing ? 'updated' : 'added'}.</p>
             <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
               Back to Users
             </button>
           </div>
         </div>
-        {/* Mobile */}
         <div className="lg:hidden flex items-center justify-center min-h-screen p-8">
           <div className="text-center max-w-md">
             <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">User Created!</h2>
-            <p className="text-sm text-admin-text-secondary mb-6">{form.email} has been added.</p>
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">{isEditing ? 'User Updated!' : 'User Created!'}</h2>
+            <p className="text-sm text-admin-text-secondary mb-6">{form.email} has been {isEditing ? 'updated' : 'added'}.</p>
             <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
               Back to Users
             </button>
@@ -84,8 +104,8 @@ export default function AddUserSection({ onBack }) {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">Add New User</h1>
-              <p className="text-sm text-admin-text-secondary mt-1">Create a new user account and assign access permissions.</p>
+              <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{isEditing ? 'Edit User' : 'Add New User'}</h1>
+              <p className="text-sm text-admin-text-secondary mt-1">{isEditing ? 'Update user account details and permissions.' : 'Create a new user account and assign access permissions.'}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -94,10 +114,10 @@ export default function AddUserSection({ onBack }) {
             </button>
             <button
               onClick={handleSubmit}
-              disabled={submitting || !form.email.trim() || !form.password.trim()}
+              disabled={submitting || !form.email.trim() || (!isEditing && !form.password.trim())}
               className="flex items-center gap-2 px-8 py-3 bg-[#1550D3] text-white rounded-xl text-sm font-bold shadow-md hover:bg-[#1550D3]/90 transition-colors disabled:opacity-50"
             >
-              {submitting ? 'Creating…' : 'Add User'}
+              {submitting ? (isEditing ? 'Updating…' : 'Creating…') : (isEditing ? 'Update User' : 'Add User')}
             </button>
           </div>
         </div>
@@ -143,12 +163,14 @@ export default function AddUserSection({ onBack }) {
                 />
               </div>
               <div>
-                <label className="block text-base text-[#434654] mb-2">Password *</label>
+                <label className="block text-base text-[#434654] mb-2">
+                  Password {isEditing ? '(leave blank to keep current)' : '*'}
+                </label>
                 <input
                   type="password"
                   value={form.password}
                   onChange={e => update('password', e.target.value)}
-                  placeholder="Min 6 characters"
+                  placeholder={isEditing ? 'Min 6 characters (optional)' : 'Min 6 characters'}
                   className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
                 />
               </div>
@@ -199,7 +221,7 @@ export default function AddUserSection({ onBack }) {
           <button onClick={onBack} className="p-2 -ml-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold text-admin-text-primary">Add User</h1>
+          <h1 className="text-xl font-bold text-admin-text-primary">{isEditing ? 'Edit User' : 'Add User'}</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-5">
@@ -219,8 +241,10 @@ export default function AddUserSection({ onBack }) {
               <input type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="alexander@dolapy.com" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Password *</label>
-              <input type="password" value={form.password} onChange={e => update('password', e.target.value)} placeholder="Min 6 characters" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">
+                Password {isEditing ? '(leave blank to keep current)' : '*'}
+              </label>
+              <input type="password" value={form.password} onChange={e => update('password', e.target.value)} placeholder={isEditing ? 'Min 6 characters (optional)' : 'Min 6 characters'} className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
             </div>
           </div>
 
@@ -254,10 +278,10 @@ export default function AddUserSection({ onBack }) {
         <div className="px-4 py-4 bg-white border-t border-admin-border/30">
           <button
             onClick={handleSubmit}
-            disabled={submitting || !form.email.trim() || !form.password.trim()}
+            disabled={submitting || !form.email.trim() || (!isEditing && !form.password.trim())}
             className="w-full flex items-center justify-center gap-2 py-4 bg-[#1550D3] text-white rounded-2xl text-base font-medium shadow-md hover:bg-[#1550D3]/90 transition-colors disabled:opacity-50"
           >
-            {submitting ? 'Creating…' : 'Add User'}
+            {submitting ? (isEditing ? 'Updating…' : 'Creating…') : (isEditing ? 'Update User' : 'Add User')}
           </button>
         </div>
       </div>

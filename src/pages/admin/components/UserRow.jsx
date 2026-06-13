@@ -12,14 +12,20 @@ const roleStyles = {
   User: { bg: 'rgba(107,114,128,0.082)', color: '#6B7280' },
 };
 
-export default function UserRow({ user, mobile }) {
+export default function UserRow({ user, mobile, selected, onToggle }) {
   const roleStyle = roleStyles[user.role] || roleStyles.User;
 
   if (mobile) {
     return (
-      <div className="bg-white rounded-xl border border-admin-border/40 shadow-sm p-4">
+      <div className={`bg-white rounded-xl border shadow-sm p-4 transition-colors ${selected ? 'border-admin-brand bg-admin-brand/5' : 'border-admin-border/40'}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3 min-w-0">
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={() => onToggle?.(user.id)}
+              className="w-4 h-4 rounded border-admin-border accent-admin-brand shrink-0 cursor-pointer"
+            />
             <div
               className="w-9 h-9 rounded-[14px] flex items-center justify-center shrink-0"
               style={{ backgroundColor: user.avatarBg }}
@@ -68,9 +74,15 @@ export default function UserRow({ user, mobile }) {
   }
 
   return (
-    <tr className="border-b border-[#F9FAFB] hover:bg-admin-brand-activeBg/30 transition-colors">
+    <tr className={`border-b border-[#F9FAFB] hover:bg-admin-brand-activeBg/30 transition-colors ${selected ? 'bg-admin-brand/5' : ''}`}>
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onToggle?.(user.id)}
+            className="w-4 h-4 rounded border-admin-border accent-admin-brand shrink-0 cursor-pointer"
+          />
           <div
             className="w-9 h-9 rounded-[14px] flex items-center justify-center shrink-0"
             style={{ backgroundColor: user.avatarBg }}
