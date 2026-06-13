@@ -11,7 +11,23 @@ export const getAllStores = () => api.get("/stores");
 export const getProductById = (id) => api.get(`/products/${id}`);
 export const deleteUserAccountApi = (email) =>
   api.delete("/users/account", { data: { email } });
+export const getProductMatchesApi = (productId) => api.post(`/matches/product/${productId}`);
+export const getWardrobeApi = () => api.get("/wardrobe");
+export const addWardrobeItemFromAnalysisApi = (analysis_id, data = {}) =>
+  api.post("/wardrobe/from-analysis", { analysis_id, ...data });
+export const deleteWardrobeItemApi = (id) => api.delete(`/wardrobe/${id}`);
+export const updateWardrobeItemApi = (id, data) => api.put(`/wardrobe/${id}`, data);
+export const analyzeImageApi = (formData) =>
+  api.post("/analyze", formData, { timeout: 60000 });
+export const getAnalysisApi = (id) => api.get(`/analyze/${id}`);
+export const updateAnalysisApi = (id, data) => api.put(`/analyze/${id}`, data);
 
 export const addToLatestTryOnApi = (data) =>
   api.post("/users/latest-tryon", data);
-export const getProductMatchesApi = (productId) => api.post(`/matches/product/${productId}`);
+
+export const updateUserImageApi = (base64Image) =>
+  api.put("/users/user-image", { userImage: base64Image });
+
+export const deleteUserImageApi = () =>
+  api.delete("/users/user-image");
+

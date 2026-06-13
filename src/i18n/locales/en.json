@@ -1,6 +1,7 @@
 {
   "nav": {
-    "features": "Features",
+    "home": "Home",
+    "featuresDropdown": "Features",
     "tryOn": "Try-On",
     "recycle": "Recycle",
     "matching": "Matching",

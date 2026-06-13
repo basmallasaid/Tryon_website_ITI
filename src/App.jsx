@@ -35,6 +35,9 @@ import Dashboard from './pages/admin/Dashboard';
 import Products from './pages/admin/Products';
 import EditProfilePage from './pages/profile/EditProfilePage';
 import ContactUs from './pages/contactUs/ContactUs';
+import WardrobePage from './pages/wardrobe/WardrobePage';
+import EditItemWardrobe from './components/wardrobe/EditItemWardrobe';
+import ItemDetailsModal from './components/wardrobe/ItemDetailsModal';
 
 const LoadingFallback = () => (
   <Box
@@ -82,10 +85,11 @@ function AppContent() {
             { path: 'recycle', element: <Recycle /> },
             { path: 'about-recycle', element: <AboutRecycle /> },
             { path: 'contact-us', element: <ContactUs /> },
-            {path:'editprofile',element:<EditProfilePage/>},
+            { path: 'editprofile', element: <EditProfilePage /> },
+            {path:'wardrobe',element:<WardrobePage/>},
+            { path: '/wardrobe/edit/:id',element: <EditItemWardrobe />}
           ],
         },
-        
       ],
     },
     {
