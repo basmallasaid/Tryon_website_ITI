@@ -1,4 +1,4 @@
-import { LayoutDashboard, Store, Package, Tag, Bell, Mail, Users, KeyRound, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Store, Package, Bell, Mail, Users, KeyRound, Settings, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -6,7 +6,6 @@ const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'stores', label: 'Stores', icon: Store },
   { id: 'products', label: 'Products', icon: Package },
-  { id: 'promotions', label: 'Promotions', icon: Tag },
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'emailCenter', label: 'Email Center', icon: Mail },
   { id: 'users', label: 'Users', icon: Users },

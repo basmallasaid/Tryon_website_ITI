@@ -2,7 +2,7 @@ import { Bell, Mail, Moon, ChevronDown } from 'lucide-react';
 
 export default function AdminTopBar({ className = '', actions, unreadContacts = 0 }) {
   return (
-    <div className={`${className} items-center justify-end px-6 pt-10 pb-4`}>
+    <div className={`${className} items-center justify-end px-6 pt-3 pb-1`}>
       <div className="flex items-center gap-4">
         {actions}
 
