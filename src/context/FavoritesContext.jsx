@@ -46,6 +46,14 @@ export const FavoritesProvider = ({ children }) => {
     fetchAll();
   }, [fetchAll]);
 
+  useEffect(() => {
+    if (!user) {
+      setItems([]);
+      setError(null);
+      removingRef.current.clear();
+    }
+  }, [user]);
+
   const addItem = async (itemId, itemType) => {
     try {
       const res = await addFavorite(itemId, itemType);

@@ -3,12 +3,12 @@
 // import viteLogo from './assets/vite.svg'
 // import heroImg from './assets/hero.png'
 // import './App.css'
-import { lazy, Suspense, useMemo, useEffect } from 'react';
+import { lazy, Suspense, useMemo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { WardrobeProvider } from './context/WardrobeContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import Login from './pages/Auth/Login';
@@ -61,10 +61,30 @@ function AdminGuard() {
   return <Outlet />;
 }
 
+function LogoutWatcher() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const prevUser = useRef(user);
+
+  useEffect(() => {
+    if (prevUser.current && !user) {
+      navigate('/', { replace: true, state: { openAuth: 'login' } });
+    }
+    prevUser.current = user;
+  }, [user, navigate]);
+
+  return null;
+}
+
 function UserGuard() {
   const auth = JSON.parse(localStorage.getItem('auth') || 'null');
   if (auth?.role === 'admin') return <Navigate to="/admin" replace />;
-  return <Outlet />;
+  return (
+    <>
+      <LogoutWatcher />
+      <Outlet />
+    </>
+  );
 }
 
 function AuthGuard() {
