@@ -5,6 +5,7 @@ import PhoneIcon from '../icons/PhoneIcon';
 import MailIcon from '../icons/MailIcon';
 import TelegramIcon from '../icons/TelegramIcon';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const socialIcons = [
   { icon: GlobeIcon, href: '#', label: 'Website' },
@@ -20,7 +21,11 @@ const contactInfo = [
 
 export default function Footer() {
   const { t } = useTranslation();
-  const platformLinks = [t("footer.styleGuide"), t("footer.tryOnTech"), t("footer.features")];
+  const platformLinks = [
+    { label: t("footer.styleGuide"), path: '/stores' },
+    { label: t("footer.tryOnTech"), path: '/tryOn' },
+    { label: t("footer.features"), path: '/about' },
+  ];
 
   return (
     <footer className="bg-[#F4F3F5]">
@@ -56,13 +61,14 @@ export default function Footer() {
               </h3>
               <ul className="space-y-4">
                 {platformLinks.map(link => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-text-disabled font-semibold hover:text-text-primary transition-colors "
+                  <li key={link.label}>
+                    <Link
+                      to={link.path}
+                      onClick={() => window.scrollTo(0, 0)}
+                      className="text-text-disabled font-semibold hover:text-text-primary transition-colors"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

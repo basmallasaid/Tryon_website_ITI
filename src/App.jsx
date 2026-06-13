@@ -3,43 +3,41 @@
 // import viteLogo from './assets/vite.svg'
 // import heroImg from './assets/hero.png'
 // import './App.css'
-import { lazy, Suspense } from 'react';
-
-import { Navigate, Outlet } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, Outlet, useNavigate } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router';
-import { AuthProvider } from './context/AuthContext';
+
+// Contexts
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { WardrobeProvider } from './context/WardrobeContext';
 import { FavoritesProvider } from './context/FavoritesContext';
-import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
-import AuthPage from './pages/Auth/AuthPage';
-import GoogleCallback from './pages/Auth/GoogleCallback';
-import Home from './pages/home/Home';
-// const FurnitureDetail = lazy(() => import('./pages/FurnitureDetail'));
 
+// Pages
+import Home from './pages/home/Home';
+import GoogleCallback from './pages/Auth/GoogleCallback';
 import TryOn from './pages/tryOn/TryOn';
 import StoresPage from './pages/store/StoresPage';
-import Navbar from './components/Navbar';
 import Recycle from './pages/recycle/Recycle';
 import Matching from './pages/matching/Matching';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 import AboutTryon from './pages/aboutTryOn/AboutTryon';
+import About from './pages/about/About';
 import PricingPage from './pages/pricing/PricingPage';
 import AvatarGeneration from './pages/avatar/AvatarGeneration';
-
-import { CircularProgress, Box } from '@mui/material';
-import Layout from './pages/Layout';
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminDashboardPage from './pages/admin/AdminDashboardPage';
-import Dashboard from './pages/admin/Dashboard';
-import Products from './pages/admin/Products';
 import EditProfilePage from './pages/profile/EditProfilePage';
 import ContactUs from './pages/contactUs/ContactUs';
 import Fav from './pages/fav/Fav';
 import WardrobePage from './pages/wardrobe/WardrobePage';
-import EditItemWardrobe from './components/wardrobe/EditItemWardrobe';
-import ItemDetailsModal from './components/wardrobe/ItemDetailsModal';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 
+// Components & Layouts
+import Layout from './pages/Layout';
+import EditItemWardrobe from './components/wardrobe/EditItemWardrobe';
+import NotFound from './pages/NotFound/NotFound'; 
+import { CircularProgress, Box } from '@mui/material';
+
+// Loading Component
 const LoadingFallback = () => (
   <Box
     sx={{
@@ -54,18 +52,46 @@ const LoadingFallback = () => (
   </Box>
 );
 
+// Guards
 function AdminGuard() {
   const auth = JSON.parse(localStorage.getItem('auth') || 'null');
   if (!auth || auth.role !== 'admin') return <Navigate to="/" replace />;
   return <Outlet />;
 }
 
+function LogoutWatcher() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const prevUser = useRef(user);
+
+  useEffect(() => {
+    if (prevUser.current && !user) {
+      navigate('/login', { replace: true });
+    }
+    prevUser.current = user;
+  }, [user, navigate]);
+
+  return null;
+}
+
 function UserGuard() {
   const auth = JSON.parse(localStorage.getItem('auth') || 'null');
   if (auth?.role === 'admin') return <Navigate to="/admin" replace />;
+  return (
+    <>
+      <LogoutWatcher />
+      <Outlet />
+    </>
+  );
+}
+
+function AuthGuard() {
+  const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+  if (!auth) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
 
+// Router Configuration
 function AppContent() {
   const router = createBrowserRouter([
     {
@@ -73,23 +99,30 @@ function AppContent() {
       element: <UserGuard />,
       children: [
         {
-          element: <Layout />,
+          element: <Layout />, 
           children: [
             { index: true, element: <Home /> },
-            { path: 'tryOn', element: <TryOn /> },
+            { path: 'login', element: <Navigate to="/" replace state={{ openAuth: 'login' }} /> },
             { path: 'about-tryon', element: <AboutTryon /> },
-            { path: 'pricing', element: <PricingPage /> },
-            { path: 'auth/callback', element: <GoogleCallback /> },
-            { path: 'stores', element: <StoresPage /> },
-            { path: 'avatar', element: <AvatarGeneration /> },
-            { path: 'matching', element: <Matching /> },
-            { path: 'recycle', element: <Recycle /> },
             { path: 'about-recycle', element: <AboutRecycle /> },
+            { path: 'about', element: <About /> },
             { path: 'contact-us', element: <ContactUs /> },
-            { path: 'editprofile', element: <EditProfilePage /> },
-            { path: 'favorites', element: <Fav /> },
-            { path: 'wardrobe', element: <WardrobePage /> },
-            { path: '/wardrobe/edit/:id', element: <EditItemWardrobe /> }
+            { path: 'auth/callback', element: <GoogleCallback /> },
+            {
+              element: <AuthGuard />,
+              children: [
+                { path: 'tryOn', element: <TryOn /> },
+                { path: 'pricing', element: <PricingPage /> },
+                { path: 'stores', element: <StoresPage /> },
+                { path: 'avatar', element: <AvatarGeneration /> },
+                { path: 'matching', element: <Matching /> },
+                { path: 'recycle', element: <Recycle /> },
+                { path: 'editprofile', element: <EditProfilePage /> },
+                { path: 'favorites', element: <Fav /> },
+                { path: 'wardrobe', element: <WardrobePage /> },
+                { path: 'wardrobe/edit/:id', element: <EditItemWardrobe /> },
+              ],
+            },
           ],
         },
       ],
@@ -97,9 +130,16 @@ function AppContent() {
     {
       path: '/admin',
       element: <AdminGuard />,
-      children: [{ index: true, element: <AdminDashboardPage /> }],
+      children: [
+        { index: true, element: <AdminDashboardPage /> },
+      ],
+    },
+    {
+      path: '*',
+      element: <NotFound />,
     },
   ]);
+
   return (
     <Suspense fallback={<LoadingFallback />}>
       <RouterProvider router={router} />
@@ -107,6 +147,7 @@ function AppContent() {
   );
 }
 
+// Main App Component
 function App() {
   return (
     <AuthProvider>

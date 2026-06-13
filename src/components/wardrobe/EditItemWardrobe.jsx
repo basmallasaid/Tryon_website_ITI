@@ -29,23 +29,17 @@ const EditItemWardrobe = () => {
 
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
-        name: '',
-        category: '',
-        season: '',
-        style: '',
-        color: '',
-        pattern: '',
-        gender: '',
+        name: '', category: '', season: '', style: '', color: '', pattern: '', gender: '',
     });
     const [imageUrl, setImageUrl] = useState('');
     const [saving, setSaving] = useState(false);
     const isNew = id === 'new';
+    
+    // ربط المفضلة بالـ Context
     const { isFavorite, addItem, removeItem } = useFavorites();
     const favorited = !isNew && isFavorite(id);
 
-    const isMatching = (val1, val2) => {
-        return val1?.toLowerCase() === val2?.toLowerCase();
-    };
+    const isMatching = (val1, val2) => val1?.toLowerCase() === val2?.toLowerCase();
 
     useEffect(() => {
         const fetchItem = async () => {
@@ -64,18 +58,13 @@ const EditItemWardrobe = () => {
                     });
                     setImageUrl(item.image || '');
                 }
-            } catch (err) {
-                console.error("Error loading item:", err);
-            } finally {
-                setLoading(false);
-            }
+            } catch (err) { console.error(err); } finally { setLoading(false); }
         };
 
         const fetchAnalysis = async () => {
             try {
                 const res = await getAnalysisApi(analysisId);
-                const data = res.data;
-                const garment = data.garments?.[0] || data;
+                const garment = res.data.garments?.[0] || res.data;
                 originalGarmentRef.current = garment;
                 setFormData({
                     name: garment.specificType || garment.name || '',
@@ -86,12 +75,8 @@ const EditItemWardrobe = () => {
                     pattern: garment.pattern || '',
                     gender: garment.gender || 'unisex',
                 });
-                setImageUrl(data.image || garment.image || '');
-            } catch (err) {
-                console.error("Error loading analysis:", err);
-            } finally {
-                setLoading(false);
-            }
+                setImageUrl(res.data.image || garment.image || '');
+            } catch (err) { console.error(err); } finally { setLoading(false); }
         };
 
         if (isNew && navState?.analysisResult) {
@@ -106,30 +91,29 @@ const EditItemWardrobe = () => {
                 pattern: garment.pattern || '',
                 gender: garment.gender || 'unisex',
             });
-            if (imageFile) {
-                setImageUrl(URL.createObjectURL(imageFile));
-            }
+            if (imageFile) setImageUrl(URL.createObjectURL(imageFile));
             setLoading(false);
         } else if (isNew && analysisId) {
             fetchAnalysis();
         } else if (id && !isNew) {
             fetchItem();
-        } else {
-            setLoading(false);
-        }
+        } else { setLoading(false); }
     }, [id, analysisId, isNew, navState, imageFile]);
-
-    useEffect(() => {
-        return () => {
-            if (imageUrl && imageUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(imageUrl);
-            }
-        };
-    }, [imageUrl]);
 
     const handleUpdateField = (field, value) => {
         if (!isNew) return;
         setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleFavorite = (e) => {
+        e.stopPropagation();
+        if (favorited) {
+            removeItem(id);
+            showToast('success', t('favorites.removed')); // اختياري
+        } else {
+            addItem(id, 'WARDROBE');
+            showToast('success', t('favorites.added')); // اختياري
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -155,11 +139,7 @@ const EditItemWardrobe = () => {
                 showToast('success', t('wardrobe.addedSuccess'));
                 navigate('/wardrobe');
             }
-        } catch (err) {
-            showToast('error', t('wardrobe.addFailed'));
-        } finally {
-            setSaving(false);
-        }
+        } catch (err) { showToast('error', t('wardrobe.addFailed')); } finally { setSaving(false); }
     };
 
     const handleDelete = async () => {
@@ -168,193 +148,166 @@ const EditItemWardrobe = () => {
             text: t('wardrobe.deleteConfirm'),
             icon: 'warning',
             showCancelButton: true,
+            confirmButtonColor: '#40B9FF',
             confirmButtonText: t('wardrobe.yesDelete'),
             cancelButtonText: t('wardrobe.cancel'),
         });
-        if (!result.isConfirmed) return;
-        try {
-            await deleteWardrobeItemApi(id);
-            showToast('success', t('wardrobe.deletedSuccess'));
-            navigate('/wardrobe');
-        } catch (err) {
-            showToast('error', t('wardrobe.deleteFailed'));
+        if (result.isConfirmed) {
+            try {
+                await deleteWardrobeItemApi(id);
+                showToast('success', t('wardrobe.deletedSuccess'));
+                navigate('/wardrobe');
+            } catch (err) { showToast('error', t('wardrobe.deleteFailed')); }
         }
     };
-
-    const handleFavorite = (e) => {
-        e.stopPropagation();
-        if (favorited) {
-            removeItem(id);
-        } else {
-            addItem(id, 'WARDROBE');
-        }
-    };
-
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-            <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-        </div>
-    );
 
     const SelectionChip = ({ label, activeValue, onClick, activeClass }) => (
         <button
             type="button"
             onClick={() => onClick(label)}
-            className={`px-4 py-2 rounded-xl text-[11px] font-bold transition-all duration-200 border ${isMatching(activeValue, label)
-                ? `${activeClass} scale-105`
-                : 'bg-white border-gray-100 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
-                }`}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 border ${isMatching(activeValue, label)
+                ? `border-[var(--color-primary)] bg-blue-50 text-[var(--color-primary)]`
+                : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'
+            }`}
         >
             {(t('wardrobe.opt_' + label.toLowerCase()) || label).toUpperCase()}
         </button>
     );
 
-    const currentCategories = getCategoriesByGender(formData.gender);
+    if (loading) return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <Loader2 className="w-10 h-10 text-[var(--color-primary)] animate-spin" />
+        </div>
+    );
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10" dir={isArabic ? 'rtl' : 'ltr'}>
-            <div className="max-w-6xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                    <button onClick={() => navigate('/wardrobe')} className="group flex items-center gap-2 rtl:flex-row-reverse text-gray-500 font-semibold hover:text-gray-900">
-                        <div className="p-2 bg-white rounded-lg shadow-sm"><ArrowLeft size={18} className={isArabic ? 'rotate-180' : ''} /></div>
-                        {t('wardrobe.backToWardrobe')}
+        <div className="min-h-screen bg-[#FDFDFF] p-4 md:p-8" dir={isArabic ? 'rtl' : 'ltr'}>
+            <div className="max-w-5xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                    <button onClick={() => navigate('/wardrobe')} className="flex items-center gap-2 text-slate-500 font-bold hover:text-[#40B9FF] transition-colors">
+                        <ArrowLeft size={20} className={isArabic ? 'rotate-180' : ''} />
+                        <span className="text-sm uppercase tracking-wider">{t('wardrobe.backToWardrobe')}</span>
                     </button>
                     {!isNew && (
-                        <div className="flex items-center gap-2">
-                            <button onClick={handleFavorite} className={`p-2.5 rounded-xl transition-all ${favorited ? 'bg-rose-50 text-rose-500' : 'bg-white text-gray-400 hover:text-rose-500 hover:bg-rose-50'} shadow-sm`}>
-                                <Heart size={20} className={favorited ? 'fill-rose-500' : ''} />
+                        <div className="flex gap-2">
+                            {/* زر المفضلة المحدث */}
+                            <button 
+                                onClick={handleFavorite} 
+                                className={`p-2.5 rounded-xl transition-all shadow-sm ${
+                                    favorited 
+                                    ? 'bg-rose-50 text-[var(--color-accent-pink)]' 
+                                    : 'bg-white text-gray-400 hover:text-[var(--color-accent-pink)] hover:bg-rose-50'
+                                }`}
+                            >
+                                <Heart size={18} className={favorited ? 'fill-[var(--color-accent-pink)]' : ''} />
                             </button>
-                            <button onClick={handleDelete} className="p-2.5 bg-red-50 text-[var(--color-accent-orange)] rounded-xl hover:bg-red-100">
-                                <Trash2 size={20} />
+
+                            {/* زر الحذف */}
+                            <button onClick={handleDelete} className="p-2.5 text-[var(--color-accent-orange)] bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors shadow-sm">
+                                <Trash2 size={18} />
                             </button>
                         </div>
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div className={`lg:col-span-4 space-y-6${isArabic ? ' lg:order-2' : ''}`}>
-                        <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-left rtl:text-right">
-                            <div className="w-64 h-80 rounded-[2rem] overflow-hidden bg-gray-50 border-4 border-gray-50 shadow-md">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    {/* Left: Image Card */}
+                    <div className="lg:col-span-4 lg:sticky lg:top-8">
+                        <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
+                            <div className="w-full aspect-[3/4] rounded-[1.5rem] overflow-hidden bg-slate-50 shadow-inner">
                                 <img src={imageUrl} alt="Item" className="w-full h-full object-cover" />
                             </div>
-
-                            <div className="mt-8 w-full">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 rtl:mr-2">{t('wardrobe.itemName')}</label>
+                            <div className="mt-6 w-full px-2">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                                    {t('wardrobe.itemName')}
+                                </label>
                                 <input
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => handleUpdateField('name', e.target.value)}
                                     readOnly={!isNew}
-                                    className="w-full mt-1 bg-gray-50 border-none rounded-2xl p-4 text-gray-900 font-bold text-lg text-left rtl:text-right focus:ring-2 focus:ring-blue-500/20"
+                                    className="w-full bg-slate-50/50 border-none rounded-xl p-3 text-slate-800 font-bold text-base outline-none"
                                 />
-                            </div>
-
-                            <div className="mt-4 flex items-center gap-2 rtl:flex-row-reverse bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
-                                <Palette
-                                    size={14}
-                                    style={{ color: formData.color ? formData.color.toLowerCase() : 'gray' }}
-                                />
-                                <span
-                                    className="text-xs font-bold uppercase tracking-tight"
-                                    style={{ color: formData.color ? formData.color.toLowerCase() : '#666' }}
-                                >
-                                    {t('wardrobe.colorLabel')} {formData.color || t('wardrobe.notSpecified')}
-                                </span>
                             </div>
                         </div>
                     </div>
 
-                    <div className={`lg:col-span-8${isArabic ? ' lg:order-1' : ''}`}>
-                        <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-gray-100 space-y-10 text-left rtl:text-right">
+                    {/* Right: Options Card */}
+                    <div className="lg:col-span-8">
+                        <form onSubmit={handleSubmit} className="bg-white rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 space-y-8">
+                            {/* ... (باقي أقسام الفورم كما هي في الكود السابق) ... */}
                             <section>
-                                <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
-                                    <User size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.intendedGender')}
-                                </h3>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <User size={16} className="text-[var(--color-primary)]" />
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.intendedGender')}</h3>
+                                </div>
                                 <div className="flex flex-wrap gap-2">
                                     {['male', 'female', 'unisex'].map(g => (
-                                        <SelectionChip
-                                            key={g} label={g} activeValue={formData.gender}
-                                            onClick={(val) => handleUpdateField('gender', val)}
-                                            activeClass="border-1 border-[var(--color-light-green)] shadow-sm "
-                                        />
+                                        <SelectionChip key={g} label={g} activeValue={formData.gender} onClick={(val) => handleUpdateField('gender', val)} />
                                     ))}
                                 </div>
                             </section>
 
-                            <div className="grid md:grid-cols-2 gap-10">
+                            <div className="grid md:grid-cols-2 gap-8">
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
-                                        <Shirt size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.category')}
-                                    </h3>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Shirt size={16} className="text-[var(--color-primary)]" />
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.category')}</h3>
+                                    </div>
                                     <div className="flex flex-wrap gap-2">
-                                        {currentCategories.filter(c => c !== 'All').map(c => (
-                                            <SelectionChip
-                                                key={c} label={c} activeValue={formData.category}
-                                                onClick={(val) => handleUpdateField('category', val)}
-                                                activeClass="border-1 border-[var(--color-light-green)] shadow-sm "
-                                            />
+                                        {getCategoriesByGender(formData.gender).filter(c => c !== 'All').map(c => (
+                                            <SelectionChip key={c} label={c} activeValue={formData.category} onClick={(val) => handleUpdateField('category', val)} />
                                         ))}
                                     </div>
                                 </section>
-
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
-                                        <CloudSun size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.season')}
-                                    </h3>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <CloudSun size={16} className="text-[var(--color-primary)]" />
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.season')}</h3>
+                                    </div>
                                     <div className="flex flex-wrap gap-2">
                                         {['summer', 'winter', 'spring', 'fall', 'all season'].map(s => (
-                                            <SelectionChip
-                                                key={s} label={s} activeValue={formData.season}
-                                                onClick={(val) => handleUpdateField('season', val)}
-                                                activeClass="border-1 border-[var(--color-light-green)] shadow-sm "
-                                            />
+                                            <SelectionChip key={s} label={s} activeValue={formData.season} onClick={(val) => handleUpdateField('season', val)} />
                                         ))}
                                     </div>
                                 </section>
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-10">
+                            <div className="grid md:grid-cols-2 gap-8">
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
-                                        <Sparkles size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.style')}
-                                    </h3>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Sparkles size={16} className="text-[var(--color-primary)]" />
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.style')}</h3>
+                                    </div>
                                     <div className="flex flex-wrap gap-2">
                                         {['casual', 'formal', 'streetwear', 'vintage', 'minimalist'].map(st => (
-                                            <SelectionChip
-                                                key={st} label={st} activeValue={formData.style}
-                                                onClick={(val) => handleUpdateField('style', val)}
-                                                activeClass="border-1 border-[var(--color-light-green)] shadow-sm "
-                                            />
+                                            <SelectionChip key={st} label={st} activeValue={formData.style} onClick={(val) => handleUpdateField('style', val)} />
                                         ))}
                                     </div>
                                 </section>
-
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
-                                        <Layers size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.pattern')}
-                                    </h3>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Layers size={16} className="text-[var(--color-primary)]" />
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.pattern')}</h3>
+                                    </div>
                                     <div className="flex flex-wrap gap-2">
                                         {['solid', 'striped', 'floral', 'checkered', 'graphic'].map(p => (
-                                            <SelectionChip
-                                                key={p} label={p} activeValue={formData.pattern}
-                                                onClick={(val) => handleUpdateField('pattern', val)}
-                                                activeClass="border-1 border-[var(--color-light-green)] shadow-sm "
-                                            />
+                                            <SelectionChip key={p} label={p} activeValue={formData.pattern} onClick={(val) => handleUpdateField('pattern', val)} />
                                         ))}
                                     </div>
                                 </section>
                             </div>
 
                             {isNew && (
-                            <div className="pt-6 border-t border-gray-50">
-                                <button
-                                    type="submit"
-                                    disabled={saving}
-                                    className="w-full bg-[var(--color-primary)] text-white py-5 rounded-2xl font-bold text-lg transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3 rtl:flex-row-reverse"
-                                >
-                                    {saving ? <Loader2 className="animate-spin" /> : <><Check size={22} /> {t('wardrobe.addToWardrobe')}</>}
-                                </button>
-                            </div>
+                                <div className="pt-6">
+                                    <button
+                                        type="submit"
+                                        disabled={saving}
+                                        className="w-full bg-[var(--color-primary)] text-white py-4 rounded-xl font-black uppercase tracking-widest text-sm transition-all hover:opacity-90 shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
+                                    >
+                                        {saving ? <Loader2 className="animate-spin" size={20} /> : <><Check size={20} /> {t('wardrobe.addToWardrobe')}</>}
+                                    </button>
+                                </div>
                             )}
                         </form>
                     </div>
