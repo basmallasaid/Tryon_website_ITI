@@ -1,6 +1,7 @@
 {
   "nav": {
-    "features": "المميزات",
+    "home": "الرئيسية",
+    "featuresDropdown": "المميزات",
     "tryOn": "تجربة ارتداء",
     "recycle": "إعادة تدوير",
     "matching": "مطابقة",
