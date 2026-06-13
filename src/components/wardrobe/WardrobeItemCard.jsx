@@ -34,6 +34,7 @@ const WardrobeItemCard = ({ item, onClick }) => {
       <div className="absolute bottom-6 left-6 rtl:right-6 text-white">
         <p className="text-xs font-black opacity-60 tracking-widest mb-1 uppercase">{item.category}</p>
         <h3 className="text-lg font-bold">{item.name}</h3>
+      </div>
     </div>
   );
 };
