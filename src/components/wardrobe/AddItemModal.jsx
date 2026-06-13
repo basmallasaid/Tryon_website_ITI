@@ -1,9 +1,11 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { X, Camera, Loader2 } from 'lucide-react';
 import { analyzeImageApi } from '../../api/userApi';
 
 const AddItemModal = ({ isOpen, onClose }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -37,7 +39,7 @@ const AddItemModal = ({ isOpen, onClose }) => {
                 state: { analysisId, analysisResult, imageFile: selectedFile }
             });
         } catch (err) {
-            setError(err.response?.data?.message || err.message || 'Analysis failed');
+            setError(err.response?.data?.message || err.message || t('wardrobe.analysisFailed'));
         } finally {
             setAnalyzing(false);
         }
@@ -58,7 +60,7 @@ const AddItemModal = ({ isOpen, onClose }) => {
                 </button>
 
                 <h2 className="text-xl font-black text-gray-900 text-center mb-5 pt-2">
-                    Upload & Analyze
+                    {t('wardrobe.uploadAnalyze')}
                 </h2>
 
                 <div
@@ -74,7 +76,7 @@ const AddItemModal = ({ isOpen, onClose }) => {
                     ) : (
                         <>
                             <Camera size={36} className="text-gray-300" />
-                            <span className="font-bold text-sm text-gray-400">Click to upload</span>
+                            <span className="font-bold text-sm text-gray-400">{t('wardrobe.clickToUpload')}</span>
                         </>
                     )}
                 </div>
@@ -96,9 +98,9 @@ const AddItemModal = ({ isOpen, onClose }) => {
                     className="w-full bg-[#40B9FF] text-white py-3.5 rounded-xl font-black shadow-md shadow-blue-100 uppercase tracking-widest text-sm mt-5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                     {analyzing ? (
-                        <><Loader2 className="animate-spin" size={18} /> Analyzing...</>
+                        <><Loader2 className="animate-spin" size={18} /> {t('wardrobe.analyzing')}</>
                     ) : (
-                        'Analyze & Add'
+                        t('wardrobe.analyzeAdd')
                     )}
                 </button>
             </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { X, Trash2, ShoppingBag, CloudSun, Palette, Layers, User, Sparkles, Eye } from 'lucide-react';
 
@@ -9,7 +10,8 @@ const ColorDot = ({ color }) => (
   />
 );
 
-const ItemDetailsModal = ({ item, onClose, onDelete, isArabic }) => {
+const ItemDetailsModal = ({ item, onClose, onDelete }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   if (!item) return null;
@@ -56,7 +58,7 @@ const ItemDetailsModal = ({ item, onClose, onDelete, isArabic }) => {
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-8 h-1 bg-[var(--color-brand-secondary)] rounded-full" />
                 <span className="text-[var(--color-brand-secondary)] font-black tracking-widest uppercase text-[11px]">
-                  {isArabic ? 'تفاصيل القطعة' : 'Item Details'}
+                  {t('wardrobe.itemDetails')}
                 </span>
               </div>
               <h2 className="text-xl md:text-2xl font-black text-gray-900 ">
@@ -68,25 +70,25 @@ const ItemDetailsModal = ({ item, onClose, onDelete, isArabic }) => {
             <div className="grid grid-cols-2 gap-x-6 gap-y-6">
               <DetailRow
                 icon={<ShoppingBag size={18} />}
-                label={isArabic ? 'التصنيف' : 'Category'}
+                label={t('wardrobe.category')}
                 value={item.category}
                 color="var(--color-primary)"
               />
               <DetailRow
                 icon={<CloudSun size={18} />}
-                label={isArabic ? 'الموسم' : 'Season'}
+                label={t('wardrobe.season')}
                 value={Array.isArray(item.season) ? item.season.join(', ') : item.season}
                 color="var(--color-primary)"
               />
               <DetailRow
                 icon={<Sparkles size={18} />}
-                label={isArabic ? 'الستايل' : 'Style'}
+                label={t('wardrobe.style')}
                 value={item.style || '-'}
                 color="var(--color-primary)"
               />
               <DetailRow
                 icon={<Palette size={18} />}
-                label={isArabic ? 'اللون' : 'Color'}
+                label={t('wardrobe.color')}
                 value={
                   <span className="flex items-center gap-2">
                     <ColorDot color={item.color} />
@@ -97,13 +99,13 @@ const ItemDetailsModal = ({ item, onClose, onDelete, isArabic }) => {
               />
               <DetailRow
                 icon={<Layers size={18} />}
-                label={isArabic ? 'النقش' : 'Pattern'}
+                label={t('wardrobe.pattern')}
                 value={item.pattern || '-'}
                 color="var(--color-primary)"
               />
               <DetailRow
                 icon={<User size={18} />}
-                label={isArabic ? 'الجنس' : 'Gender'}
+                label={t('wardrobe.gender')}
                 value={item.gender || '-'}
                 color="var(--color-primary)"
               />
@@ -116,7 +118,7 @@ const ItemDetailsModal = ({ item, onClose, onDelete, isArabic }) => {
               <button
                 onClick={() => onDelete(item._id)}
                 className="p-4 bg-rose-50 text-[var(--color-accent-orange)] rounded-2xl hover:bg-rose-100 transition-all hover:scale-105 active:scale-95"
-                title={isArabic ? 'حذف' : 'Delete'}
+                title={t('wardrobe.delete')}
               >
                 <Trash2 size={22} />
               </button>
@@ -126,7 +128,7 @@ const ItemDetailsModal = ({ item, onClose, onDelete, isArabic }) => {
               className="flex-1 bg-[var(--color-primary)] text-white py-4 rounded-2xl font-bold shadow-lg shadow-gray-200  hover:shadow-gray-300 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
             >
               <Eye size={20} />
-              <span className="text-sm tracking-wide">{isArabic ? 'عرض' : 'View'}</span>
+              <span className="text-sm tracking-wide">{t('wardrobe.view')}</span>
             </button>
           </div>
         </div>

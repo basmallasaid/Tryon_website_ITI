@@ -11,8 +11,7 @@ import { Plus, Loader2, AlertCircle } from 'lucide-react';
 import { getWardrobeApi, deleteWardrobeItemApi } from '../../api/userApi';
 
 const WardrobePage = () => {
-  const { i18n, t } = useTranslation();
-  const isArabic = i18n.language === 'ar';
+  const { t } = useTranslation();
 
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +41,7 @@ const WardrobePage = () => {
       const res = await getWardrobeApi();
       setItems(res.data.items || []);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to load wardrobe');
+      setError(err.response?.data?.message || err.message || t('wardrobe.failedToLoad'));
       setItems([]);
     } finally {
       setLoading(false);
@@ -55,21 +54,21 @@ const WardrobePage = () => {
 
   const handleDelete = async (itemId) => {
     const result = await Swal.fire({
-      title: 'Delete Item?',
-      text: 'Are you sure you want to remove this item from your wardrobe?',
+      title: t('wardrobe.deleteTitle'),
+      text: t('wardrobe.deleteConfirm'),
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: t('wardrobe.yesDelete'),
+      cancelButtonText: t('wardrobe.cancel'),
     });
     if (!result.isConfirmed) return;
     try {
       await deleteWardrobeItemApi(itemId);
       setItems((prev) => prev.filter((item) => item._id !== itemId));
       setSelectedItem(null);
-      Swal.fire({ icon: 'success', title: 'Item deleted successfully', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+      Swal.fire({ icon: 'success', title: t('wardrobe.deletedSuccess'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Failed to delete item', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+      Swal.fire({ icon: 'error', title: t('wardrobe.deleteFailed'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
     }
   };
 
@@ -98,24 +97,24 @@ const WardrobePage = () => {
           <div className="flex flex-col items-center justify-center py-24">
             <Loader2 className="w-10 h-10 text-[#8ED321] animate-spin mb-4" />
             <p className="text-gray-500 font-bold">
-              {isArabic ? 'جاري تحميل الخزانة...' : 'Loading wardrobe...'}
+              {t('wardrobe.loading')}
             </p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-24">
             <AlertCircle size={48} className="text-red-400 mb-4" />
             <p className="text-red-500 font-bold text-lg mb-2">
-              {isArabic ? 'فشل في تحميل الخزانة' : 'Failed to load wardrobe'}
+              {t('wardrobe.failedToLoad')}
             </p>
             <p className="text-gray-400 text-sm text-center max-w-md">{error}</p>
           </div>
         ) : items.length === 0 ? (
-          <EmptyState onAdd={() => setIsAddModalOpen(true)} isArabic={isArabic} />
+          <EmptyState onAdd={() => setIsAddModalOpen(true)} />
         ) : (
           <div className="space-y-8">
             <div className="flex justify-between items-center px-2">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                   {isArabic ? `عرض ${filteredItems.length} قطعة` : `Showing ${filteredItems.length} items`}
+                   {t('wardrobe.showingItems', { count: filteredItems.length })}
                 </p>
             </div>
 
@@ -127,7 +126,7 @@ const WardrobePage = () => {
                 >
                 <div className="p-4 bg-gray-50 rounded-full"><Plus size={32} /></div>
                 <span className="font-bold text-[10px] tracking-widest uppercase">
-                    {isArabic ? 'إضافة قطعة' : 'Add Item'}
+                    {t('wardrobe.addItem')}
                 </span>
                 </button>
 
@@ -149,7 +148,6 @@ const WardrobePage = () => {
         item={selectedItem}
         onClose={() => setSelectedItem(null)}
         onDelete={handleDelete}
-        isArabic={isArabic}
       />
     </div>
   );

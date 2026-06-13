@@ -1,6 +1,9 @@
 import { Circle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ModelSelectionCard({ children, selected, onClick, badge, media }) {
+  const { i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   return (
     <div
       onClick={onClick}
@@ -25,7 +28,7 @@ export default function ModelSelectionCard({ children, selected, onClick, badge,
             : media
         )}
       </div>
-      <div className="absolute top-4 right-4">
+      <div className={`absolute top-4 ${isArabic ? 'left-4' : 'right-4'}`}>
         {selected ? (
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10" fill="#4FC3FF" stroke="#4FC3FF" strokeWidth="2" />

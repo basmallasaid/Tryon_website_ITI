@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Sparkles, Shirt, Grid3x3, X, LogIn, Plus } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import StepIndicator from "../recycle/components/StepIndicator";
 import UploadArea from "../recycle/components/UploadArea";
@@ -33,6 +34,9 @@ export default function TryOn() {
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
 
   const storeProduct = useMemo(
     () => location.state?.productImage
@@ -147,9 +151,9 @@ export default function TryOn() {
   }, [selectedModel, user]);
 
   const steps = [
-    { id: 1, title: "Choose styling model", subtitle: "Upload 1-2 garment photos" },
-    { id: 2, title: "Choose Items", subtitle: "Pick your favorite design" },
-    { id: 3, title: "Generate", subtitle: "Visualize your upcycled piece" },
+    { id: 1, title: t("tryOn.modelStep1Title"), subtitle: t("tryOn.modelStep1Subtitle") },
+    { id: 2, title: t("tryOn.modelStep2Title"), subtitle: t("tryOn.modelStep2Subtitle") },
+    { id: 3, title: t("tryOn.modelStep3Title"), subtitle: t("tryOn.modelStep3Subtitle") },
   ];
 
   const currentStep = generating || generatedImageUrl ? 3 : selectedModel ? 2 : 1;
@@ -296,7 +300,7 @@ export default function TryOn() {
       const errorPayload = err.response?.data || err.message || err;
       console.error("❌ [TryOn] Error — model:", selectedModel, "items:", selectedItems, "|", errorPayload);
       setGenerateError(
-        err.response?.data?.error || err.message || "Try-on failed"
+        err.response?.data?.error || err.message || t("tryOn.generationFailed")
       );
     } finally {
       setGenerating(false);
@@ -321,7 +325,7 @@ export default function TryOn() {
               lineHeight: "1.2",
             }}
           >
-            <span style={{ color: "var(--Primary-Text-color)" }}>Redolapy </span>
+            <span style={{ color: "var(--Primary-Text-color)" }}>{t("tryOn.title")} </span>
             <span
               style={{
                 background: "linear-gradient(90deg, #40B9FF 0%, #69C9AC 50%, #AAE338 100%)",
@@ -329,7 +333,7 @@ export default function TryOn() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Virtual Try-on
+              {t("tryOn.subtitle")}
             </span>
           </h1>
           <p
@@ -340,7 +344,7 @@ export default function TryOn() {
               opacity: 0.85,
             }}
           >
-            Upload your pieces · Pick a style · See it come to life
+            {t("tryOn.heroDesc")}
           </p>
         </section>
 
@@ -357,12 +361,12 @@ export default function TryOn() {
               onClick={() => setSelectedModel(selectedModel === "avatar" ? null : "avatar")}
               media="/boyTryOn.png"
             >
-              <h3 className="font-bold text-lg mt-2">Avatar</h3>
+              <h3 className="font-bold text-lg mt-2">{t("tryOn.avatar")}</h3>
               <span className="bg-[#40B9FF] text-white text-[10px] px-2 py-0.5 rounded-full uppercase font-semibold">
-                recommended
+                {t("tryOn.recommended")}
               </span>
               <p className="text-xs text-gray-500 max-w-[180px] mt-1">
-                Create your digital twin and try outfits instantly.
+                {t("tryOn.avatarDesc")}
               </p>
             </ModelSelectionCard>
 
@@ -372,13 +376,13 @@ export default function TryOn() {
               media={
                 <div className="w-32 h-32 bg-blue-50 rounded-2xl flex flex-col items-center justify-center border border-dashed border-blue-200">
                   <img src="/cameraFrame.png" alt="" className="w-12 h-12 object-contain" />
-                  <span className="text-[10px] mt-1 text-blue-400">Tap to upload</span>
+                  <span className="text-[10px] mt-1 text-blue-400">{t("tryOn.tapToUpload")}</span>
                 </div>
               }
             >
-              <h3 className="font-bold text-lg">Your Photo</h3>
+              <h3 className="font-bold text-lg">{t("tryOn.yourPhoto")}</h3>
               <p className="text-xs text-gray-500 max-w-[180px] mt-1">
-                Upload your own photo for realistic try-on.
+                {t("tryOn.photoDesc")}
               </p>
             </ModelSelectionCard>
           </div>
@@ -406,7 +410,7 @@ export default function TryOn() {
                 <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center border-2 border-dashed border-blue-200 mb-3">
                   <Plus className="w-8 h-8 text-blue-400" strokeWidth={2} />
                 </div>
-                <p className="text-sm text-gray-500 font-medium">Create your Avatar</p>
+                <p className="text-sm text-gray-500 font-medium">{t("tryOn.createAvatar")}</p>
               </div>
             )}
           </div>
@@ -442,7 +446,7 @@ export default function TryOn() {
                 className="absolute left-6 bottom-6 inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium"
                 style={{ backgroundColor: "#FAF8FF" }}
               >
-                Your Photo
+                {t("tryOn.yourPhoto")}
               </div>
             </div>
           </div>
@@ -459,8 +463,8 @@ export default function TryOn() {
                 </div>
                 <div>
                   <p className="font-bold text-lg text-gray-800">{storeProduct.name}</p>
-                  <p className="text-sm text-gray-500 mt-1">This product is pre-selected for try-on</p>
-                  <p className="text-xs text-gray-400 mt-1">Select your model above and generate</p>
+                  <p className="text-sm text-gray-500 mt-1">{t("tryOn.productPreselected")}</p>
+                  <p className="text-xs text-gray-400 mt-1">{t("tryOn.selectModelAndGenerate")}</p>
                 </div>
               </div>
             </div>
@@ -479,7 +483,7 @@ export default function TryOn() {
                 : "bg-[#E9EBEE] text-gray-400"
             }`}
           >
-            <span className="inline-flex items-center gap-1.5"><Shirt className="w-4 h-4" /> My Wardrobe</span>
+            <span className={`inline-flex items-center gap-1.5 ${isArabic ? 'flex-row-reverse' : ''}`}><Shirt className="w-4 h-4" /> {t("tryOn.myWardrobe")}</span>
           </button>
           <button
             onClick={() => setActiveTab("gallery")}
@@ -489,7 +493,7 @@ export default function TryOn() {
                 : "bg-[#E9EBEE] text-gray-400"
             }`}
           >
-            <span className="inline-flex items-center gap-1.5"><Grid3x3 className="w-4 h-4" /> Gallery</span>
+            <span className={`inline-flex items-center gap-1.5 ${isArabic ? 'flex-row-reverse' : ''}`}><Grid3x3 className="w-4 h-4" /> {t("tryOn.tabsGallery")}</span>
           </button>
         </div>
         </section>
@@ -502,16 +506,16 @@ export default function TryOn() {
           {activeTab === "wardrobe" ? (
             <>
               <div className="flex items-center justify-between mb-5" style={{ marginTop: "30px" }}>
-                <h3 style={{ color: "#1a202c", fontSize: "1.2rem", fontWeight: 700 }}>Active wardrobe</h3>
-                <a href="#" style={{ color: "#4a5568", fontSize: "0.9rem", fontWeight: 600, textDecoration: "none" }}>See All</a>
+                <h3 style={{ color: "#1a202c", fontSize: "1.2rem", fontWeight: 700 }}>{t("tryOn.activeWardrobe")}</h3>
+                <a href="#" style={{ color: "#4a5568", fontSize: "0.9rem", fontWeight: 600, textDecoration: "none" }}>{t("tryOn.seeAll")}</a>
               </div>
 
               {!user ? (
                 <div className="bg-gray-100 rounded-xl p-8 text-center">
                   <LogIn className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600 font-medium">Please sign in to view your wardrobe</p>
+                  <p className="text-gray-600 font-medium">{t("tryOn.signInToView")}</p>
                   <p className="text-xs text-gray-400 mt-1">
-                    <a href="/auth" className="text-blue-500 hover:underline">Sign in</a> to access your saved items
+                    <a href="/auth" className="text-blue-500 hover:underline">{t("tryOn.signIn")}</a> {t("tryOn.toAccessItems")}
                   </p>
                 </div>
               ) : wardrobeLoading ? (
@@ -521,8 +525,8 @@ export default function TryOn() {
               ) : wardrobeItems.length === 0 ? (
                 <div className="bg-gray-100 rounded-xl p-8 text-center">
                   <Shirt className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-600 font-medium">Your wardrobe is empty</p>
-                  <p className="text-xs text-gray-400 mt-1">Add items to your wardrobe to get started</p>
+                  <p className="text-gray-600 font-medium">{t("tryOn.wardrobeEmpty")}</p>
+                  <p className="text-xs text-gray-400 mt-1">{t("tryOn.addItemsToStart")}</p>
                 </div>
               ) : (
                 <div className="flex gap-[15px] flex-wrap">
@@ -530,7 +534,7 @@ export default function TryOn() {
                     <WardrobeItem
                       key={item._id}
                       src={imgSrc(item.image)}
-                      alt={item.name || `Clothing item`}
+                      alt={item.name || t("tryOn.clothingItem")}
                       selected={selectedItems.includes(item._id)}
                       disabled={!selectedItems.includes(item._id) && selectedItems.length >= MAX_SELECTION}
                       onClick={() => toggleItem(item._id)}
@@ -569,9 +573,7 @@ export default function TryOn() {
           <div className="max-w-6xl mx-auto">
           <div className="flex items-center mb-4">
             <h3 style={{ color: "#1a202c", fontSize: "1.2rem", fontWeight: 700 }}>
-              {selectedItems.length > 0
-                ? `Selected Items (${selectedItems.length})`
-                : "Selected Items (0)"}
+              {t("tryOn.selectedItems", { count: selectedItems.length })}
             </h3>
           </div>
           <div
@@ -587,13 +589,13 @@ export default function TryOn() {
             <div>
               <p className="font-bold" style={{ color: "#1e293b", fontSize: "0.95rem" }}>
                 {selectedItems.length > 0
-                  ? "Items selected"
-                  : "No items selected yet"}
+                  ? t("tryOn.itemsSelected")
+                  : t("tryOn.noItemsSelected")}
               </p>
               <p style={{ color: "#64748b", fontSize: "0.85rem" }}>
                 {selectedItems.length > 0
-                  ? "You can try them on now"
-                  : "Add items from above to try them on."}
+                  ? t("tryOn.youCanTryOn")
+                  : t("tryOn.addItemsAbove")}
               </p>
             </div>
           </div>
@@ -610,17 +612,17 @@ export default function TryOn() {
               isReady && !generating
                 ? "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
                 : "bg-gray-400 cursor-not-allowed"
-            }`}
+            } ${isArabic ? 'flex-row-reverse' : ''}`}
           >
             {generating ? (
               <>
                 <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                Generating...
+                {t("tryOn.generating")}
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5" />
-                Generate Try-on
+                {t("tryOn.generateTryOn")}
               </>
             )}
           </button>
@@ -633,17 +635,17 @@ export default function TryOn() {
             {generating ? (
               <div className="rounded-2xl shadow-xl bg-gray-100 flex flex-col items-center justify-center py-20">
                 <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
-                <p className="text-gray-500 font-medium">Generating your try-on...</p>
+                <p className="text-gray-500 font-medium">{t("tryOn.generatingTryOn")}</p>
               </div>
             ) : generateError ? (
               <div className="rounded-2xl shadow-xl bg-red-50 border border-red-200 p-8 text-center">
-                <p className="text-red-600 font-medium mb-2">Something went wrong</p>
+                <p className="text-red-600 font-medium mb-2">{t("tryOn.somethingWentWrong")}</p>
                 <p className="text-sm text-red-500">{generateError}</p>
                 <button
                   onClick={handleReset}
                   className="mt-6 inline-flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 transition-all shadow-lg"
                 >
-                  Try Again
+                  {t("tryOn.tryAgain")}
                 </button>
               </div>
             ) : (
@@ -651,7 +653,7 @@ export default function TryOn() {
                 <div className="rounded-2xl overflow-hidden shadow-xl bg-gray-100">
                   <img
                     src={generatedImageUrl}
-                    alt="Try-on result"
+                    alt={t("tryOn.tryOnResult")}
                     className="w-full h-auto max-h-[600px] object-contain"
                   />
                 </div>
@@ -662,14 +664,14 @@ export default function TryOn() {
                     className="inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg hover:scale-105 active:scale-95"
                     style={{ backgroundColor: saving ? "#9ca3af" : "#3b82f6" }}
                   >
-                    {saving ? "Saving..." : saveMsg === "saved" ? "Saved!" : saveMsg === "error" ? "Failed" : "Save"}
+                    {saving ? t("tryOn.saving") : saveMsg === "saved" ? t("tryOn.saved") : saveMsg === "error" ? t("tryOn.failed") : t("tryOn.save")}
                   </button>
                   <button
                     onClick={handleReset}
-                    className="inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg"
+                    className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg ${isArabic ? 'flex-row-reverse' : ''}`}
                   >
                     <Sparkles className="w-5 h-5" />
-                    Try Again
+                    {t("tryOn.tryAgain")}
                   </button>
                 </div>
               </>

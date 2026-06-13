@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import {
     Shirt, CloudSun, Trash2, ArrowLeft, Check,
@@ -10,6 +11,7 @@ import { getCategoriesByGender } from '../../constants/wardrobeCategories';
 import { getWardrobeApi, deleteWardrobeItemApi, getAnalysisApi, addWardrobeItemFromAnalysisApi, updateAnalysisApi } from '../../api/userApi';
 
 const EditItemWardrobe = () => {
+    const { t } = useTranslation();
     const { id } = useParams();
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -145,11 +147,11 @@ const EditItemWardrobe = () => {
                     }]
                 });
                 await addWardrobeItemFromAnalysisApi(analysisId, { garment_index: 0 });
-                Swal.fire({ icon: 'success', title: 'Item added to wardrobe successfully', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+                Swal.fire({ icon: 'success', title: t('wardrobe.addedSuccess'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
                 navigate('/wardrobe');
             }
         } catch (err) {
-            Swal.fire({ icon: 'error', title: 'Failed to add item', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            Swal.fire({ icon: 'error', title: t('wardrobe.addFailed'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
         } finally {
             setSaving(false);
         }
@@ -157,20 +159,20 @@ const EditItemWardrobe = () => {
 
     const handleDelete = async () => {
         const result = await Swal.fire({
-            title: 'Delete Item?',
-            text: 'Are you sure you want to remove this item from your wardrobe?',
+            title: t('wardrobe.deleteTitle'),
+            text: t('wardrobe.deleteConfirm'),
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: t('wardrobe.yesDelete'),
+            cancelButtonText: t('wardrobe.cancel'),
         });
         if (!result.isConfirmed) return;
         try {
             await deleteWardrobeItemApi(id);
-            Swal.fire({ icon: 'success', title: 'Item deleted successfully', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            Swal.fire({ icon: 'success', title: t('wardrobe.deletedSuccess'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
             navigate('/wardrobe');
         } catch (err) {
-            Swal.fire({ icon: 'error', title: 'Failed to delete item', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            Swal.fire({ icon: 'error', title: t('wardrobe.deleteFailed'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
         }
     };
 
@@ -189,7 +191,7 @@ const EditItemWardrobe = () => {
                 : 'bg-white border-gray-100 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
                 }`}
         >
-            {label.toUpperCase()}
+            {(t('wardrobe.opt_' + label) || label).toUpperCase()}
         </button>
     );
 
@@ -201,7 +203,7 @@ const EditItemWardrobe = () => {
                 <div className="flex items-center justify-between mb-8">
                     <button onClick={() => navigate('/wardrobe')} className="group flex items-center gap-2 text-gray-500 font-semibold hover:text-gray-900">
                         <div className="p-2 bg-white rounded-lg shadow-sm"><ArrowLeft size={18} /></div>
-                        Back to Wardrobe
+                        {t('wardrobe.backToWardrobe')}
                     </button>
                     {!isNew && (
                         <button onClick={handleDelete} className="p-2.5 bg-red-50 text-[var(--color-accent-orange)] rounded-xl hover:bg-red-100">
@@ -218,7 +220,7 @@ const EditItemWardrobe = () => {
                             </div>
 
                             <div className="mt-8 w-full">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Item Name</label>
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('wardrobe.itemName')}</label>
                                 <input
                                     type="text"
                                     value={formData.name}
@@ -237,7 +239,7 @@ const EditItemWardrobe = () => {
                                     className="text-xs font-bold uppercase tracking-tight"
                                     style={{ color: formData.color ? formData.color.toLowerCase() : '#666' }}
                                 >
-                                    Color: {formData.color || 'Not Specified'}
+                                    {t('wardrobe.colorLabel')} {formData.color || t('wardrobe.notSpecified')}
                                 </span>
                             </div>
                         </div>
@@ -247,7 +249,7 @@ const EditItemWardrobe = () => {
                         <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-gray-100 space-y-10">
                             <section>
                                 <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                                    <User size={18} className="text-[var(--color-brand-secondary)]" /> Intended Gender
+                                    <User size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.intendedGender')}
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
                                     {['male', 'female', 'unisex'].map(g => (
@@ -263,7 +265,7 @@ const EditItemWardrobe = () => {
                             <div className="grid md:grid-cols-2 gap-10">
                                 <section>
                                     <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                                        <Shirt size={18} className="text-[var(--color-brand-secondary)]" /> Category
+                                        <Shirt size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.category')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {currentCategories.filter(c => c !== 'All').map(c => (
@@ -278,7 +280,7 @@ const EditItemWardrobe = () => {
 
                                 <section>
                                     <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                                        <CloudSun size={18} className="text-[var(--color-brand-secondary)]" /> Season
+                                        <CloudSun size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.season')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {['summer', 'winter', 'spring', 'fall', 'all season'].map(s => (
@@ -295,7 +297,7 @@ const EditItemWardrobe = () => {
                             <div className="grid md:grid-cols-2 gap-10">
                                 <section>
                                     <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                                        <Sparkles size={18} className="text-[var(--color-brand-secondary)]" /> Style
+                                        <Sparkles size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.style')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {['casual', 'formal', 'streetwear', 'vintage', 'minimalist'].map(st => (
@@ -310,7 +312,7 @@ const EditItemWardrobe = () => {
 
                                 <section>
                                     <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
-                                        <Layers size={18} className="text-[var(--color-brand-secondary)]" /> Pattern
+                                        <Layers size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.pattern')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {['solid', 'striped', 'floral', 'checkered', 'graphic'].map(p => (
@@ -331,7 +333,7 @@ const EditItemWardrobe = () => {
                                     disabled={saving}
                                     className="w-full bg-[var(--color-primary)] text-white py-5 rounded-2xl font-bold text-lg transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3"
                                 >
-                                    {saving ? <Loader2 className="animate-spin" /> : <><Check size={22} /> Add to Wardrobe</>}
+                                    {saving ? <Loader2 className="animate-spin" /> : <><Check size={22} /> {t('wardrobe.addToWardrobe')}</>}
                                 </button>
                             </div>
                             )}

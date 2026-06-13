@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Shirt, Grid3x3, Sparkles, LogIn, X, Circle, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import StepIndicator from "../recycle/components/StepIndicator";
 import UploadArea from "../recycle/components/UploadArea";
@@ -37,6 +38,8 @@ const base64ToFile = (base64, filename) => {
 };
 
 export default function Matching() {
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   const { user } = useAuth();
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
   const navigate = useNavigate();
@@ -54,21 +57,21 @@ export default function Matching() {
   const resultRef = useRef(null);
 
   const steps = [
-    { id: 1, title: "Select Item", subtitle: "Choose a clothing item" },
-    { id: 2, title: "Find Matches", subtitle: "AI finds complementary pieces" },
-    { id: 3, title: "View Results", subtitle: "See matching recommendations" },
+    { id: 1, title: t("matching.step1Title"), subtitle: t("matching.step1Subtitle") },
+    { id: 2, title: t("matching.step2Title"), subtitle: t("matching.step2Subtitle") },
+    { id: 3, title: t("matching.step3Title"), subtitle: t("matching.step3Subtitle") },
   ];
 
   const currentStep = showResults ? 3 : isLoading ? 2 : (selectedItemId || galleryFile) ? 2 : 1;
   const isReady = (itemSource === "wardrobe" && selectedItemId) || (itemSource === "gallery" && galleryFile);
 
   const hasItem = !!selectedItemId || !!galleryFile;
-  const selectedTitle = hasItem ? "1 item selected" : "No items selected yet";
+  const selectedTitle = hasItem ? t("matching.oneItemSelected") : t("matching.noItemsSelected");
   const selectedSubtitle = hasItem
     ? selectedItemId
-      ? "Item selected from your wardrobe"
-      : "Item uploaded from gallery"
-    : "Select an item to see matching suggestions";
+      ? t("matching.itemFromWardrobe")
+      : t("matching.itemFromGallery")
+    : t("matching.selectItemHint");
 
   const handleGalleryFileSelected = (files) => {
     if (files && files.length > 0) {
@@ -219,7 +222,7 @@ export default function Matching() {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Matching
+              {t("matching.title")}
             </span>
           </h1>
           <p
@@ -230,8 +233,7 @@ export default function Matching() {
               opacity: 0.85,
             }}
           >
-            Find matching items from your wardrobe and discover products from
-            the store that complement your selected outfit.
+            {t("matching.heroDesc")}
           </p>
         </section>
 
@@ -256,9 +258,9 @@ export default function Matching() {
               >
                 <div className="flex items-center justify-between w-full">
                   <div>
-                    <h3 className="font-bold text-lg">Wardrobe</h3>
+                    <h3 className="font-bold text-lg">{t("matching.wardrobe")}</h3>
                     <p className="text-xs text-gray-500 max-w-[180px] mt-1">
-                      Choose from your saved wardrobe items.
+                      {t("matching.wardrobeDesc")}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4 mr-6">
@@ -267,7 +269,7 @@ export default function Matching() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute top-4 right-4">
+                <div className={`absolute top-4 ${isArabic ? "left-4" : "right-4"}`}>
                   {itemSource === "wardrobe" ? (
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <circle cx="12" cy="12" r="10" fill="#4FC3FF" stroke="#4FC3FF" strokeWidth="2" />
@@ -289,9 +291,9 @@ export default function Matching() {
               >
                 <div className="flex items-center justify-between w-full">
                   <div>
-                    <h3 className="font-bold text-lg">Gallery</h3>
+                    <h3 className="font-bold text-lg">{t("matching.gallery")}</h3>
                     <p className="text-xs text-gray-500 max-w-[180px] mt-1">
-                      Upload an image of your clothing item.
+                      {t("matching.galleryDesc")}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0 ml-4 mr-6">
@@ -300,7 +302,7 @@ export default function Matching() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute top-4 right-4">
+                <div className={`absolute top-4 ${isArabic ? "left-4" : "right-4"}`}>
                   {itemSource === "gallery" ? (
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
                       <circle cx="12" cy="12" r="10" fill="#4FC3FF" stroke="#4FC3FF" strokeWidth="2" />
@@ -322,16 +324,16 @@ export default function Matching() {
               <div className="bg-gray-100 rounded-xl p-8 text-center">
                 <LogIn className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600 font-medium">
-                  Please sign in to view your wardrobe
+                  {t("matching.signInToView")}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   <span
                     onClick={() => navigate("/auth")}
                     className="text-blue-500 hover:underline cursor-pointer"
                   >
-                    Sign in
+                    {t("matching.signIn")}
                   </span>{" "}
-                  to access your saved items
+                  {t("matching.toAccessItems")}
                 </p>
               </div>
             ) : wardrobeLoading ? (
@@ -342,10 +344,10 @@ export default function Matching() {
               <div className="bg-gray-100 rounded-xl p-8 text-center">
                 <Shirt className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600 font-medium">
-                  Your wardrobe is empty
+                  {t("matching.wardrobeEmpty")}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  Add items to your wardrobe to get started
+                  {t("matching.addItemsToStart")}
                 </p>
               </div>
             ) : (
@@ -361,7 +363,7 @@ export default function Matching() {
                       fontWeight: 700,
                     }}
                   >
-                    Select an item
+                    {t("matching.selectItem")}
                   </h3>
                 </div>
                 <div
@@ -371,7 +373,7 @@ export default function Matching() {
                     <WardrobeItem
                       key={item._id}
                       src={imgSrc(item.image)}
-                      alt={item.name || "Clothing item"}
+                      alt={item.name || t("matching.clothingItem")}
                       selected={selectedItemId === item._id}
                       disabled={!!selectedItemId && selectedItemId !== item._id}
                       onClick={() =>
@@ -415,13 +417,13 @@ export default function Matching() {
                     <button
                       type="button"
                       onClick={handleRemoveGalleryImage}
-                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-md transition-all duration-200 hover:bg-red-500 hover:text-white hover:scale-110"
+                      className={`absolute ${isArabic ? "left-2" : "right-2"} top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-md transition-all duration-200 hover:bg-red-500 hover:text-white hover:scale-110`}
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </div>
                   <div
-                    className="absolute left-5 bottom-5 sm:left-6 sm:bottom-6 inline-flex items-center rounded-full px-2 py-1"
+                    className={`absolute ${isArabic ? "right-5 sm:right-6" : "left-5 sm:left-6"} bottom-5 sm:bottom-6 inline-flex items-center rounded-full px-2 py-1`}
                     style={{
                       backgroundColor: "#FAF8FF",
                       color: "var(--Primary-Text-color)",
@@ -430,7 +432,7 @@ export default function Matching() {
                       lineHeight: "14px",
                     }}
                   >
-                    Your Item
+                    {t("matching.yourItem")}
                   </div>
                 </div>
               </div>
@@ -469,13 +471,15 @@ export default function Matching() {
                 onClick={handleFindMatches}
                 disabled={!isReady}
                 className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg w-full max-w-md justify-center ${
+                  isArabic ? "flex-row-reverse" : ""
+                } ${
                   isReady
                     ? "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
                 <Sparkles className="w-5 h-5" />
-                Find Matches
+                {t("matching.findMatches")}
               </button>
             </div>
           </section>
@@ -486,7 +490,7 @@ export default function Matching() {
           <div className="flex flex-col items-center justify-center py-20">
             <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
             <p className="text-gray-500 font-medium">
-              Finding matching items...
+              {t("matching.findingMatches")}
             </p>
           </div>
         )}
@@ -501,11 +505,11 @@ export default function Matching() {
                 className="text-2xl font-bold mb-6"
                 style={{ color: "var(--Primary-Text-color)" }}
               >
-                Items Matching In Your Wardrobe
+                {t("matching.wardrobeMatches")}
               </h2>
               <div className="flex gap-[15px] flex-wrap">
                 {wardrobeMatches.length === 0 ? (
-                  <p className="text-gray-400 text-sm py-4">No wardrobe matches found</p>
+                  <p className="text-gray-400 text-sm py-4">{t("matching.noWardrobeMatches")}</p>
                 ) : (
                   wardrobeMatches.map((match, index) => {
                     const imgUrl = getMatchImage(match);
@@ -522,7 +526,7 @@ export default function Matching() {
                         }}
                       >
                         <div className="relative w-full h-full bg-white rounded-[9px] flex flex-col items-center justify-center overflow-hidden">
-                          <div className="absolute top-1 right-1 z-10 bg-lime-500 text-white text-[9px] font-bold px-[6px] py-[2px] rounded-full">
+                          <div className={`absolute top-1 ${isArabic ? "left-1" : "right-1"} z-10 bg-lime-500 text-white text-[9px] font-bold px-[6px] py-[2px] rounded-full`}>
                             {match.score}%
                           </div>
                           {imgUrl ? (
@@ -548,11 +552,11 @@ export default function Matching() {
                 className="text-2xl font-bold mb-6"
                 style={{ color: "var(--Primary-Text-color)" }}
               >
-                Matching Items From Store
+                {t("matching.storeMatches")}
               </h2>
               <div className="flex gap-[15px] flex-wrap">
                 {storeMatches.length === 0 ? (
-                  <p className="text-gray-400 text-sm py-4">No store matches found</p>
+                  <p className="text-gray-400 text-sm py-4">{t("matching.noStoreMatches")}</p>
                 ) : (
                   storeMatches.map((match, index) => {
                     const imgUrl = getMatchImage(match);
@@ -569,7 +573,7 @@ export default function Matching() {
                         }}
                       >
                         <div className="relative w-full h-full bg-white rounded-[9px] flex flex-col items-center justify-center overflow-hidden">
-                          <div className="absolute top-1 right-1 z-10 bg-lime-500 text-white text-[9px] font-bold px-[6px] py-[2px] rounded-full">
+                          <div className={`absolute top-1 ${isArabic ? "left-1" : "right-1"} z-10 bg-lime-500 text-white text-[9px] font-bold px-[6px] py-[2px] rounded-full`}>
                             {match.score}%
                           </div>
                           {imgUrl ? (
@@ -593,10 +597,10 @@ export default function Matching() {
             <div className="flex justify-center pb-10 mt-16">
               <button
                 onClick={handleReset}
-                className="inline-flex items-center justify-center gap-2 w-full max-w-md py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
+                className={`inline-flex items-center justify-center gap-2 w-full max-w-md py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer ${isArabic ? "flex-row-reverse" : ""}`}
               >
                 <Sparkles className="w-5 h-5" />
-                Try Again
+                {t("matching.tryAgain")}
               </button>
             </div>
             </div>
