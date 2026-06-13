@@ -21,7 +21,7 @@ export default function AdminLayout({ activePage, setActivePage, topBarActions, 
       <AdminMobileHeader className="lg:hidden" unreadContacts={unreadContacts} />
 
       <main className={isRTL ? 'lg:mr-[280px]' : 'lg:ml-[280px]'}>
-        <AdminTopBar className="hidden lg:flex sticky top-0 z-10 bg-white h-[60px]" actions={topBarActions} unreadContacts={unreadContacts} />
+        <AdminTopBar className="hidden lg:flex sticky top-0 z-10 bg-surface-elevated h-[60px]" actions={topBarActions} unreadContacts={unreadContacts} />
 
         <div className="pb-[72px] lg:pb-0 lg:p-8">
           {children}

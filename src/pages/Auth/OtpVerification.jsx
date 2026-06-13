@@ -60,8 +60,8 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
       isVisible ? "z-10 opacity-100" : "z-0 opacity-0"
     } ${inModal ? "p-6 md:p-10" : "p-8 md:p-16"}`}>
       <div className="mx-auto w-full max-w-md">
-        <h2 className={`font-bold text-black ${inModal ? "text-2xl" : "text-3xl"}`}>{t("auth.enterVerificationCode")}</h2>
-        <p className={`mt-2 text-gray-500 leading-relaxed ${inModal ? "mb-6 text-sm" : "mb-8"}`}>
+        <h2 className={`font-bold text-text-primary ${inModal ? "text-2xl" : "text-3xl"}`}>{t("auth.enterVerificationCode")}</h2>
+        <p className={`mt-2 text-text-secondary leading-relaxed ${inModal ? "mb-6 text-sm" : "mb-8"}`}>
           {t("auth.otpDesc", { email: maskEmail(email) })}
         </p>
         <form onSubmit={handleSubmit}>
@@ -77,29 +77,29 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 className={`w-[52px] h-14 text-center text-2xl font-bold rounded-xl outline-none transition-all duration-200 ${
                   digit
-                    ? "bg-[#f1f8e9] border-2 border-[#A6E22E] text-gray-800"
-                    : "bg-[#f0f3ff] border-2 border-transparent focus:bg-white focus:border-[#A6E22E]"
+                    ? "bg-[var(--secondary)]/10 border-2 border-[var(--secondary)] text-text-primary"
+                    : "bg-[var(--primary)]/10 border-2 border-transparent focus:bg-surface-elevated focus:border-[var(--secondary)]"
                 } ${inModal ? 'w-[46px] h-12 text-xl' : 'w-[52px] h-14 text-2xl'}`}
               />
             ))}
           </div>
 
-          <button type="submit" className={`w-full rounded-xl bg-[#40B9FF] font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-[#89D4FF] inline-flex items-center justify-center gap-2 ${inModal ? "py-3" : "py-4"}`}>
+          <button type="submit" className={`w-full rounded-xl bg-[var(--primary)] font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-[var(--primary)] inline-flex items-center justify-center gap-2 ${inModal ? "py-3" : "py-4"}`}>
             {t("auth.verifyContinue")} <span className="inline-block rtl:rotate-180">→</span>
           </button>
 
           <div className="mt-8 text-center space-y-4">
-            <p className="text-sm font-semibold text-gray-700">
+            <p className="text-sm font-semibold text-text-secondary">
               {t("auth.noCode")}{" "}
-              <button type="button" className="underline hover:text-gray-900">{t("auth.resendCode")}</button>
+              <button type="button" className="underline hover:text-text-primary">{t("auth.resendCode")}</button>
             </p>
 
-            <p className={`text-sm font-semibold ${timeLeft > 0 ? "text-[#FF7E41]" : "text-gray-400"}`}>
+            <p className={`text-sm font-semibold ${timeLeft > 0 ? "text-[var(--accent-orange)]" : "text-text-secondary"}`}>
               {t("auth.requestNewCode")} {formatTime(timeLeft)}
             </p>
 
             <div className="pt-2">
-              <button type="button" onClick={onBackToLogin} className="inline-flex items-center gap-1 font-semibold text-[#A6E22E] border-b border-[#A6E22E] pb-0.5 text-sm hover:opacity-80">
+              <button type="button" onClick={onBackToLogin} className="inline-flex items-center gap-1 font-semibold text-[var(--secondary)] border-b border-[var(--secondary)] pb-0.5 text-sm hover:opacity-80">
                 <span className="inline-block rtl:rotate-180">←</span> {t("auth.backToLogin")}
               </button>
             </div>

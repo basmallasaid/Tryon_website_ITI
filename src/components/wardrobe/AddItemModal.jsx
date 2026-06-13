@@ -53,19 +53,19 @@ const AddItemModal = ({ isOpen, onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/40">
-            <div className="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative animate-in fade-in zoom-in duration-300">
-                <button onClick={handleClose} className="absolute top-4 right-4 rtl:left-4 p-1.5 hover:bg-gray-100 rounded-full">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-overlay">
+            <div className="bg-surface-elevated w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative animate-in fade-in zoom-in duration-300 border border-[var(--border)]">
+                <button onClick={handleClose} className="absolute top-4 right-4 rtl:left-4 p-1.5 hover:bg-[var(--bg-secondary)] rounded-full">
                     <X size={20} />
                 </button>
 
-                <h2 className="text-xl font-black text-gray-900 text-center mb-5 pt-2">
+                <h2 className="text-xl font-black text-text-primary text-center mb-5 pt-2">
                     {t('wardrobe.uploadAnalyze')}
                 </h2>
 
                 <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="aspect-[3/2] bg-gray-100 border-3 border-dashed border-gray-200 rounded-[1.5rem] flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-[#40B9FF] transition-colors overflow-hidden relative"
+                    className="aspect-[3/2] bg-[var(--bg-secondary)] border-3 border-dashed border-[var(--border)] rounded-[1.5rem] flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-[var(--primary)] transition-colors overflow-hidden relative"
                 >
                     {preview ? (
                         <img
@@ -75,8 +75,8 @@ const AddItemModal = ({ isOpen, onClose }) => {
                         />
                     ) : (
                         <>
-                            <Camera size={36} className="text-gray-300" />
-                            <span className="font-bold text-sm text-gray-400">{t('wardrobe.clickToUpload')}</span>
+                            <Camera size={36} className="text-text-disabled" />
+                            <span className="font-bold text-sm text-text-disabled">{t('wardrobe.clickToUpload')}</span>
                         </>
                     )}
                 </div>
@@ -89,13 +89,13 @@ const AddItemModal = ({ isOpen, onClose }) => {
                 />
 
                 {error && (
-                    <p className="text-red-500 text-xs font-bold mt-3 text-center">{error}</p>
+                    <p className="text-error-text text-xs font-bold mt-3 text-center">{error}</p>
                 )}
 
                 <button
                     onClick={handleAnalyze}
                     disabled={!selectedFile || analyzing}
-                    className="w-full bg-[#40B9FF] text-white py-3.5 rounded-xl font-black shadow-md shadow-blue-100 uppercase tracking-widest text-sm mt-5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 rtl:flex-row-reverse"
+                    className="w-full bg-[var(--primary)] text-white py-3.5 rounded-xl font-black shadow-md uppercase tracking-widest text-sm mt-5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 rtl:flex-row-reverse"
                 >
                     {analyzing ? (
                         <><Loader2 className="animate-spin" size={18} /> {t('wardrobe.analyzing')}</>

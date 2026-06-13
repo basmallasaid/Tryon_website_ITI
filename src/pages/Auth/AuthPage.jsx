@@ -203,8 +203,8 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
     };
 
     return (
-        <div className={`flex ${inModal ? '' : 'min-h-screen'} items-center justify-center ${inModal ? '' : 'bg-gray-100 p-4'} font-sans`}>
-            <div dir={isArabic ? 'rtl' : 'ltr'} className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full ${inModal ? '' : 'max-w-6xl'} overflow-hidden rounded-[40px] bg-white shadow-2xl`}>
+        <div className={`flex ${inModal ? '' : 'min-h-screen'} items-center justify-center ${inModal ? '' : 'bg-surface-elevated p-4'} font-sans`}>
+            <div dir={isArabic ? 'rtl' : 'ltr'} className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full ${inModal ? '' : 'max-w-6xl'} overflow-hidden rounded-[40px] bg-surface-elevated shadow-2xl`}>
                 
                 <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
                 

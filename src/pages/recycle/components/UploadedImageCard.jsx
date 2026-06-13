@@ -6,10 +6,9 @@ const UploadedImageCard = ({ image, index, onRemove }) => {
   const { t } = useTranslation();
   return (
     <div
-      className="relative w-44 sm:w-52 rounded-2xl p-3 sm:p-4"
-      style={{ backgroundColor: "#E9EDFF" }}
+      className="relative w-44 sm:w-52 rounded-2xl p-3 sm:p-4 bg-info-bg"
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-white">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-surface-elevated">
         <img
           src={image.preview}
           alt={`${t("recycle.piece")} ${index + 1}`}
@@ -19,15 +18,15 @@ const UploadedImageCard = ({ image, index, onRemove }) => {
           type="button"
           onClick={() => onRemove(index)}
           aria-label={`${t("recycle.piece")} ${index + 1}`}
-          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-md transition-all duration-200 hover:bg-red-500 hover:text-white hover:scale-110"
+          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-surface-elevated/90 text-text-secondary shadow-md transition-all duration-200 hover:bg-error-text hover:text-white hover:scale-110"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
       <div
         className="absolute left-5 bottom-5 sm:left-6 sm:bottom-6 inline-flex items-center rounded-full px-2 py-1"
+        className="bg-info-bg"
         style={{
-          backgroundColor: "#FAF8FF",
           color: "var(--Primary-Text-color)",
           fontWeight: "var(--Semi-Bold)",
           fontSize: "12px",

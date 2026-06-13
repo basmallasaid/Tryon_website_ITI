@@ -12,16 +12,16 @@ export default function WardrobeItem({ src, alt, selected, disabled = false, onC
       style={{
         width: 130,
         height: 150,
-        background: selected ? gradientBorder : "#e2e8f0",
+        background: selected ? gradientBorder : "var(--bg-secondary)",
         borderRadius: 12,
         padding: 3,
       }}
     >
-      <div className="relative w-full h-full bg-white rounded-[9px] flex justify-center items-center">
+      <div className="relative w-full h-full bg-surface-elevated rounded-[9px] flex justify-center items-center">
         <div
           className={`absolute top-2 ${isArabic ? 'left-2' : 'right-2'} w-[18px] h-[18px] rounded-full flex items-center justify-center text-[10px] font-bold leading-none`}
           style={{
-            backgroundColor: selected ? "#A6E22E" : "#a0aec0",
+            backgroundColor: selected ? "var(--secondary)" : "var(--Disabled-Text-color)",
             color: "white",
           }}
         >

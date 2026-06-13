@@ -35,7 +35,7 @@ function CancelModal({ open, onClose, onConfirm, cancelling, endDate }) {
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay px-4"
       onClick={onClose}
     >
       <div
@@ -289,7 +289,7 @@ export default function PricingPage() {
                     </div>
 
                     <div className="flex flex-col gap-1 pb-4 border-b border-border-strong">
-                      <span className="font-roboto font-bold text-[24px] leading-[38.4px] text-[#131e2b]">
+                      <span className="font-roboto font-bold text-[24px] leading-[38.4px] text-text-primary">
                         {t("pricing.proStyle")}
                       </span>
                       <span className="font-roboto font-normal text-[12px] text-border-disabled">
@@ -374,9 +374,9 @@ export default function PricingPage() {
             </div>
 
             <div className="w-[798px] h-[94px] flex items-center justify-center max-[1100px]:w-full max-[1100px]:px-4">
-              <div className="relative flex items-center bg-[#ededed] rounded-full w-full h-full">
+              <div className="relative flex items-center bg-bg-secondary rounded-full w-full h-full">
                 <span
-                  className="absolute rounded-full border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
+                  className="absolute rounded-full border border-[var(--border)] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
                   style={{
                     top: "4px",
                     bottom: "4px",
@@ -413,7 +413,7 @@ export default function PricingPage() {
 
             <div className="flex items-stretch justify-center gap-8 max-[1100px]:flex-col">
               <div className="w-[449px] max-[1100px]:w-full rounded-[32px] py-8 max-[1100px]:py-6 px-10 shadow-[0px_0px_4px_0px_#00000026] bg-surface-elevated flex flex-col gap-8">
-                <div className="w-[154px] h-8 rounded-full py-1 px-3 bg-[#a1a7b3] flex items-center justify-center self-start">
+                <div className="w-[154px] h-8 rounded-full py-1 px-3 bg-[var(--text-secondary)] flex items-center justify-center self-start">
                   <span className="font-roboto font-medium text-[14px] leading-[117%] text-surface-elevated text-center">
                     {t("pricing.currentPlan")}
                   </span>
@@ -460,7 +460,7 @@ export default function PricingPage() {
                   }}
                 />
 
-                <div className="relative z-10 w-full h-full flex flex-col gap-8 py-8 max-[1100px]:py-6 px-10">
+                <div className="relative z-10 w-full h-full flex flex-col gap-8 py-8 max-[1100px]:py-6 px-10 bg-surface-elevated">
                   <div className="w-[116px] rounded-full py-1 px-3 bg-accent-orange flex items-center justify-center">
                     <span className="font-medium text-sm leading-[117%] text-surface-elevated">
                       {t("pricing.popular")}
@@ -560,7 +560,7 @@ export default function PricingPage() {
                   <button
                     onClick={handleSubscribe}
                     disabled={subscribing}
-                    className="w-full h-16 px-2 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xl text-[#F1F5F9] transition-all duration-300 bg-accent-orange cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50"
+                    className="w-full h-16 px-2 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xl text-white transition-all duration-300 bg-accent-orange cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50"
                   >
                     {subscribing && (
                       <Loader2 className="w-5 h-5 animate-spin" />

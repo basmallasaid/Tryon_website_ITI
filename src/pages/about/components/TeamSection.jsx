@@ -47,7 +47,7 @@ export default function TeamSection() {
                   maskComposite: 'exclude',
                 }}
               />
-              <div className="relative z-10 bg-white/70 backdrop-blur-md rounded-2xl p-4 border border-white/20 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:border-transparent h-full flex flex-row items-center gap-4">
+              <div className="relative z-10 bg-surface-elevated/70 backdrop-blur-md rounded-2xl p-4 border border-[var(--border)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:border-transparent h-full flex flex-row items-center gap-4">
                 <div
                   className={`w-12 h-12 rounded-full bg-gradient-to-br ${member.avatarBg} flex items-center justify-center shrink-0 shadow-md`}
                 >

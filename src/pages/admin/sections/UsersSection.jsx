@@ -1,11 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Shirt, RefreshCw, Plus, Trash2, Filter, X, AlertTriangle, RotateCcw, Pencil } from 'lucide-react';
+import {
+  Shirt,
+  RefreshCw,
+  Plus,
+  Trash2,
+  Filter,
+  X,
+  AlertTriangle,
+  RotateCcw,
+  Pencil,
+} from 'lucide-react';
 import UserRow from '../components/UserRow';
 import QuotaBar from '../components/QuotaBar';
-import { getUsersApi, getUserStatsApi, deleteUserApi, markUserNotifiedApi } from '../../../api/adminApi';
+import {
+  getUsersApi,
+  getUserStatsApi,
+  deleteUserApi,
+  markUserNotifiedApi,
+} from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
 
-const avatarColors = ['#8ED321', '#3B82F6', '#8B5CF6', '#F97316', '#EC4899', '#14B8A6', '#EF4444', '#06B6D4'];
+const avatarColors = [
+  '#8ED321',
+  '#3B82F6',
+  '#8B5CF6',
+  '#F97316',
+  '#EC4899',
+  '#14B8A6',
+  '#EF4444',
+  '#06B6D4',
+];
 
 function getInitials(first, last) {
   return ((first?.[0] || '') + (last?.[0] || '')).toUpperCase() || '?';
@@ -13,7 +37,8 @@ function getInitials(first, last) {
 
 function getAvatarColor(name) {
   let hash = 0;
-  for (let i = 0; i < (name || '').length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  for (let i = 0; i < (name || '').length; i++)
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
   return avatarColors[Math.abs(hash) % avatarColors.length];
 }
 
@@ -30,19 +55,27 @@ function getStatus(user, t) {
 const TRYON_LIMIT = 50;
 const RECYCLE_LIMIT = 30;
 
-function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete, t }) {
+function DeleteConfirmDialog({
+  user,
+  onClose,
+  onSendNotification,
+  onDelete,
+  t,
+}) {
   const notified = user?.deletionNotified || false;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+      <div className="relative bg-surface-elevated rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-admin-danger/10 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-5 h-5 text-admin-danger" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-admin-text-primary">{t('admin.users.deleteUser')}</h3>
+              <h3 className="text-lg font-bold text-admin-text-primary">
+                {t('admin.users.deleteUser')}
+              </h3>
               <p className="text-sm text-admin-text-secondary">{user?.email}</p>
             </div>
           </div>
@@ -86,7 +119,13 @@ function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete, t })
   );
 }
 
-export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFilter, onSendDeletionNotification, onEditUser }) {
+export default function UsersSection({
+  onAddUser,
+  roleFilter = 'All',
+  onResetFilter,
+  onSendDeletionNotification,
+  onEditUser,
+}) {
   const { t } = adminI18n;
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
@@ -111,10 +150,14 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const mapped = users.map((u) => {
-    const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email;
+  const mapped = users.map(u => {
+    const name =
+      [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') ||
+      u.email;
     const role = mapRole(u, t);
     return {
       id: u._id,
@@ -130,14 +173,16 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
     };
   });
 
-  const filtered = mapped.filter((u) => {
-    const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
+  const filtered = mapped.filter(u => {
+    const matchSearch =
+      u.name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase());
     const matchRole = roleFilter === 'All' || u.role === roleFilter;
     return matchSearch && matchRole;
   });
 
-  const handleToggle = (id) => {
-    setSelectedIds((prev) => {
+  const handleToggle = id => {
+    setSelectedIds(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -149,14 +194,14 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
     if (selectedIds.size === filtered.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filtered.map((u) => u.id)));
+      setSelectedIds(new Set(filtered.map(u => u.id)));
     }
   };
 
   const handleDeleteClick = () => {
     if (selectedIds.size === 1) {
       const userId = [...selectedIds][0];
-      const user = mapped.find((u) => u.id === userId);
+      const user = mapped.find(u => u.id === userId);
       setDeleteTarget(user);
     }
   };
@@ -165,9 +210,11 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
     if (deleteTarget) {
       try {
         await markUserNotifiedApi(deleteTarget.id);
-        setUsers((prev) => prev.map((u) =>
-          u._id === deleteTarget.id ? { ...u, deletionNotified: true } : u
-        ));
+        setUsers(prev =>
+          prev.map(u =>
+            u._id === deleteTarget.id ? { ...u, deletionNotified: true } : u,
+          ),
+        );
       } catch (err) {
         console.error('Failed to mark user as notified:', err);
       }
@@ -181,8 +228,8 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
     setDeleting(true);
     try {
       await deleteUserApi(deleteTarget.id);
-      setUsers((prev) => prev.filter((u) => u._id !== deleteTarget.id));
-      setSelectedIds((prev) => {
+      setUsers(prev => prev.filter(u => u._id !== deleteTarget.id));
+      setSelectedIds(prev => {
         const next = new Set(prev);
         next.delete(deleteTarget.id);
         return next;
@@ -195,36 +242,80 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
     }
   };
 
-  const statCards = stats ? [
-    { label: t('admin.users.totalUsers'), value: stats.total.toLocaleString(), valueColor: 'text-admin-text-primary' },
-    { label: t('admin.users.verified'), value: stats.active.toLocaleString(), valueColor: 'text-admin-success' },
-    { label: t('admin.users.admins'), value: stats.admins.toLocaleString(), valueColor: 'text-admin-text-primary' },
-    { label: t('admin.users.newUsers'), value: stats.recentWeek.toLocaleString(), valueColor: 'text-admin-amber' },
-  ] : [
-    { label: t('admin.users.totalUsers'), value: '—', valueColor: 'text-admin-text-primary' },
-    { label: t('admin.users.verified'), value: '—', valueColor: 'text-admin-success' },
-    { label: t('admin.users.admins'), value: '—', valueColor: 'text-admin-text-primary' },
-    { label: t('admin.users.newUsers'), value: '—', valueColor: 'text-admin-amber' },
-  ];
+  const statCards = stats
+    ? [
+        {
+          label: t('admin.users.totalUsers'),
+          value: stats.total.toLocaleString(),
+          valueColor: 'text-admin-text-primary',
+        },
+        {
+          label: t('admin.users.verified'),
+          value: stats.active.toLocaleString(),
+          valueColor: 'text-admin-success',
+        },
+        {
+          label: t('admin.users.admins'),
+          value: stats.admins.toLocaleString(),
+          valueColor: 'text-admin-text-primary',
+        },
+        {
+          label: t('admin.users.newUsers'),
+          value: stats.recentWeek.toLocaleString(),
+          valueColor: 'text-admin-amber',
+        },
+      ]
+    : [
+        {
+          label: t('admin.users.totalUsers'),
+          value: '—',
+          valueColor: 'text-admin-text-primary',
+        },
+        {
+          label: t('admin.users.verified'),
+          value: '—',
+          valueColor: 'text-admin-success',
+        },
+        {
+          label: t('admin.users.admins'),
+          value: '—',
+          valueColor: 'text-admin-text-primary',
+        },
+        {
+          label: t('admin.users.newUsers'),
+          value: '—',
+          valueColor: 'text-admin-amber',
+        },
+      ];
 
   return (
     <>
       {/* Desktop / Tablet */}
       <div className="hidden md:block p-4 md:p-6 lg:p-0">
         <div className="mb-8">
-          <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.users.title')}</h1>
-          <p className="text-sm text-admin-text-secondary mt-1">{t('admin.users.subtitle')}</p>
+          <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">
+            {t('admin.users.title')}
+          </h1>
+          <p className="text-sm text-admin-text-secondary mt-1">
+            {t('admin.users.subtitle')}
+          </p>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {statCards.map((stat) => (
+          {statCards.map(stat => (
             <div
               key={stat.label}
               className="bg-admin-brand-activeBg border border-admin-border/30 rounded-xl p-4 flex flex-col gap-1"
             >
-              <span className="text-xs font-medium text-admin-text-secondary tracking-[0.6px] uppercase">{stat.label}</span>
-              <span className={`text-xl font-bold tracking-[-0.2px] ${stat.valueColor}`}>{stat.value}</span>
+              <span className="text-xs font-medium text-admin-text-secondary tracking-[0.6px] uppercase">
+                {stat.label}
+              </span>
+              <span
+                className={`text-xl font-bold tracking-[-0.2px] ${stat.valueColor}`}
+              >
+                {stat.value}
+              </span>
             </div>
           ))}
         </div>
@@ -237,7 +328,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
               type="text"
               placeholder={t('admin.users.search')}
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={e => setSearch(e.target.value)}
               className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
             />
           </div>
@@ -255,7 +346,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
             <button
               onClick={() => {
                 const userId = [...selectedIds][0];
-                const user = mapped.find((u) => u.id === userId);
+                const user = mapped.find(u => u.id === userId);
                 onEditUser?.(user);
               }}
               className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border text-admin-text-secondary rounded-lg text-xs font-medium hover:bg-admin-brand-activeBg transition-colors"
@@ -276,30 +367,50 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-2xl border border-[#BEC8D1] shadow-sm overflow-x-auto">
+        <div className="bg-surface-elevated rounded-2xl border border-admin-border shadow-sm overflow-x-auto">
           <table className="w-full text-left min-w-[700px] md:min-w-0">
             <thead>
-              <tr className="bg-[#F5F7FA] border-b border-[#F3F4F6]">
+              <tr className="bg-admin-brand-bg border-b border-admin-border">
                 <th className="py-2.5 px-4 w-12">
                   <input
                     type="checkbox"
-                    checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                    checked={
+                      filtered.length > 0 &&
+                      selectedIds.size === filtered.length
+                    }
                     onChange={handleSelectAll}
                     className="w-4 h-4 rounded border-admin-border accent-admin-brand cursor-pointer"
                   />
                 </th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.userCol')}</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.roleCol')}</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.virtualTryOn')}</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.recycling')}</th>
-                <th className="py-2.5 px-4 text-[11px] font-semibold text-[#99A1AF] uppercase tracking-[0.6px] whitespace-nowrap">{t('admin.users.statusCol')}</th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
+                  {t('admin.users.userCol')}
+                </th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
+                  {t('admin.users.roleCol')}
+                </th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
+                  {t('admin.users.virtualTryOn')}
+                </th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
+                  {t('admin.users.recycling')}
+                </th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
+                  {t('admin.users.statusCol')}
+                </th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.users.loadingUsers')}</td></tr>
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="py-12 text-center text-sm text-admin-text-muted"
+                  >
+                    {t('admin.users.loadingUsers')}
+                  </td>
+                </tr>
               ) : filtered.length > 0 ? (
-                filtered.map((user) => (
+                filtered.map(user => (
                   <UserRow
                     key={user.id}
                     user={user}
@@ -308,7 +419,14 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
                   />
                 ))
               ) : (
-                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.users.noUsers')}</td></tr>
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="py-12 text-center text-sm text-admin-text-muted"
+                  >
+                    {t('admin.users.noUsers')}
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -318,19 +436,29 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
       {/* Mobile */}
       <div className="md:hidden px-4 py-6 flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.users.title')}</h1>
-          <p className="text-sm text-admin-text-secondary mt-1">{t('admin.users.subtitle')}</p>
+          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">
+            {t('admin.users.title')}
+          </h1>
+          <p className="text-sm text-admin-text-secondary mt-1">
+            {t('admin.users.subtitle')}
+          </p>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 gap-3">
-          {statCards.map((stat) => (
+          {statCards.map(stat => (
             <div
               key={stat.label}
               className="bg-admin-brand-activeBg border border-admin-border/30 rounded-xl p-4 flex flex-col gap-1"
             >
-              <span className="text-[10px] font-medium text-admin-text-secondary tracking-[0.5px] uppercase">{stat.label}</span>
-              <span className={`text-lg font-bold tracking-[-0.2px] ${stat.valueColor}`}>{stat.value}</span>
+              <span className="text-[10px] font-medium text-admin-text-secondary tracking-[0.5px] uppercase">
+                {stat.label}
+              </span>
+              <span
+                className={`text-lg font-bold tracking-[-0.2px] ${stat.valueColor}`}
+              >
+                {stat.value}
+              </span>
             </div>
           ))}
         </div>
@@ -342,7 +470,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
             type="text"
             placeholder={t('admin.users.search')}
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
           />
         </div>
@@ -351,7 +479,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
           <button
             onClick={() => {
               const userId = [...selectedIds][0];
-              const user = mapped.find((u) => u.id === userId);
+              const user = mapped.find(u => u.id === userId);
               onEditUser?.(user);
             }}
             className="flex items-center justify-center gap-2 px-4 py-2.5 bg-admin-brand-bg border border-admin-border text-admin-text-secondary rounded-xl text-xs font-medium"
@@ -373,9 +501,11 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
         {/* Mobile Cards */}
         <div className="flex flex-col gap-3">
           {loading ? (
-            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.users.loadingUsers')}</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">
+              {t('admin.users.loadingUsers')}
+            </p>
           ) : filtered.length > 0 ? (
-            filtered.map((user) => (
+            filtered.map(user => (
               <UserRow
                 key={user.id}
                 user={user}
@@ -385,11 +515,16 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
               />
             ))
           ) : (
-            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.users.noUsers')}</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">
+              {t('admin.users.noUsers')}
+            </p>
           )}
         </div>
 
-        <button onClick={onAddUser} className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full bg-admin-brand text-white shadow-lg flex items-center justify-center hover:bg-admin-brand-light transition-colors">
+        <button
+          onClick={onAddUser}
+          className="fixed bottom-20 right-5 z-40 w-14 h-14 rounded-full bg-admin-brand text-white shadow-lg flex items-center justify-center hover:bg-admin-brand-light transition-colors"
+        >
           <Plus className="w-6 h-6" />
         </button>
       </div>
