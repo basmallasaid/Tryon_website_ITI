@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { User, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { generateAvatarApi } from '../../api/avatarApi';
+import { generateAvatarApi, getAvatarByIdApi } from '../../api/avatarApi';
 import { useAuth } from '../../context/AuthContext';
 import { getAuth } from '../../utils/tokenUtils';
 import Button from '../../components/Button';
@@ -63,7 +63,23 @@ export default function AvatarGeneration() {
   const [processing, setProcessing] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
   const [apiError, setApiError] = useState('');
+  const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState(null);
   const previewRef = useRef(null);
+
+  useEffect(() => {
+    const avatarIds = user?.avatars;
+    if (!avatarIds || avatarIds.length === 0) return;
+    getAvatarByIdApi(avatarIds[0])
+      .then(res => {
+        const url = res.data?.avatar?.image_url;
+        if (url) setFetchedAvatarUrl(url);
+      })
+      .catch(() => {});
+  }, [user?.avatars]);
+
+  const hasAvatar = !!(generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || user?.avatars?.length > 0);
+  const displayImageUrl = generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || null;
+  const showUpgrade = hasAvatar || !!generatedImageUrl;
 
   useEffect(() => {
     if (generatedImageUrl && previewRef.current) {
@@ -360,15 +376,15 @@ export default function AvatarGeneration() {
               <div className="mt-8">
                 <Button
                   variant="styling"
-                  onClick={generatedImageUrl ? () => navigate('/pricing') : handleGenerate}
-                  disabled={!generatedImageUrl && (!allFilled || processing)}
+                  onClick={showUpgrade ? () => navigate('/pricing') : handleGenerate}
+                  disabled={!showUpgrade && (!allFilled || processing)}
                   className={`w-full gap-3 ${
-                    !generatedImageUrl && (!allFilled || processing)
+                    !showUpgrade && (!allFilled || processing)
                       ? 'opacity-60 !cursor-not-allowed'
                       : ''
                   }`}
                 >
-                  {generatedImageUrl ? (
+                  {showUpgrade ? (
                     <>{t('avatar.upgrade')}</>
                   ) : processing ? (
                     <>
@@ -387,14 +403,14 @@ export default function AvatarGeneration() {
                 ref={previewRef}
                 className="rounded-2xl flex items-center justify-center overflow-hidden p-6 sm:p-8 min-h-[300px] sm:min-h-[400px] bg-surface-elevated flex-1"
                 style={{
-                  ...(!generatedImageUrl && !processing
+                  ...(!displayImageUrl && !processing
                     ? {
                         backgroundImage: dashedBorderSvg,
                         backgroundRepeat: 'no-repeat',
                         backgroundSize: '100% 100%',
                       }
                     : {
-                        border: generatedImageUrl
+                        border: displayImageUrl
                           ? '2px solid transparent'
                           : 'none',
                       }),
@@ -410,9 +426,9 @@ export default function AvatarGeneration() {
                       {t('avatar.generatingAvatar')}
                     </p>
                   </div>
-                ) : generatedImageUrl ? (
+                ) : displayImageUrl ? (
                   <img
-                    src={generatedImageUrl}
+                    src={displayImageUrl}
                     alt="Generated Avatar"
                     className="w-full h-full object-contain rounded-2xl"
                     style={{ maxHeight: '600px' }}
@@ -431,7 +447,7 @@ export default function AvatarGeneration() {
                   </div>
                 )}
               </div>
-              {generatedImageUrl && (
+              {displayImageUrl && (
                 <Button
                   onClick={() => navigate('/tryOn')}
                   className="w-full h-12 bg-primary text-white text-base font-semibold rounded-lg shadow"
