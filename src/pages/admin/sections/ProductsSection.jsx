@@ -3,12 +3,14 @@ import { Filter, X, ChevronLeft, ChevronRight, Plus, SlidersHorizontal, Trash2, 
 import ProductRow from '../components/ProductRow';
 import ProductCard from '../components/ProductCard';
 import { getProductsApi, getStoresApi, deleteProductApi } from '../../../api/adminApi';
+import adminI18n from '../../../i18n/admin/adminI18n';
 
 const PAGE_SIZE = 5;
 
 const categoryLabels = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', acc: 'Accessories' };
 
 export default function ProductsSection({ onAddProduct, onEditProduct }) {
+  const { t } = adminI18n;
   const [products, setProducts] = useState([]);
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -141,8 +143,8 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
       <div className="hidden lg:block p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">Products</h1>
-            <p className="text-sm text-admin-text-secondary mt-1">Manage your global product catalog.</p>
+            <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.products.title')}</h1>
+            <p className="text-sm text-admin-text-secondary mt-1">{t('admin.products.subtitle')}</p>
           </div>
         </div>
 

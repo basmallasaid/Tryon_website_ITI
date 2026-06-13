@@ -3,6 +3,7 @@ import { Filter, X, ChevronLeft, ChevronRight, Plus, SlidersHorizontal, Trash2, 
 import StoreRow from '../components/StoreRow';
 import StoreCard from '../components/StoreCard';
 import { getStoresApi, getProductsApi, deleteStoreApi } from '../../../api/adminApi';
+import adminI18n from '../../../i18n/admin/adminI18n';
 
 const PAGE_SIZE = 5;
 
@@ -21,6 +22,7 @@ function formatDate(dateStr) {
 }
 
 export default function StoresSection({ onAddStore, onEditStore }) {
+  const { t } = adminI18n;
   const [stores, setStores] = useState([]);
   const [productCounts, setProductCounts] = useState({});
   const [loading, setLoading] = useState(true);
@@ -168,8 +170,8 @@ export default function StoresSection({ onAddStore, onEditStore }) {
       <div className="hidden lg:block p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">Global Store Network</h1>
-            <p className="text-sm text-admin-text-secondary mt-1">Manage and monitor all retail partners across the globe.</p>
+            <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.stores.title')}</h1>
+            <p className="text-sm text-admin-text-secondary mt-1">{t('admin.stores.subtitle')}</p>
           </div>
         </div>
 
@@ -178,7 +180,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
             <Filter className="w-[14px] h-[14px] text-admin-text-secondary" />
             <input
               type="text"
-              placeholder="Filter stores..."
+              placeholder={t('admin.stores.search')}
               value={filter}
               onChange={(e) => { setFilter(e.target.value); setPage(1); }}
               className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"

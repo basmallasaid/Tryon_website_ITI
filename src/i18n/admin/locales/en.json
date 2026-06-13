@@ -1,0 +1,130 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Welcome back",
+      "overview": "Here's what's happening with your stores today."
+    },
+    "stores": {
+      "title": "Stores Management",
+      "subtitle": "Manage your connected retail stores and inventory sync status.",
+      "addStore": "Add Store",
+      "editStore": "Edit Store",
+      "storeName": "Store Name",
+      "location": "Location",
+      "products": "Products",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "connected": "Connected",
+      "search": "Search stores...",
+      "noStores": "No stores found."
+    },
+    "products": {
+      "title": "Products Management",
+      "subtitle": "Browse and manage your product catalog across all stores.",
+      "addProduct": "Add Product",
+      "editProduct": "Edit Product",
+      "productName": "Product Name",
+      "price": "Price",
+      "category": "Category",
+      "store": "Store",
+      "search": "Search products...",
+      "noProducts": "No products found.",
+      "sortBy": "Sort by",
+      "priceLow": "Price: Low to High",
+      "priceHigh": "Price: High to Low",
+      "nameAZ": "Name: A to Z"
+    },
+    "notifications": {
+      "title": "Notification Center",
+      "subtitle": "View all notifications sent to users.",
+      "createNew": "Create New",
+      "allNotifications": "All Notifications",
+      "noNotifications": "No notifications yet."
+    },
+    "emailCenter": {
+      "title": "Email Center",
+      "subtitle": "Manage your inbox and respond to customer inquiries.",
+      "markAllRead": "Mark All Read",
+      "inbox": "Inbox",
+      "unread": "Unread",
+      "all": "All",
+      "noEmails": "No emails yet.",
+      "reply": "Reply",
+      "send": "Send"
+    },
+    "users": {
+      "title": "Users Management",
+      "subtitle": "Oversee your team access, roles, and store assignments.",
+      "addUser": "Add User",
+      "editUser": "Edit User",
+      "totalUsers": "TOTAL USERS",
+      "verified": "VERIFIED",
+      "admins": "ADMINS",
+      "newUsers": "NEW (7 DAYS)",
+      "search": "Search users...",
+      "noUsers": "No users found.",
+      "delete": "Delete",
+      "edit": "Edit"
+    },
+    "apiManagement": {
+      "title": "API Management",
+      "subtitle": "Manage your API keys and access tokens.",
+      "noKeys": "No API keys found."
+    },
+    "settings": {
+      "title": "Platform Settings",
+      "subtitle": "Manage your enterprise environment, notification preferences, and global account security.",
+      "preferences": "Preferences",
+      "systemLanguage": "System Language",
+      "systemLanguageDesc": "Choose your preferred language for the dashboard interface.",
+      "notifications": "Notifications",
+      "pushNotifications": "Push Notifications",
+      "pushNotificationsDesc": "Receive real-time alerts for inventory changes and order status.",
+      "emailDigests": "Email Digests",
+      "emailDigestsDesc": "Weekly performance reports and summary of store activities.",
+      "marketing": "Marketing Communications",
+      "marketingDesc": "Tips for growth and new enterprise feature announcements.",
+      "accountSupport": "Account & Support",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "knowledgeBase": "Knowledge Base",
+      "logOut": "Log Out",
+      "saveConfiguration": "Save Configuration",
+      "discardChanges": "Discard Changes",
+      "settingsSaved": "Settings saved"
+    },
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "add": "Add",
+      "search": "Search...",
+      "loading": "Loading...",
+      "noData": "No data available.",
+      "confirm": "Confirm",
+      "back": "Back",
+      "next": "Next",
+      "send": "Send",
+      "discard": "Discard",
+      "english": "English",
+      "arabic": "Arabic"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "stores": "Stores",
+      "products": "Products",
+      "notifications": "Notifications",
+      "emailCenter": "Email Center",
+      "users": "Users",
+      "apiManagement": "API Management",
+      "settings": "Settings"
+    },
+    "topbar": {
+      "filter": "Filter",
+      "clearFilter": "Clear filter"
+    }
+  }
+}
