@@ -529,7 +529,7 @@ export default function TryOn() {
                   <p className="text-xs text-gray-400 mt-1">{t("tryOn.addItemsToStart")}</p>
                 </div>
               ) : (
-                <div className="flex gap-[15px] flex-wrap">
+                <div className="flex gap-[15px] flex-wrap justify-center sm:justify-start">
                   {wardrobeItems.map((item) => (
                     <WardrobeItem
                       key={item._id}
@@ -551,7 +551,7 @@ export default function TryOn() {
                 </div>
               )}
               {galleryFiles.length > 0 && (
-                <div className="flex flex-wrap gap-4 sm:gap-6">
+                <div className="flex flex-wrap gap-4 sm:gap-6 justify-center sm:justify-start">
                   {galleryFiles.map((img, i) => (
                     <UploadedImageCard
                       key={img.preview}

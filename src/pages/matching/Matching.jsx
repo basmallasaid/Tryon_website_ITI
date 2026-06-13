@@ -367,7 +367,7 @@ export default function Matching() {
                   </h3>
                 </div>
                 <div
-                  className="flex gap-[15px] flex-wrap"
+                  className="flex gap-[15px] flex-wrap justify-center sm:justify-start"
                 >
                   {wardrobeItems.map((item) => (
                     <WardrobeItem
@@ -507,7 +507,7 @@ export default function Matching() {
               >
                 {t("matching.wardrobeMatches")}
               </h2>
-              <div className="flex gap-[15px] flex-wrap">
+              <div className="flex gap-[15px] flex-wrap justify-center sm:justify-start">
                 {wardrobeMatches.length === 0 ? (
                   <p className="text-gray-400 text-sm py-4">{t("matching.noWardrobeMatches")}</p>
                 ) : (
@@ -554,7 +554,7 @@ export default function Matching() {
               >
                 {t("matching.storeMatches")}
               </h2>
-              <div className="flex gap-[15px] flex-wrap">
+              <div className="flex gap-[15px] flex-wrap justify-center sm:justify-start">
                 {storeMatches.length === 0 ? (
                   <p className="text-gray-400 text-sm py-4">{t("matching.noStoreMatches")}</p>
                 ) : (
