@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Lightbulb, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Shirt, Grid3x3, Sparkles, LogIn, X, Package, Circle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import StepIndicator from "./components/StepIndicator";
@@ -8,68 +9,61 @@ import UploadedImageCard from "./components/UploadedImageCard";
 import DesignIdeaCard from "./components/DesignIdeaCard";
 import SettingsRow from "./components/SettingsRow";
 import GeneratedDesign from "./components/GeneratedDesign";
+import WardrobeItem from "../../components/tryOn/WardrobeItem";
+import { useAuth } from "../../context/AuthContext";
+import { useWardrobe } from "../../context/WardrobeContext";
 import {
   analyzeRecycleApi,
   generateRecycleIdeaApi,
 } from "../../api/recycleApi";
 
-const HangerIcon = ({ className = "", style = {} }) => (
-  <svg
-    width="40"
-    height="40"
-    viewBox="0 0 40 40"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlnsXlink="http://www.w3.org/1999/xlink"
-    className={className}
-    style={style}
-    aria-hidden="true"
-  >
-    <rect width="40" height="40" fill="url(#pattern0_972_1047)" />
-    <defs>
-      <pattern id="pattern0_972_1047" patternContentUnits="objectBoundingBox" width="1" height="1">
-        <use xlinkHref="#image0_972_1047" transform="scale(0.0078125)" />
-      </pattern>
-      <image id="image0_972_1047" width="128" height="128" preserveAspectRatio="none" xlinkHref="data:image/png;base64,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" />
-    </defs>
-  </svg>
-);
+const MAX_SELECTION = 2;
 
-const MAX_FILES = 2;
-const ACCEPTED_TYPES = [
-  ".jpg",
-  ".jpeg",
-  ".png",
-  ".webp",
-  ".bmp",
-  ".tiff",
-  ".tif",
-  ".heic",
-  ".gif",
-];
+const imgSrc = (image) => {
+  if (!image) return null;
+  if (typeof image === "string") {
+    if (image.startsWith("data:") || image.startsWith("http")) return image;
+    return `data:image/jpeg;base64,${image}`;
+  }
+  if (image.url) return image.url;
+  if (image.uri) return image.uri;
+  return null;
+};
 
-const readFileAsDataUrl = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+const base64ToFile = (base64, filename) => {
+  const url = base64?.startsWith("data:") ? base64 : `data:image/jpeg;base64,${base64}`;
+  const [header, data] = url.split(",");
+  const mime = header?.match(/:(.*?);/)?.[1] || "image/jpeg";
+  const ext = mime.split("/")[1] || "jpg";
+  const bytes = atob(data);
+  const arr = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+  return new File([arr], `${filename}.${ext}`, { type: mime });
+};
 
 const buildPreviews = async (files) => {
   const results = await Promise.all(
-    files.map(async (file) => ({
-      file,
-      preview: await readFileAsDataUrl(file),
-    }))
+    files.map(
+      (file) =>
+        new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve({ file, preview: reader.result });
+          reader.readAsDataURL(file);
+        })
+    )
   );
   return results;
 };
 
-const Recycle = () => {
+export default function Recycle() {
   const { t, i18n } = useTranslation();
   const isAr = i18n.language === "ar";
-  const [uploadedImages, setUploadedImages] = useState([]);
+  const { user } = useAuth();
+  const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
+  const navigate = useNavigate();
+
+  const [wardrobeSelectedIds, setWardrobeSelectedIds] = useState([]);
+  const [galleryFiles, setGalleryFiles] = useState([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [ideas, setIdeas] = useState([]);
   const [sessionId, setSessionId] = useState(null);
@@ -85,6 +79,30 @@ const Recycle = () => {
   const generateRef = useRef(null);
   const resultRef = useRef(null);
 
+  const totalSelected = wardrobeSelectedIds.length + galleryFiles.length;
+  const isReady = totalSelected >= 1;
+  const remainingSlots = MAX_SELECTION - totalSelected;
+
+  const steps = [
+    { id: 1, title: isAr ? "اختيار العناصر" : "Select Items", subtitle: isAr ? "اختر 1-2 قطعة ملابس" : "Choose 1-2 clothing items" },
+    { id: 2, title: isAr ? "الحصول على أفكار" : "Get Ideas", subtitle: isAr ? "AI يولد أفكار إعادة التدوير" : "AI generates upcycling ideas" },
+    { id: 3, title: isAr ? "إنشاء التصميم" : "Generate Design", subtitle: isAr ? "إنشاء تصميمك المعاد تدويره" : "Create your upcycled design" },
+  ];
+
+  const currentStep = generating
+    ? 3
+    : ideas.length > 0
+      ? 2
+      : 1;
+
+  const selectedTitle = totalSelected > 0
+    ? `${totalSelected} item${totalSelected > 1 ? "s" : ""} selected`
+    : "No items selected yet";
+
+  const selectedSubtitle = totalSelected > 0
+    ? "Select up to 2 items to recycle"
+    : "Select from your wardrobe or upload images";
+
   const selectedIdea = useMemo(
     () => ideas.find((i) => i.id === selectedIdeaId) || null,
     [ideas, selectedIdeaId]
@@ -92,13 +110,13 @@ const Recycle = () => {
 
   useEffect(() => {
     return () => {
-      uploadedImages.forEach((img) => {
+      galleryFiles.forEach((img) => {
         if (img.preview && img.preview.startsWith("blob:")) {
           URL.revokeObjectURL(img.preview);
         }
       });
     };
-  }, [uploadedImages]);
+  }, [galleryFiles]);
 
   useEffect(() => {
     if (ideas.length > 0 && ideasRef.current) {
@@ -120,15 +138,29 @@ const Recycle = () => {
     }
   }, [generating, generatedIdea]);
 
-  const handleFilesSelected = async (files) => {
-    setApiError("");
-    const previews = await buildPreviews(files);
-    setUploadedImages((prev) => [...prev, ...previews]);
+  const toggleWardrobeItem = (id) => {
+    setWardrobeSelectedIds((prev) => {
+      if (prev.includes(id)) return prev.filter((i) => i !== id);
+      if (prev.length + galleryFiles.length >= MAX_SELECTION) return prev;
+      return [...prev, id];
+    });
   };
 
-  const handleRemoveImage = (index) => {
+  const handleGalleryFilesSelected = async (files) => {
     setApiError("");
-    setUploadedImages((prev) => prev.filter((_, i) => i !== index));
+    const allowed = remainingSlots > 0 ? files.slice(0, remainingSlots) : [];
+    if (allowed.length === 0) return;
+    const previews = await buildPreviews(allowed);
+    setGalleryFiles((prev) => [...prev, ...previews]);
+  };
+
+  const handleRemoveGalleryImage = (index) => {
+    setApiError("");
+    setGalleryFiles((prev) => {
+      const img = prev[index];
+      if (img?.preview?.startsWith("blob:")) URL.revokeObjectURL(img.preview);
+      return prev.filter((_, i) => i !== index);
+    });
     setIdeas([]);
     setSessionId(null);
     setSelectedIdeaId(null);
@@ -136,8 +168,8 @@ const Recycle = () => {
     setGeneratedImageUrl(null);
   };
 
-  const handleDiscoverIdeas = async () => {
-    if (uploadedImages.length === 0) return;
+  const handleRecycle = async () => {
+    if (!isReady) return;
     setApiError("");
     setAnalyzing(true);
     setIdeas([]);
@@ -145,9 +177,22 @@ const Recycle = () => {
     setSelectedIdeaId(null);
     setGeneratedIdea(null);
     setGeneratedImageUrl(null);
+
     try {
       const formData = new FormData();
-      uploadedImages.forEach((p) => formData.append("images", p.file));
+
+      const selectedWardrobeItems = wardrobeItems.filter((item) =>
+        wardrobeSelectedIds.includes(item._id)
+      );
+      selectedWardrobeItems.forEach((item) => {
+        const file = base64ToFile(item.image, `wardrobe_${item._id}`);
+        formData.append("images", file);
+      });
+
+      galleryFiles.forEach((gf) => {
+        formData.append("images", gf.file);
+      });
+
       const res = await analyzeRecycleApi(formData);
       const data = res.data || {};
       setSessionId(data.session_id);
@@ -161,6 +206,10 @@ const Recycle = () => {
     } finally {
       setAnalyzing(false);
     }
+
+    setTimeout(() => {
+      ideasRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 300);
   };
 
   const handleGenerate = async () => {
@@ -173,7 +222,8 @@ const Recycle = () => {
       const res = await generateRecycleIdeaApi(
         sessionId,
         selectedIdeaId,
-        model
+        model,
+        aspectRatio
       );
       const data = res.data || {};
       if (data.image_url) {
@@ -192,11 +242,20 @@ const Recycle = () => {
     }
   };
 
-  const currentStep = generating
-    ? 3
-    : ideas.length > 0
-      ? 2
-      : 1;
+  const handleReset = () => {
+    galleryFiles.forEach((img) => {
+      if (img.preview?.startsWith("blob:")) URL.revokeObjectURL(img.preview);
+    });
+    setWardrobeSelectedIds([]);
+    setGalleryFiles([]);
+    setAnalyzing(false);
+    setIdeas([]);
+    setSessionId(null);
+    setSelectedIdeaId(null);
+    setGeneratedIdea(null);
+    setGeneratedImageUrl(null);
+    setApiError("");
+  };
 
   return (
     <div
@@ -241,157 +300,200 @@ const Recycle = () => {
 
         {/* Step Indicator */}
         <section className="mt-8 sm:mt-10">
-          <StepIndicator currentStep={currentStep} />
+          <StepIndicator
+            currentStep={currentStep}
+            steps={steps}
+          />
         </section>
 
-        {/* Upload Section */}
+        {/* Wardrobe Section */}
         <section className="mt-12 sm:mt-16">
-          <div className="flex flex-col items-center mb-6 sm:mb-8">
-            <div className="inline-flex items-center gap-[15px]">
-              <HangerIcon
-                style={{ color: "var(--Primary-Text-color)" }}
-              />
-              <div className="flex flex-col items-start gap-4">
-                <h2
-                  className="text-3xl sm:text-4xl"
-                  style={{
-                    color: "var(--Primary-Text-color)",
-                    fontWeight: "var(--Bold)",
-                    lineHeight: "38px",
-                  }}
-                >
-                  {t("recycle.uploadGarments")}
-                </h2>
-                <p
-                  className="text-sm sm:text-base"
-                  style={{
-                    color: "var(--Primary-Text-color)",
-                    fontWeight: 400,
-                    lineHeight: "18px",
-                  }}
-                >
-                  {t("recycle.uploadSupport")}
+          <div className="max-w-6xl mx-auto">
+            {!user ? (
+              <div className="bg-gray-100 rounded-xl p-8 text-center">
+                <LogIn className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-600 font-medium">
+                  {isAr ? "يرجى تسجيل الدخول لعرض خزانة ملابسك" : "Please sign in to view your wardrobe"}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  <span
+                    onClick={() => navigate("/auth")}
+                    className="text-blue-500 hover:underline cursor-pointer"
+                  >
+                    {isAr ? "تسجيل الدخول" : "Sign in"}
+                  </span>{" "}
+                  {isAr ? "للوصول إلى العناصر المحفوظة" : "to access your saved items"}
                 </p>
               </div>
-            </div>
+            ) : wardrobeLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-5">
+                  <Shirt className="w-5 h-5 text-blue-500" />
+                  <h3 className="font-bold text-lg" style={{ color: "#1a202c" }}>
+                    {isAr ? "من خزانة ملابسي" : "From My Wardrobe"}
+                  </h3>
+                  {remainingSlots < MAX_SELECTION && (
+                    <span className="text-xs text-gray-400 ml-auto">
+                      {remainingSlots > 0
+                        ? isAr ? `${remainingSlots} متبقي` : `${remainingSlots} slot${remainingSlots > 1 ? 's' : ''} left`
+                        : isAr ? "الحد الأقصى تم الوصول إليه" : "Max reached"}
+                    </span>
+                  )}
+                </div>
+
+                {wardrobeItems.length === 0 ? (
+                  <div className="bg-gray-50 rounded-xl p-8 text-center border border-dashed border-gray-200">
+                    <Shirt className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                    <p className="text-gray-500 text-sm font-medium">
+                      {isAr ? "خزانة ملابسك فارغة" : "Your wardrobe is empty"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex gap-[15px] flex-wrap">
+                    {wardrobeItems.map((item) => {
+                      const isSelected = wardrobeSelectedIds.includes(item._id);
+                      const canSelect = isSelected || totalSelected < MAX_SELECTION;
+                      return (
+                        <WardrobeItem
+                          key={item._id}
+                          src={imgSrc(item.image)}
+                          alt={item.name || "Clothing item"}
+                          selected={isSelected}
+                          disabled={!canSelect}
+                          onClick={() => toggleWardrobeItem(item._id)}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* Gallery Section */}
+        <section className="mt-10 sm:mt-14 max-w-6xl mx-auto">
+          <div className="flex items-center gap-3 mb-5">
+            <Grid3x3 className="w-5 h-5 text-blue-500" />
+            <h3 className="font-bold text-lg" style={{ color: "#1a202c" }}>
+              {isAr ? "رفع صور" : "Upload Images"}
+            </h3>
+            {remainingSlots < MAX_SELECTION && (
+              <span className="text-xs text-gray-400 ml-auto">
+                {remainingSlots > 0
+                  ? isAr ? `${remainingSlots} متبقي` : `${remainingSlots} slot${remainingSlots > 1 ? 's' : ''} left`
+                  : isAr ? "الحد الأقصى تم الوصول إليه" : "Max reached"}
+              </span>
+            )}
           </div>
 
-          {uploadedImages.length < MAX_FILES && (
+          {galleryFiles.length < MAX_SELECTION && remainingSlots > 0 && (
             <UploadArea
-              onFilesSelected={handleFilesSelected}
+              onFilesSelected={handleGalleryFilesSelected}
               disabled={analyzing || generating}
-              maxFiles={MAX_FILES}
+              maxFiles={remainingSlots}
             />
           )}
 
-          {analyzing && (
-            <div
-              className="mt-4 flex items-center justify-center gap-3 text-sm"
-              style={{ color: "var(--Disabled-Text-color)" }}
-            >
-              <div
-                className="h-4 w-4 animate-spin rounded-full border-2"
-                style={{
-                  borderColor: "var(--Border-Strong)",
-                  borderTopColor: "var(--Secondary-Brand-color)",
-                }}
-              />
-              {t("recycle.analyzingGarments")}
-            </div>
-          )}
-
-          {apiError && (
-            <div className="mt-4 max-w-6xl mx-auto rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              {apiError}
-            </div>
-          )}
-        </section>
-
-        {/* Uploaded Images */}
-        {uploadedImages.length > 0 && (
-          <section className="mt-8 sm:mt-10">
-            <div className="flex flex-wrap gap-4 sm:gap-6 max-w-6xl mx-auto">
-              {uploadedImages.map((img, idx) => (
+          {galleryFiles.length > 0 && (
+            <div className="flex flex-wrap gap-4 sm:gap-6 mt-4">
+              {galleryFiles.map((img, idx) => (
                 <UploadedImageCard
                   key={idx}
                   image={img}
                   index={idx}
-                  onRemove={handleRemoveImage}
+                  onRemove={handleRemoveGalleryImage}
                 />
               ))}
             </div>
+          )}
+        </section>
 
-            {/* Discover Design Ideas Button */}
-            {ideas.length === 0 && (
-              <div className="mt-8 flex justify-center">
-                <button
-                  type="button"
-                  onClick={handleDiscoverIdeas}
-                  disabled={analyzing}
-                  className={`inline-flex items-center gap-3 sm:gap-6 rounded-lg px-8 sm:px-16 py-4 text-lg sm:text-2xl text-white transition-all duration-300 ${analyzing
-                      ? "cursor-not-allowed"
-                      : "hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-                    }`}
-                  style={{
-                    backgroundColor: analyzing
-                      ? "var(--Border-Strong)"
-                      : "var(--Secondary-Brand-color)",
-                    fontWeight: "var(--Bold)",
-                    minWidth: "320px",
-                    maxWidth: "480px",
-                    width: "100%",
-                    justifyContent: "center",
-                  }}
-                >
-                  {analyzing ? (
-                    <>
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                      {t("recycle.analyzing")}
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-                      {t("recycle.discoverIdeas")}
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
+        {/* API Error */}
+        {apiError && (
+          <section className="mt-6 max-w-6xl mx-auto">
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+              {apiError}
+            </div>
           </section>
         )}
 
-        {/* Style Ideas Section */}
+        {/* Selected Items Status */}
+        {!ideas.length && (
+          <section className="mt-12 sm:mt-16">
+            <div className="max-w-6xl mx-auto">
+              <div
+                className="rounded-[15px] p-5 flex items-center gap-4"
+                style={{ backgroundColor: "#edf2ff" }}
+              >
+                <div className="w-[45px] h-[45px] rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "#dbeafe" }}>
+                  <Package className="w-5 h-5" style={{ color: "#1e293b" }} />
+                </div>
+                <div>
+                  <p className="font-bold" style={{ color: "#1e293b", fontSize: "0.95rem" }}>
+                    {selectedTitle}
+                  </p>
+                  <p style={{ color: "#64748b", fontSize: "0.85rem" }}>
+                    {selectedSubtitle}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Recycle Button */}
+        {!analyzing && !ideas.length && (
+          <section className="mt-12 sm:mt-16">
+            <div className="flex justify-center">
+              <button
+                onClick={handleRecycle}
+                disabled={!isReady}
+                className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg w-full max-w-md justify-center ${
+                  isReady
+                    ? "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <Sparkles className="w-5 h-5" />
+                {isAr ? "إعادة تدوير" : "Recycle"}
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Analyzing Loading */}
+        {analyzing && (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
+            <p className="text-gray-500 font-medium">
+              {isAr ? "جاري تحليل العناصر..." : "Analyzing your items..."}
+            </p>
+          </div>
+        )}
+
+        {/* Design Ideas Section */}
         {ideas.length > 0 && (
           <section ref={ideasRef} className="mt-14 sm:mt-20">
             <div className="flex items-center justify-between max-w-6xl mx-auto mb-8 sm:mb-14 px-1 gap-4 flex-wrap">
-              <div className="inline-flex items-center gap-3 sm:gap-4">
-                <Lightbulb
-                  className="h-5 w-5 sm:h-6 sm:w-6"
-                  style={{ color: "var(--Primary-Brand-color)" }}
-                  strokeWidth={1.5}
-                />
-                <h2
-                  className="text-2xl sm:text-3xl md:text-4xl"
-                  style={{
-                    color: "var(--Secondary-Text-color)",
-                    fontWeight: "var(--Bold)",
-                    lineHeight: "1.05",
-                  }}
-                >
-                  {t("recycle.chooseIdea")}
-                </h2>
-              </div>
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold"
+                style={{ color: "var(--Secondary-Text-color)" }}
+              >
+                {isAr ? "أفكار التصميم" : "Design Ideas"}
+              </h2>
               <span
                 className="inline-flex items-center rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base text-white"
-                style={{
-                  backgroundColor: "var(--Secondary-Brand-color)",
-                }}
+                style={{ backgroundColor: "var(--Secondary-Brand-color)" }}
               >
-                {t("recycle.aiSuggested")}
+                {isAr ? "مقترح بواسطة AI" : "AI Suggested"}
               </span>
             </div>
 
-            {/* ✅ THE FIX: items-start prevents sibling cards from stretching */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto items-start">
               {ideas.map((idea, idx) => (
                 <DesignIdeaCard
@@ -421,32 +523,16 @@ const Recycle = () => {
                 type="button"
                 onClick={handleGenerate}
                 disabled={!selectedIdeaId || generating}
-                className={`inline-flex items-center gap-3 sm:gap-6 rounded-lg px-8 sm:px-16 py-4 text-lg sm:text-2xl text-white transition-all duration-300 ${!selectedIdeaId || generating
-                    ? "cursor-not-allowed"
-                    : "hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
-                  }`}
-                style={{
-                  backgroundColor: !selectedIdeaId || generating
-                    ? "var(--Border-Strong)"
-                    : "var(--Secondary-Brand-color)",
-                  fontWeight: "var(--Bold)",
-                  minWidth: "320px",
-                  maxWidth: "480px",
-                  width: "100%",
-                  justifyContent: "center",
-                }}
+                className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg w-full max-w-md justify-center ${
+                  !selectedIdeaId || generating
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
+                }`}
               >
-                {generating ? (
-                  <>
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    {t("recycle.generating")}
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
-                    {t("recycle.generateSelected")}
-                  </>
-                )}
+                <Sparkles className="w-5 h-5" />
+                {generating
+                  ? (isAr ? "جاري الإنشاء..." : "Generating...")
+                  : (isAr ? "إنشاء التصميم" : "Generate Design")}
               </button>
             </div>
           </section>
@@ -462,9 +548,20 @@ const Recycle = () => {
             />
           </div>
         )}
+
+        {/* Try Again */}
+        {ideas.length > 0 && !generating && !generatedIdea && (
+          <div className="flex justify-center pb-10 mt-16">
+            <button
+              onClick={handleReset}
+              className="inline-flex items-center justify-center gap-2 w-full max-w-md py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
+            >
+              <Sparkles className="w-5 h-5" />
+              {isAr ? "المحاولة مرة أخرى" : "Try Again"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default Recycle;
+}
