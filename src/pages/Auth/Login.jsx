@@ -7,8 +7,8 @@ export default function LoginForm({ isVisible, onLogin, onForgot, onGoogleLogin,
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className={`absolute left-0 top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ${
-      isVisible ? "z-10 opacity-100 translate-x-0" : "z-0 opacity-0 -translate-x-10"
+    <div className={`absolute top-0 flex h-full w-full flex-col justify-center transition-all duration-700 md:w-[60%] ltr:left-0 rtl:right-0 ${
+      isVisible ? "z-10 opacity-100 translate-x-0" : "z-0 opacity-0 ltr:-translate-x-10 rtl:translate-x-10"
     } ${inModal ? 'p-6 md:p-10' : 'p-8 md:p-16'} bg-white`}>
       
       <div className="mx-auto w-full max-w-md">
@@ -22,29 +22,29 @@ export default function LoginForm({ isVisible, onLogin, onForgot, onGoogleLogin,
         <form onSubmit={onLogin} className={inModal ? 'space-y-4' : 'space-y-5'}>
           {/* Email Field */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-bold text-slate-700 ml-1">{t("auth.email")}</label>
+            <label className="text-sm font-bold text-slate-700 ltr:ml-1 rtl:mr-1">{t("auth.email")}</label>
             <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={18} />
+              <Mail className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={18} />
               <input 
                 name="email" type="email" placeholder={t("auth.emailPlaceholder")} required 
-                className={`w-full pl-11 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-4'}`} 
+                className={`w-full ltr:pl-11 rtl:pr-11 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-4'}`} 
               />
             </div>
           </div>
 
           {/* Password Field */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-bold text-slate-700 ml-1">{t("auth.password")}</label>
+            <label className="text-sm font-bold text-slate-700 ltr:ml-1 rtl:mr-1">{t("auth.password")}</label>
             <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={18} />
+              <Lock className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#40B9FF] transition-colors" size={18} />
               <input
                 name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder={t("auth.passwordPlaceholder")}
                 required
-                className={`w-full pl-11 pr-12 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-4'}`}
+                className={`w-full ltr:pl-11 rtl:pr-11 ltr:pr-12 rtl:pl-12 rounded-2xl border border-gray-200 bg-gray-50/50 text-sm focus:bg-white focus:border-[#40B9FF] focus:ring-4 focus:ring-[#40B9FF]/10 outline-none transition-all ${inModal ? 'p-3' : 'p-4'}`}
               />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
