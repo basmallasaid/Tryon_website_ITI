@@ -1,5 +1,4 @@
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
+import { createInstance } from "i18next";
 import en from "./locales/en.json";
 import ar from "./locales/ar.json";
 
@@ -16,7 +15,9 @@ const savedSettings = (() => {
   return { lang: "en" };
 })();
 
-i18n.use(initReactI18next).init({
+const adminI18n = createInstance();
+
+adminI18n.init({
   resources,
   lng: savedSettings.lang || "en",
   fallbackLng: "en",
@@ -25,7 +26,7 @@ i18n.use(initReactI18next).init({
   defaultNS: "translation",
 });
 
-i18n.on("languageChanged", (lng) => {
+adminI18n.on("languageChanged", (lng) => {
   document.documentElement.dir = lng === "ar" ? "rtl" : "ltr";
   document.documentElement.lang = lng;
   const settings = (() => {
@@ -39,4 +40,4 @@ i18n.on("languageChanged", (lng) => {
   localStorage.setItem("admin_settings", JSON.stringify(settings));
 });
 
-export default i18n;
+export default adminI18n;
