@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { getUserApi, updateProfileApi, deleteUserAccountApi } from '../../api/userApi';
-import { Camera, UserPlus, Lock, SquarePen, AlertTriangle } from 'lucide-react';
+import { getUserApi, updateProfileApi, deleteUserAccountApi, updateUserImageApi, deleteUserImageApi } from '../../api/userApi';
+import { getAvatarByIdApi } from '../../api/avatarApi';
+import { Camera, UserPlus, Lock, SquarePen, AlertTriangle, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 export default function EditProfilePage() {
     const { user, login, logout } = useAuth();
@@ -17,6 +18,9 @@ export default function EditProfilePage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const [avatarLoading, setAvatarLoading] = useState(false);
 
     const userId = user?.id || user?._id;
 
@@ -56,12 +60,115 @@ export default function EditProfilePage() {
         };
     }, [userImageFile, imagePreview]);
 
-    const handleImageChange = (event) => {
+    useEffect(() => {
+        const ids = user?.avatars;
+        if (!ids?.length) return;
+
+        let cancelled = false;
+        setAvatarLoading(true);
+
+        getAvatarByIdApi(ids[0])
+            .then((res) => {
+                if (cancelled) return;
+                const url = res.data?.avatar?.image_url ?? null;
+                setAvatarUrl(url);
+            })
+            .catch(() => {
+                if (!cancelled) setAvatarUrl(null);
+            })
+            .finally(() => {
+                if (!cancelled) setAvatarLoading(false);
+            });
+
+        return () => { cancelled = true; };
+    }, [user]);
+
+    const handleImageChange = async (event) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
+        const previewUrl = URL.createObjectURL(file);
+        setImagePreview(previewUrl);
         setUserImageFile(file);
-        setImagePreview(URL.createObjectURL(file));
+        setUploadingImage(true);
+
+        try {
+            const toBase64 = (f) =>
+                new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(f);
+                });
+
+            const base64 = await toBase64(file);
+            const res = await updateUserImageApi(base64);
+            const newImageUrl = res.data?.userImage || res.data?.imageUrl || res.data?.url || '';
+
+            if (newImageUrl) {
+                URL.revokeObjectURL(previewUrl);
+                setUserImage(newImageUrl);
+                setImagePreview(newImageUrl);
+                setUserImageFile(null);
+                login({ ...user, userImage: newImageUrl });
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Profile image updated',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+        } catch (error) {
+            console.error('Failed to upload image:', error);
+            URL.revokeObjectURL(previewUrl);
+            setImagePreview(userImage || '');
+            Swal.fire({
+                icon: 'error',
+                title: 'Upload Failed',
+                text: error.response?.data?.message || 'Failed to upload image',
+            });
+        } finally {
+            setUploadingImage(false);
+            event.target.value = '';
+        }
+    };
+
+    const handleImageRemove = async () => {
+        const result = await Swal.fire({
+            title: 'Remove Profile Image?',
+            text: 'Your profile picture will be removed.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, Remove',
+            cancelButtonText: 'Cancel',
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            await deleteUserImageApi();
+            setUserImage('');
+            setImagePreview('');
+            setUserImageFile(null);
+            login({ ...user, userImage: '' });
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Removed',
+                text: 'Profile image removed',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+        } catch (error) {
+            console.error('Failed to remove image:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Remove Failed',
+                text: error.response?.data?.message || 'Failed to remove image',
+            });
+        }
     };
 
     const handleCancel = () => {
@@ -232,20 +339,37 @@ export default function EditProfilePage() {
                             )}
                         </div>
 
+                        {uploadingImage && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-white/60 rounded-full">
+                                <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+                            </div>
+                        )}
+
                         <input
                             id="profileImageUpload"
                             type="file"
                             accept="image/*"
                             className="hidden"
+                            disabled={uploadingImage}
                             onChange={handleImageChange}
                         />
 
                         <label
                             htmlFor="profileImageUpload"
-                            className="absolute bottom-1 right-1 bg-[var(--Primary-Brand-color)] p-2 rounded-full border-4 border-white shadow-sm hover:scale-110 transition-transform cursor-pointer"
+                            className={`absolute bottom-1 right-1 bg-[var(--Primary-Brand-color)] p-2 rounded-full border-4 border-white shadow-sm transition-transform cursor-pointer ${uploadingImage ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
                         >
                             <Camera className="text-white w-5 h-5" />
                         </label>
+
+                        {userImage && !uploadingImage && (
+                            <button
+                                type="button"
+                                onClick={handleImageRemove}
+                                className="absolute top-1 right-1 bg-white p-1.5 rounded-full border-2 border-gray-200 shadow-sm hover:scale-110 transition-transform cursor-pointer"
+                            >
+                                <Trash2 className="text-red-500 w-4 h-4" />
+                            </button>
+                        )}
                     </div>
                     <h2 className="text-xl font-bold text-gray-800">{fullName}</h2>
                     <p className="text-gray-400 text-xs mt-1 font-medium">Click the camera icon to change photo</p>
@@ -253,17 +377,48 @@ export default function EditProfilePage() {
 
                 {/* Avatar Card */}
                 <div className="flex-1 bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col items-center text-center">
-                    <div className="relative mb-4">
-                        <div className="w-32 h-32 bg-[#DDF1FF] rounded-full"></div>
-                        <button className="absolute bottom-1 right-1 bg-[var(--Primary-Brand-color)] p-2 rounded-full border-4 border-white shadow-sm hover:scale-110 transition-transform">
-                            <UserPlus className="text-white w-5 h-5" />
-                        </button>
-                    </div>
-                    <p className="text-gray-500 text-sm font-semibold mb-4">Create you Avatar</p>
-                    <div className="flex gap-3">
-                        <button className="bg-[var(--Secondary-Orange-Brand-color)] text-white px-6 py-2 rounded-lg text-sm font-bold shadow-sm hover:opacity-90">Delete</button>
-                        <button className="bg-[var(--color-brand-secondary)] text-white px-8 py-2 rounded-lg text-sm font-bold shadow-sm hover:opacity-90">Edit</button>
-                    </div>
+                    {avatarLoading ? (
+                        <div className="w-full py-12 flex justify-center">
+                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+                        </div>
+                    ) : avatarUrl ? (
+                        <>
+                            <div className="relative mb-4">
+                                <div className="w-32 h-32 rounded-full overflow-hidden">
+                                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                </div>
+                            </div>
+                            <p className="text-gray-500 text-sm font-semibold mb-4">Your Avatar</p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => navigate('/avatar')}
+                                    className="bg-[var(--color-brand-secondary)] text-white px-8 py-2 rounded-lg text-sm font-bold shadow-sm hover:opacity-90"
+                                >
+                                    Edit
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div
+                                onClick={() => navigate('/avatar')}
+                                className="cursor-pointer"
+                            >
+                                <div className="relative mb-4">
+                                    <div className="w-32 h-32 bg-[#DDF1FF] rounded-full flex items-center justify-center">
+                                        <UserPlus className="w-12 h-12 text-[#40B9FF]" />
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-gray-500 text-sm font-semibold mb-4">Create your Avatar</p>
+                            <button
+                                onClick={() => navigate('/avatar')}
+                                className="bg-[var(--color-brand-secondary)] text-white px-8 py-2 rounded-lg text-sm font-bold shadow-sm hover:opacity-90"
+                            >
+                                Create
+                            </button>
+                        </>
+                    )}
                 </div>
 
             </div>

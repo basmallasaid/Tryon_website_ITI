@@ -25,3 +25,9 @@ export const updateAnalysisApi = (id, data) => api.put(`/analyze/${id}`, data);
 export const addToLatestTryOnApi = (data) =>
   api.post("/users/latest-tryon", data);
 
+export const updateUserImageApi = (base64Image) =>
+  api.put("/users/user-image", { userImage: base64Image });
+
+export const deleteUserImageApi = () =>
+  api.delete("/users/user-image");
+
