@@ -80,7 +80,7 @@ const Navbar = ({ onOpenAuth }) => {
     { name: t("nav.stores"), path: "/stores" },
     { name: t("nav.wardrobe"), path: "/wardrobe" },
     { name: t("nav.pricing"), path: "/pricing" },
-    { name: t("nav.about") },
+    { name: t("nav.about"), path: "/about" },
     { name: t("nav.contactUs"), path: "/contact-us" },
   ];
 

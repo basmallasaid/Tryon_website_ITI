@@ -25,6 +25,7 @@ import Recycle from './pages/recycle/Recycle';
 import Matching from './pages/matching/Matching';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 import AboutTryon from './pages/aboutTryOn/AboutTryon';
+import About from './pages/about/About';
 import PricingPage from './pages/pricing/PricingPage';
 import AvatarGeneration from './pages/avatar/AvatarGeneration';
 
@@ -86,6 +87,7 @@ function AppContent() {
             { path: 'matching', element: <Matching /> },
             { path: 'recycle', element: <Recycle /> },
             { path: 'about-recycle', element: <AboutRecycle /> },
+            { path: 'about', element: <About /> },
             { path: 'contact-us', element: <ContactUs /> },
             { path: 'editprofile', element: <EditProfilePage /> },
             { path: 'favorites', element: <Fav /> },
