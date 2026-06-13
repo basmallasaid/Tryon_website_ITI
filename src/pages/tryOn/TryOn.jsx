@@ -29,6 +29,12 @@ const base64ToFile = (base64, filename) => {
   return new File([arr], `${filename}.${ext}`, { type: mime });
 };
 
+const CATEGORY_DISABLE_RULES = {
+  top: ["top", "dress"],
+  bottom: ["bottom", "dress"],
+  dress: ["dress", "top", "bottom"],
+};
+
 export default function TryOn() {
   const { user } = useAuth();
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
@@ -160,6 +166,37 @@ export default function TryOn() {
   const isReady = selectedModel && selectedItems.length > 0;
 
   const MAX_SELECTION = 2;
+
+  const disabledItemIds = useMemo(() => {
+    const disabled = new Set();
+
+    for (const selectedId of selectedItems) {
+      const item = wardrobeItems.find((i) => i._id === selectedId);
+      if (!item) continue;
+      const cat = (item.category || "").toLowerCase();
+      const disables = CATEGORY_DISABLE_RULES[cat];
+      if (!disables) continue;
+
+      wardrobeItems.forEach((i) => {
+        if (!selectedItems.includes(i._id)) {
+          const icat = (i.category || "").toLowerCase();
+          if (disables.includes(icat)) {
+            disabled.add(i._id);
+          }
+        }
+      });
+    }
+
+    if (selectedItems.length >= MAX_SELECTION) {
+      wardrobeItems.forEach((i) => {
+        if (!selectedItems.includes(i._id)) {
+          disabled.add(i._id);
+        }
+      });
+    }
+
+    return disabled;
+  }, [selectedItems, wardrobeItems]);
 
   const toggleItem = (id) => {
     setSelectedItems((prev) =>
@@ -530,16 +567,20 @@ export default function TryOn() {
                 </div>
               ) : (
                 <div className="flex gap-[15px] flex-wrap justify-center sm:justify-start">
-                  {wardrobeItems.map((item) => (
-                    <WardrobeItem
-                      key={item._id}
-                      src={imgSrc(item.image)}
-                      alt={item.name || t("tryOn.clothingItem")}
-                      selected={selectedItems.includes(item._id)}
-                      disabled={!selectedItems.includes(item._id) && selectedItems.length >= MAX_SELECTION}
-                      onClick={() => toggleItem(item._id)}
-                    />
-                  ))}
+                  {wardrobeItems.map((item) => {
+                    const isSelected = selectedItems.includes(item._id);
+                    const isDisabled = !isSelected && disabledItemIds.has(item._id);
+                    return (
+                      <WardrobeItem
+                        key={item._id}
+                        src={imgSrc(item.image)}
+                        alt={item.name || t("tryOn.clothingItem")}
+                        selected={isSelected}
+                        disabled={isDisabled}
+                        onClick={() => toggleItem(item._id)}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </>
