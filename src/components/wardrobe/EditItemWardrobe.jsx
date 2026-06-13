@@ -201,7 +201,7 @@ const EditItemWardrobe = () => {
         <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10">
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
-                    <button onClick={() => navigate('/wardrobe')} className="group flex items-center gap-2 text-gray-500 font-semibold hover:text-gray-900">
+                    <button onClick={() => navigate('/wardrobe')} className="group flex items-center gap-2 rtl:flex-row-reverse text-gray-500 font-semibold hover:text-gray-900">
                         <div className="p-2 bg-white rounded-lg shadow-sm"><ArrowLeft size={18} /></div>
                         {t('wardrobe.backToWardrobe')}
                     </button>
@@ -220,7 +220,7 @@ const EditItemWardrobe = () => {
                             </div>
 
                             <div className="mt-8 w-full">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">{t('wardrobe.itemName')}</label>
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2 rtl:mr-2">{t('wardrobe.itemName')}</label>
                                 <input
                                     type="text"
                                     value={formData.name}
@@ -230,7 +230,7 @@ const EditItemWardrobe = () => {
                                 />
                             </div>
 
-                            <div className="mt-4 flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
+                            <div className="mt-4 flex items-center gap-2 rtl:flex-row-reverse bg-gray-50 px-4 py-2 rounded-full border border-gray-100">
                                 <Palette
                                     size={14}
                                     style={{ color: formData.color ? formData.color.toLowerCase() : 'gray' }}
@@ -248,7 +248,7 @@ const EditItemWardrobe = () => {
                     <div className="lg:col-span-8">
                         <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-gray-100 space-y-10">
                             <section>
-                                <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                                <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
                                     <User size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.intendedGender')}
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
@@ -264,7 +264,7 @@ const EditItemWardrobe = () => {
 
                             <div className="grid md:grid-cols-2 gap-10">
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
                                         <Shirt size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.category')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -279,7 +279,7 @@ const EditItemWardrobe = () => {
                                 </section>
 
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
                                         <CloudSun size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.season')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -296,7 +296,7 @@ const EditItemWardrobe = () => {
 
                             <div className="grid md:grid-cols-2 gap-10">
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
                                         <Sparkles size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.style')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -311,7 +311,7 @@ const EditItemWardrobe = () => {
                                 </section>
 
                                 <section>
-                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
                                         <Layers size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.pattern')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -331,7 +331,7 @@ const EditItemWardrobe = () => {
                                 <button
                                     type="submit"
                                     disabled={saving}
-                                    className="w-full bg-[var(--color-primary)] text-white py-5 rounded-2xl font-bold text-lg transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3"
+                                    className="w-full bg-[var(--color-primary)] text-white py-5 rounded-2xl font-bold text-lg transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3 rtl:flex-row-reverse"
                                 >
                                     {saving ? <Loader2 className="animate-spin" /> : <><Check size={22} /> {t('wardrobe.addToWardrobe')}</>}
                                 </button>

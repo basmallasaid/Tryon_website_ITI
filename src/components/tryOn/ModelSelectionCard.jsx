@@ -24,7 +24,7 @@ export default function ModelSelectionCard({ children, selected, onClick, badge,
       <div className="flex items-center gap-3 shrink-0 ml-4 mr-6">
         {media && (
           typeof media === "string"
-            ? <img src={media} alt="" className="w-32 h-32" />
+            ? <img src={media} alt="" className="w-24 h-24" />
             : media
         )}
       </div>

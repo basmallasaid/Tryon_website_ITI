@@ -119,7 +119,11 @@ const WardrobePage = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                {/* زر الإضافة السريع */}
+                {filteredItems.map((item) => (
+                <WardrobeItemCard key={item._id} item={item} onClick={setSelectedItem} />
+                ))}
+
+                {/* Add new item button */}
                 <button
                 onClick={() => setIsAddModalOpen(true)}
                 className="aspect-[4/5] border-4 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 text-gray-300 hover:border-[#40B9FF] hover:text-[#40B9FF] transition-all bg-white/50"
@@ -129,10 +133,6 @@ const WardrobePage = () => {
                     {t('wardrobe.addItem')}
                 </span>
                 </button>
-
-                {filteredItems.map((item) => (
-                <WardrobeItemCard key={item._id} item={item} onClick={setSelectedItem} />
-                ))}
             </div>
           </div>
         )}

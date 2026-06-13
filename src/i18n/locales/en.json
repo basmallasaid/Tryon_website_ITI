@@ -13,7 +13,9 @@
     "signup": "Sign-up",
     "language": "Language",
     "logout": "Logout",
-    "wardrobe": "Wardrobe"
+    "wardrobe": "Wardrobe",
+    "dark": "Dark",
+    "light": "Light"
   },
   "hero": {
     "yourPersonal": "Your Personal",
@@ -476,7 +478,22 @@
     "opt_striped": "Striped",
     "opt_floral": "Floral",
     "opt_checkered": "Checkered",
-    "opt_graphic": "Graphic"
+    "opt_graphic": "Graphic",
+    "all": "All",
+    "opt_top": "Top",
+    "opt_shirt": "Shirt",
+    "opt_t-shirt": "T-Shirt",
+    "opt_bottom": "Bottom",
+    "opt_jeans": "Jeans",
+    "opt_short": "Short",
+    "opt_jacket": "Jacket",
+    "opt_suit": "Suit",
+    "opt_shoes": "Shoes",
+    "opt_accessories": "Accessories",
+    "opt_dress": "Dress",
+    "opt_skirt": "Skirt",
+    "opt_abayas": "Abayas",
+    "opt_bag": "Bag"
   },
   "aboutRecycle": {
     "heroTitle1": "Give Your Clothes a",
@@ -557,5 +574,18 @@
     "step2Desc": "Browse our collection or upload any garment you like. Our AI maps it onto your body.",
     "step3Title": "See It Instantly",
     "step3Desc": "Get a realistic preview in seconds. See exactly how the outfit looks on you with lifelike detail."
+  },
+  "profile": {
+    "notifications": "Notifications",
+    "darkMode": "Dark Mode",
+    "mobileApp": "Mobile App",
+    "enabled": "Enabled",
+    "notInstalled": "Not installed",
+    "paymentMethods": "Payment Methods",
+    "secureSettings": "Secure settings",
+    "wishlist": "Wishlist",
+    "yourSavedItems": "Your saved items",
+    "editProfile": "Edit Profile",
+    "signOut": "Sign out"
   }
 }

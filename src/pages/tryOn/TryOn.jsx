@@ -374,8 +374,8 @@ export default function TryOn() {
               selected={selectedModel === "photo"}
               onClick={() => setSelectedModel(selectedModel === "photo" ? null : "photo")}
               media={
-                <div className="w-32 h-32 bg-blue-50 rounded-2xl flex flex-col items-center justify-center border border-dashed border-blue-200">
-                  <img src="/cameraFrame.png" alt="" className="w-12 h-12 object-contain" />
+                <div className="w-24 h-24 bg-blue-50 rounded-2xl flex flex-col items-center justify-center border border-dashed border-blue-200">
+                  <img src="/cameraFrame.png" alt="" className="w-10 h-10 object-contain" />
                   <span className="text-[10px] mt-1 text-blue-400">{t("tryOn.tapToUpload")}</span>
                 </div>
               }

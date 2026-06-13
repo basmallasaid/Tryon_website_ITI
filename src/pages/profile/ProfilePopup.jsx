@@ -4,12 +4,14 @@ import {
   CreditCard, Heart, SquarePen, LogOut, Phone ,Smartphone 
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   updateUserSettingsLanguageApi,
   updateUserSettingsNotificationsApi,
 } from "../../api/userApi";
 
 const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, changeLanguage, onClose }) => {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState({
     language: isArabic ? "ar" : "en",
     notifications_enabled: true,
@@ -98,7 +100,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
         <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
           <div className="flex items-center gap-3">
             <Bell size={18} className="text-gray-500" />
-            <span className="text-sm font-bold text-gray-700">Notifications</span>
+            <span className="text-sm font-bold text-gray-700">{t("profile.notifications")}</span>
           </div>
           <button 
             onClick={() => saveNotifications(!settings.notifications_enabled)}
@@ -117,7 +119,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
         <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
           <div className="flex items-center gap-3">
             <Sun size={18} className="text-gray-500" />
-            <span className="text-sm font-bold text-gray-700">Dark Mode</span>
+            <span className="text-sm font-bold text-gray-700">{t("profile.darkMode")}</span>
           </div>
           <button 
             onClick={toggleDarkMode} 
@@ -147,10 +149,10 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
         <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
           <div className="flex items-center gap-3">
             <Smartphone size={18} className="text-gray-500" />
-            <span className="text-sm font-bold text-gray-700">Mobile App</span>
+            <span className="text-sm font-bold text-gray-700">{t("profile.mobileApp")}</span>
           </div>
           <span className="text-sm text-gray-500">
-            {settings.has_mobile_app ? 'Enabled' : 'Not installed'}
+            {settings.has_mobile_app ? t("profile.enabled") : t("profile.notInstalled")}
           </span>
         </div>
       </div>
@@ -163,8 +165,8 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
               <CreditCard size={18} />
             </div>
             <div className="text-left">
-              <p className="font-black text-gray-900 text-[13px]">Payment Methods</p>
-              <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">Secure settings</p>
+              <p className="font-black text-gray-900 text-[13px]">{t("profile.paymentMethods")}</p>
+              <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">{t("profile.secureSettings")}</p>
             </div>
           </div>
         </button>
@@ -175,8 +177,8 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
               <Heart size={18} />
             </div>
             <div className="text-left">
-              <p className="font-black text-gray-900 text-[13px]">Wishlist</p>
-              <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">Your saved items</p>
+              <p className="font-black text-gray-900 text-[13px]">{t("profile.wishlist")}</p>
+              <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">{t("profile.yourSavedItems")}</p>
             </div>
           </div>
         </button>
@@ -188,7 +190,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
         onClick={onClose} 
         className="flex items-center justify-center gap-2 w-full bg-white border-2 border-[#A6E22E] text-[#A6E22E] font-black py-3 rounded-2xl text-center hover:bg-[var(--color-brand-secondary)] hover:text-white transition-all duration-300 mb-4 text-sm shadow-sm"
       >
-        EDIT PROFILE <SquarePen size={16} />
+        {t("profile.editProfile")} <SquarePen size={16} />
       </Link>
 
       {/* Logout */}
@@ -197,7 +199,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
           onClick={logout} 
           className="flex items-center gap-2 text-[#FF8A3D] font-black text-[13px] hover:scale-105 transition-all opacity-80 hover:opacity-100 uppercase tracking-tight"
         >
-          Sign out <LogOut size={16} />
+          {t("profile.signOut")} <LogOut size={16} />
         </button>
       </div>
     </div>

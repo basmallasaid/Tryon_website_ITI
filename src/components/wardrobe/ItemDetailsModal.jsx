@@ -27,7 +27,7 @@ const ItemDetailsModal = ({ item, onClose, onDelete }) => {
         {/* Close Button Mobile */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 p-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-500 shadow-md md:hidden"
+          className="absolute top-4 right-4 rtl:left-4 z-20 p-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-500 shadow-md md:hidden"
         >
           <X size={20} />
         </button>
@@ -47,15 +47,15 @@ const ItemDetailsModal = ({ item, onClose, onDelete }) => {
           {/* Close Button Desktop */}
           <button
             onClick={onClose}
-            className="hidden md:flex absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-800 transition-all"
+            className="hidden md:flex absolute top-6 right-6 rtl:left-6 p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-800 transition-all"
           >
             <X size={24} />
           </button>
 
           <div>
             {/* Header */}
-            <div className="mb-8 pr-6">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="mb-8 pr-6 rtl:pl-6">
+              <div className="flex items-center gap-2 rtl:flex-row-reverse mb-2">
                 <div className="w-8 h-1 bg-[var(--color-brand-secondary)] rounded-full" />
                 <span className="text-[var(--color-brand-secondary)] font-black tracking-widest uppercase text-[11px]">
                   {t('wardrobe.itemDetails')}
@@ -125,7 +125,7 @@ const ItemDetailsModal = ({ item, onClose, onDelete }) => {
             )}
             <button
               onClick={() => { onClose(); navigate(`/wardrobe/edit/${item._id}`); }}
-              className="flex-1 bg-[var(--color-primary)] text-white py-4 rounded-2xl font-bold shadow-lg shadow-gray-200  hover:shadow-gray-300 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+              className="flex-1 bg-[var(--color-primary)] text-white py-4 rounded-2xl font-bold shadow-lg shadow-gray-200  hover:shadow-gray-300 transition-all flex items-center justify-center gap-3 rtl:flex-row-reverse active:scale-[0.98]"
             >
               <Eye size={20} />
               <span className="text-sm tracking-wide">{t('wardrobe.view')}</span>
@@ -138,7 +138,7 @@ const ItemDetailsModal = ({ item, onClose, onDelete }) => {
 };
 
 const DetailRow = ({ icon, label, value, color, customColor }) => (
-  <div className="flex items-start gap-3.5 group">
+  <div className="flex items-start gap-3.5 rtl:flex-row-reverse group">
     {/* Icon Container */}
     <div 
       className="p-2.5 rounded-xl transition-all duration-300 bg-gray-50 text-gray-400 group-hover:shadow-sm"

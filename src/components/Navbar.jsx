@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Globe,
   ChevronDown,
@@ -36,6 +36,7 @@ const Navbar = ({ onOpenAuth }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const isArabic = i18n.language === "ar";
+  const profileRef = useRef(null);
 
   const getUserFullName = (currentUser) => {
     if (!currentUser) return "";
@@ -56,6 +57,19 @@ const Navbar = ({ onOpenAuth }) => {
       fullName || currentUser.name || currentUser.user?.name || t("nav.user")
     );
   };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    if (isProfileOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isProfileOpen]);
+
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     setIsLangOpen(false);
@@ -263,7 +277,7 @@ const Navbar = ({ onOpenAuth }) => {
         {/* Auth Group / Profile with Popup */}
         <div className="flex items-center gap-3 ml-2 relative">
           {user ? (
-            <div className="relative">
+            <div className="relative" ref={profileRef}>
               <div
                 onClick={() => {
                   setIsProfileOpen(!isProfileOpen);
@@ -454,7 +468,7 @@ const Navbar = ({ onOpenAuth }) => {
               className="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl bg-white text-sm font-bold text-gray-700 cursor-pointer"
             >
               {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}{" "}
-              {isDarkMode ? "Light" : "Dark"}
+              {isDarkMode ? t("nav.light") : t("nav.dark")}
             </button>
             <button
               onClick={() => changeLanguage(isArabic ? "en" : "ar")}

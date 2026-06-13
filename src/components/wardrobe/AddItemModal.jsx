@@ -55,7 +55,7 @@ const AddItemModal = ({ isOpen, onClose }) => {
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md bg-black/40">
             <div className="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative animate-in fade-in zoom-in duration-300">
-                <button onClick={handleClose} className="absolute top-4 right-4 p-1.5 hover:bg-gray-100 rounded-full">
+                <button onClick={handleClose} className="absolute top-4 right-4 rtl:left-4 p-1.5 hover:bg-gray-100 rounded-full">
                     <X size={20} />
                 </button>
 
@@ -95,7 +95,7 @@ const AddItemModal = ({ isOpen, onClose }) => {
                 <button
                     onClick={handleAnalyze}
                     disabled={!selectedFile || analyzing}
-                    className="w-full bg-[#40B9FF] text-white py-3.5 rounded-xl font-black shadow-md shadow-blue-100 uppercase tracking-widest text-sm mt-5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-[#40B9FF] text-white py-3.5 rounded-xl font-black shadow-md shadow-blue-100 uppercase tracking-widest text-sm mt-5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 rtl:flex-row-reverse"
                 >
                     {analyzing ? (
                         <><Loader2 className="animate-spin" size={18} /> {t('wardrobe.analyzing')}</>
