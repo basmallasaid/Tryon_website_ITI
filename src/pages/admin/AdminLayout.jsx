@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import AdminSidebar from './components/AdminSidebar';
 import AdminTopBar from './components/AdminTopBar';
 import AdminMobileHeader from './components/AdminMobileHeader';
@@ -8,6 +8,11 @@ import { useAdminTranslation } from '../../i18n/admin/useAdminTranslation';
 export default function AdminLayout({ activePage, setActivePage, topBarActions, unreadContacts, children }) {
   const { i18n } = useAdminTranslation();
   const isRTL = i18n.language === 'ar';
+
+  useEffect(() => {
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [isRTL, i18n.language]);
 
   return (
     <div className="font-geist bg-admin-page min-h-screen">

@@ -27,8 +27,6 @@ adminI18n.init({
 });
 
 adminI18n.on("languageChanged", (lng) => {
-  document.documentElement.dir = lng === "ar" ? "rtl" : "ltr";
-  document.documentElement.lang = lng;
   const settings = (() => {
     try {
       const raw = localStorage.getItem("admin_settings");

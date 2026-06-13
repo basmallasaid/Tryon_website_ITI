@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Shield, RefreshCw, Image, Shirt, BarChart3, User, Copy, Check, AlertTriangle, X } from 'lucide-react';
 import EditIcon from '../../../icons/EditIcon';
 import { getApiKeysApi, getApiKeyByIdApi, updateApiKeyApi, deleteApiKeyApi } from '../../../api/adminApi';
+import { useAdminTranslation } from '../../../i18n/admin/useAdminTranslation';
 
 const serviceIcons = {
   'Recycle Analysis Model': { icon: RefreshCw, iconBg: 'bg-admin-profile', iconColor: 'text-admin-brand' },
@@ -18,6 +19,7 @@ function getStatusColor(status) {
 }
 
 function ConfirmDialog({ open, title, message, confirmLabel, onConfirm, onCancel, danger }) {
+  const { t } = useAdminTranslation();
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
@@ -30,7 +32,7 @@ function ConfirmDialog({ open, title, message, confirmLabel, onConfirm, onCancel
         <p className="text-sm text-admin-text-secondary text-center mt-2">{message}</p>
         <div className="flex gap-3 mt-6">
           <button onClick={onCancel} className="flex-1 py-2.5 border border-admin-border rounded-xl text-sm font-medium text-admin-text-primary hover:bg-admin-brand-bg transition-colors">
-            Cancel
+            {t('admin.apiManagement.cancel')}
           </button>
           <button onClick={onConfirm} className={`flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-colors ${danger ? 'bg-red-500 hover:bg-red-600' : 'bg-admin-brand hover:bg-admin-brand-light'}`}>
             {confirmLabel}
@@ -42,6 +44,7 @@ function ConfirmDialog({ open, title, message, confirmLabel, onConfirm, onCancel
 }
 
 function EditDialog({ open, apiKey, onSave, onCancel }) {
+  const { t } = useAdminTranslation();
   const [name, setName] = useState('');
   const [key, setKey] = useState('');
   const [status, setStatus] = useState('Active');
@@ -61,7 +64,7 @@ function EditDialog({ open, apiKey, onSave, onCancel }) {
       <div className="absolute inset-0 bg-black/40" />
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-bold text-admin-text-primary">Edit API Key</h3>
+          <h3 className="text-lg font-bold text-admin-text-primary">{t('admin.apiManagement.editKey')}</h3>
           <button onClick={onCancel} className="p-1 rounded-lg hover:bg-admin-border/20 transition-colors">
             <X className="w-5 h-5 text-admin-text-muted" />
           </button>
@@ -69,7 +72,7 @@ function EditDialog({ open, apiKey, onSave, onCancel }) {
 
         <div className="flex flex-col gap-4">
           <div>
-            <label className="block text-sm font-medium text-admin-text-primary mb-1.5">Name</label>
+            <label className="block text-sm font-medium text-admin-text-primary mb-1.5">{t('admin.apiManagement.name')}</label>
             <input
               type="text"
               value={name}
@@ -78,34 +81,34 @@ function EditDialog({ open, apiKey, onSave, onCancel }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-admin-text-primary mb-1.5">API Key</label>
+            <label className="block text-sm font-medium text-admin-text-primary mb-1.5">{t('admin.apiManagement.apiKey')}</label>
             <input
               type="password"
               value={key}
               onChange={(e) => setKey(e.target.value)}
-              placeholder="Leave empty to keep current key"
+              placeholder={t('admin.apiManagement.keepCurrentKey')}
               className="w-full px-4 py-2.5 bg-admin-input border border-admin-border/40 rounded-xl text-sm text-admin-text-primary placeholder:text-admin-text-muted/50 focus:outline-none focus:ring-2 focus:ring-admin-brand/30 focus:border-admin-brand transition-colors"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-admin-text-primary mb-1.5">Status</label>
+            <label className="block text-sm font-medium text-admin-text-primary mb-1.5">{t('admin.apiManagement.status')}</label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               className="w-full px-4 py-2.5 bg-admin-input border border-admin-border/40 rounded-xl text-sm text-admin-text-primary focus:outline-none focus:ring-2 focus:ring-admin-brand/30 focus:border-admin-brand transition-colors"
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
+              <option value="Active">{t('admin.apiManagement.active')}</option>
+              <option value="Inactive">{t('admin.apiManagement.inactive')}</option>
             </select>
           </div>
         </div>
 
         <div className="flex gap-3 mt-6">
           <button onClick={onCancel} className="flex-1 py-2.5 border border-admin-border rounded-xl text-sm font-medium text-admin-text-primary hover:bg-admin-brand-bg transition-colors">
-            Cancel
+            {t('admin.apiManagement.cancel')}
           </button>
           <button onClick={() => onSave(apiKey._id, { name, ...(key && { key }), status })} className="flex-1 py-2.5 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
-            Save Changes
+            {t('admin.apiManagement.saveChanges')}
           </button>
         </div>
       </div>
@@ -114,6 +117,7 @@ function EditDialog({ open, apiKey, onSave, onCancel }) {
 }
 
 function ApiKeyRow({ api, onCopy, copiedId, onEdit, onDelete }) {
+  const { t } = useAdminTranslation();
   const svc = serviceIcons[api.service] || { icon: Shield, iconBg: 'bg-admin-profile', iconColor: 'text-admin-text-secondary' };
   const Icon = svc.icon;
 
@@ -130,17 +134,17 @@ function ApiKeyRow({ api, onCopy, copiedId, onEdit, onDelete }) {
           </span>
         </div>
         <div className="flex items-center gap-1 shrink-0 ml-2">
-          <button onClick={() => onEdit(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title="Edit key">
+          <button onClick={() => onEdit(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title={t('admin.apiManagement.editTooltip')}>
             <EditIcon className="w-4 h-4" />
           </button>
-          <button onClick={() => onDelete(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title="Delete key">
+          <button onClick={() => onDelete(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title={t('admin.apiManagement.deleteTooltip')}>
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           </button>
         </div>
       </div>
       <div className="flex items-center justify-between bg-admin-input rounded-xl px-4 py-2.5">
         <span className="text-sm font-mono tracking-wider text-admin-text-secondary">{api.maskedKey}</span>
-        <button onClick={() => onCopy(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title="Copy key">
+        <button onClick={() => onCopy(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title={t('admin.apiManagement.copyTooltip')}>
           {copiedId === api._id ? <Check className="w-4 h-4 text-admin-success" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
@@ -149,15 +153,16 @@ function ApiKeyRow({ api, onCopy, copiedId, onEdit, onDelete }) {
 }
 
 function SecurityNoticeCard() {
+  const { t } = useAdminTranslation();
   return (
     <div className="flex items-start gap-3 bg-[#EDEEF0] rounded-xl p-4">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
         <Shield className="w-5 h-5 text-brand-secondary" />
       </div>
       <div>
-        <h3 className="text-sm font-semibold text-admin-text-primary">API keys are encrypted at rest</h3>
+        <h3 className="text-sm font-semibold text-admin-text-primary">{t('admin.apiManagement.encryptedNotice')}</h3>
         <p className="text-xs text-admin-text-secondary mt-1 leading-5">
-          Only partial keys are displayed. Copy the full key from the secure vault. Rotate keys every 90 days for security.
+          {t('admin.apiManagement.encryptedDesc')}
         </p>
       </div>
     </div>
@@ -170,6 +175,8 @@ export default function ApiManagementSection() {
   const [copiedId, setCopiedId] = useState(null);
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+
+  const { t } = useAdminTranslation();
 
   const fetchKeys = useCallback(async () => {
     try {
@@ -223,9 +230,9 @@ export default function ApiManagementSection() {
     <>
       <ConfirmDialog
         open={!!deleteItem}
-        title="Delete API Key"
-        message={`Are you sure you want to delete "${deleteItem?.name}"? This action cannot be undone.`}
-        confirmLabel="Delete"
+        title={t('admin.apiManagement.deleteKey')}
+        message={t('admin.apiManagement.deleteKeyConfirm', { name: deleteItem?.name })}
+        confirmLabel={t('admin.apiManagement.delete')}
         danger
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteItem(null)}
@@ -241,16 +248,16 @@ export default function ApiManagementSection() {
       {/* Desktop */}
       <div className="hidden lg:block pb-8">
         <div className="mb-8">
-          <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">API Key Management</h1>
-          <p className="text-sm text-admin-text-secondary mt-1">{activeCount} active keys</p>
+          <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.apiManagement.title')}</h1>
+          <p className="text-sm text-admin-text-secondary mt-1">{t('admin.apiManagement.activeKeys', { count: activeCount })}</p>
         </div>
 
         <SecurityNoticeCard />
 
         {loading ? (
-          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">Loading...</div>
+          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">{t('admin.apiManagement.loading')}</div>
         ) : apiKeys.length === 0 ? (
-          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">No API keys configured</div>
+          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">{t('admin.apiManagement.noKeys')}</div>
         ) : (
           <div className="flex flex-col gap-3 mt-6">
             {apiKeys.map((api) => (
@@ -270,16 +277,16 @@ export default function ApiManagementSection() {
       {/* Mobile */}
       <div className="lg:hidden px-4 py-6 flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">API Key Management</h1>
-          <p className="text-sm text-admin-text-secondary mt-1">{activeCount} active keys</p>
+          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.apiManagement.title')}</h1>
+          <p className="text-sm text-admin-text-secondary mt-1">{t('admin.apiManagement.activeKeys', { count: activeCount })}</p>
         </div>
 
         <SecurityNoticeCard />
 
         {loading ? (
-          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">Loading...</div>
+          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">{t('admin.apiManagement.loading')}</div>
         ) : apiKeys.length === 0 ? (
-          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">No API keys configured</div>
+          <div className="flex items-center justify-center py-16 text-admin-text-muted text-sm">{t('admin.apiManagement.noKeys')}</div>
         ) : (
           <div className="flex flex-col gap-3">
             {apiKeys.map((api) => (

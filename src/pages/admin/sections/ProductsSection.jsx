@@ -7,10 +7,10 @@ import adminI18n from '../../../i18n/admin/adminI18n';
 
 const PAGE_SIZE = 5;
 
-const categoryLabels = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', acc: 'Accessories' };
-
 export default function ProductsSection({ onAddProduct, onEditProduct }) {
   const { t } = adminI18n;
+
+  const categoryLabels = { top: t('admin.products.tops'), bottom: t('admin.products.bottoms'), dress: t('admin.products.dresses'), acc: t('admin.products.accessories') };
   const [products, setProducts] = useState([]);
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
     name: p.name,
     sku: p._id.slice(-8).toUpperCase(),
     image: p.images?.[0] || null,
-    store: storeMap[p.store_id?._id || p.store_id] || 'Unknown Store',
+    store: storeMap[p.store_id?._id || p.store_id] || t('admin.products.unknownStore'),
     storeId: p.store_id?._id || p.store_id,
     category: p.category,
     categoryLabel: categoryLabels[p.category] || p.category,
@@ -59,7 +59,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
     price: p.price || 0,
     currency: p.currency || 'USD',
     tryOn: p.try_on_enabled,
-    status: p.is_active ? 'Active' : 'Draft',
+    status: p.is_active ? t('admin.products.active') : t('admin.products.draft'),
   }));
 
   let filtered = mapped.filter((p) => {
@@ -154,7 +154,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
             onChange={(e) => { setStoreFilter(e.target.value); setPage(1); }}
             className="px-4 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none min-w-[180px]"
           >
-            <option value="All Stores">All Stores</option>
+            <option value="All Stores">{t('admin.stores.allStores')}</option>
             {stores.map((s) => <option key={s._id} value={s._id}>{s.name}</option>)}
           </select>
           <select
@@ -163,7 +163,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
             className="px-4 py-2.5 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none min-w-[160px]"
           >
             {dynamicCategories.map((c) => (
-              <option key={c} value={c}>{c === 'category' ? 'category' : (categoryLabels[c] || c)}</option>
+              <option key={c} value={c}>{c === 'category' ? t('admin.products.allCategories') : (categoryLabels[c] || c)}</option>
             ))}
           </select>
           <button
@@ -174,18 +174,18 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
           </button>
           {hasFilters && (
             <button onClick={resetFilters} className="flex items-center gap-1 text-xs font-medium text-admin-brand hover:underline ml-1">
-              <X className="w-3 h-3" /> Reset Filters
+              <X className="w-3 h-3" /> {t('admin.products.resetFilters')}
             </button>
           )}
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 ml-auto">
               {selectedIds.size === 1 && (
                 <button onClick={handleEdit} className="flex items-center gap-1.5 px-4 py-2 bg-admin-brand/10 text-admin-brand rounded-lg text-xs font-medium hover:bg-admin-brand/20 transition-colors">
-                  <Pencil className="w-3.5 h-3.5" /> Edit
+                  <Pencil className="w-3.5 h-3.5" /> {t('admin.products.selectEdit')}
                 </button>
               )}
               <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-admin-danger/10 text-admin-danger rounded-lg text-xs font-medium hover:bg-admin-danger/20 transition-colors">
-                <Trash2 className="w-3.5 h-3.5" /> Delete ({selectedIds.size})
+                <Trash2 className="w-3.5 h-3.5" /> {t('admin.products.selectDelete', { count: selectedIds.size })}
               </button>
             </div>
           )}
@@ -196,12 +196,12 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
           <div className="bg-white border border-admin-border/40 rounded-xl p-4 mb-6 shadow-sm">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
-                <label className="text-xs font-medium text-admin-text-secondary">Price Range:</label>
+                <label className="text-xs font-medium text-admin-text-secondary">{t('admin.products.priceRange')}</label>
                 <input
                   type="number"
                   value={priceMin}
                   onChange={(e) => setPriceMin(e.target.value)}
-                  placeholder="Min"
+                  placeholder={t('admin.products.min')}
                   className="w-24 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
                 />
                 <span className="text-admin-text-muted">—</span>
@@ -209,21 +209,21 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
                   type="number"
                   value={priceMax}
                   onChange={(e) => setPriceMax(e.target.value)}
-                  placeholder="Max"
+                  placeholder={t('admin.products.max')}
                   className="w-24 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
                 />
               </div>
               <div className="w-px h-8 bg-admin-border" />
               <div className="flex items-center gap-3">
-                <label className="text-xs font-medium text-admin-text-secondary">Sort by:</label>
+                <label className="text-xs font-medium text-admin-text-secondary">{t('admin.products.sortBy')}</label>
                 <select
                   value={sortBy}
                   onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
                   className="px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
                 >
-                  <option value="none">None</option>
-                  <option value="price">Price</option>
-                  <option value="name">Name</option>
+                  <option value="none">{t('admin.products.none')}</option>
+                  <option value="price">{t('admin.products.price')}</option>
+                  <option value="name">{t('admin.products.name')}</option>
                 </select>
                 {sortBy !== 'none' && (
                   <button
@@ -250,30 +250,30 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
                     className="w-4 h-4 rounded border-admin-border accent-admin-brand"
                   />
                 </th>
-                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">Product</th>
-                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">Store & Category</th>
-                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">Season</th>
-                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">Price</th>
-                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider text-center">Try-On</th>
-                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">Status</th>
+                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">{t('admin.products.product')}</th>
+                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">{t('admin.products.storeAndCategory')}</th>
+                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">{t('admin.products.season')}</th>
+                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">{t('admin.products.price')}</th>
+                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider text-center">{t('admin.products.tryOn')}</th>
+                <th className="py-3 px-4 text-[11px] font-bold text-admin-text-muted uppercase tracking-wider">{t('admin.products.status')}</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">Loading products…</td></tr>
+                <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.products.loadingProducts')}</td></tr>
               ) : paginated.length > 0 ? (
                 paginated.map((p) => (
                   <ProductRow key={p.id} product={p} selected={selectedIds.has(p.id)} onToggle={toggleSelect} />
                 ))
               ) : (
-                <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">No products match your filters.</td></tr>
+                <tr><td colSpan={7} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.products.noProductsMatch')}</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
         <div className="flex items-center justify-between text-sm text-admin-text-secondary">
-          <span>{loading ? 'Loading…' : `Showing ${filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, filtered.length)} of ${filtered.length} products`}</span>
+          <span>{loading ? t('admin.products.loadingProducts') : t('admin.products.showingProducts', { from: filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1, to: Math.min(page * PAGE_SIZE, filtered.length), total: filtered.length })}</span>
           <div className="flex items-center gap-1">
             <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="w-8 h-8 rounded flex items-center justify-center hover:bg-admin-brand-activeBg disabled:opacity-40 transition-colors">
               <ChevronLeft className="w-4 h-4" />
@@ -293,24 +293,24 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
       {/* Mobile */}
       <div className="lg:hidden px-4 py-6 flex flex-col gap-4">
         <div className="flex items-baseline justify-between">
-          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">Products</h1>
-          <span className="text-sm text-admin-text-secondary">{loading ? '—' : `${filtered.length} total`}</span>
+          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.products.title')}</h1>
+          <span className="text-sm text-admin-text-secondary">{loading ? '—' : t('admin.products.total', { count: filtered.length })}</span>
         </div>
 
         <div className="flex items-center gap-3">
           <button onClick={onAddProduct} className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand text-white rounded-xl text-xs font-medium shadow-sm">
             <Plus className="w-4 h-4" />
-            New Product
+            {t('admin.products.newProduct')}
           </button>
           {selectedIds.size > 0 && (
             <>
               {selectedIds.size === 1 && (
                 <button onClick={handleEdit} className="flex items-center gap-1.5 px-4 py-2.5 bg-admin-brand/10 text-admin-brand rounded-xl text-xs font-medium">
-                  <Pencil className="w-3.5 h-3.5" /> Edit
+                  <Pencil className="w-3.5 h-3.5" /> {t('admin.products.selectEdit')}
                 </button>
               )}
               <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2.5 bg-admin-danger/10 text-admin-danger rounded-xl text-xs font-medium">
-                <Trash2 className="w-3.5 h-3.5" /> Delete ({selectedIds.size})
+                <Trash2 className="w-3.5 h-3.5" /> {t('admin.products.selectDelete', { count: selectedIds.size })}
               </button>
             </>
           )}
@@ -323,7 +323,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
             onChange={(e) => { setStoreFilter(e.target.value); setPage(1); }}
             className="flex-1 px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-xl text-xs text-admin-text-primary outline-none"
           >
-            <option value="All Stores">All Stores</option>
+            <option value="All Stores">{t('admin.stores.allStores')}</option>
             {stores.map((s) => <option key={s._id} value={s._id}>{s.name}</option>)}
           </select>
           <select
@@ -332,7 +332,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
             className="flex-1 px-3 py-2.5 bg-admin-brand-bg border border-admin-border rounded-xl text-xs text-admin-text-primary outline-none"
           >
             {dynamicCategories.map((c) => (
-              <option key={c} value={c}>{c === 'category' ? 'All Categories' : (categoryLabels[c] || c)}</option>
+              <option key={c} value={c}>{c === 'category' ? t('admin.products.allCategories') : (categoryLabels[c] || c)}</option>
             ))}
           </select>
           <button
@@ -345,19 +345,19 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
 
         {hasFilters && (
           <button onClick={resetFilters} className="flex items-center justify-center gap-1 text-xs font-medium text-admin-brand">
-            <X className="w-3 h-3" /> Reset Filters
+            <X className="w-3 h-3" /> {t('admin.products.resetFilters')}
           </button>
         )}
 
         {showFilterPanel && (
           <div className="bg-white border border-admin-border/40 rounded-xl p-4 shadow-sm space-y-3">
             <div className="flex items-center gap-3">
-              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">Price:</label>
+              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">{t('admin.products.priceRange')}</label>
               <input
                 type="number"
                 value={priceMin}
                 onChange={(e) => setPriceMin(e.target.value)}
-                placeholder="Min"
+                placeholder={t('admin.products.min')}
                 className="flex-1 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
               />
               <span className="text-admin-text-muted">—</span>
@@ -365,20 +365,20 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
                 type="number"
                 value={priceMax}
                 onChange={(e) => setPriceMax(e.target.value)}
-                placeholder="Max"
+                placeholder={t('admin.products.max')}
                 className="flex-1 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
               />
             </div>
             <div className="flex items-center gap-3">
-              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">Sort:</label>
+              <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">{t('admin.products.sortBy')}</label>
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
                 className="flex-1 px-3 py-2 bg-admin-brand-bg border border-admin-border rounded-lg text-xs text-admin-text-primary outline-none"
               >
-                <option value="none">None</option>
-                <option value="price">Price</option>
-                <option value="name">Name</option>
+                <option value="none">{t('admin.products.none')}</option>
+                <option value="price">{t('admin.products.price')}</option>
+                <option value="name">{t('admin.products.name')}</option>
               </select>
               {sortBy !== 'none' && (
                 <button
@@ -400,13 +400,13 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
               onChange={toggleSelectAll}
               className="w-4 h-4 rounded border-admin-border accent-admin-brand"
             />
-            <span className="text-xs text-admin-text-secondary">Select all</span>
+            <span className="text-xs text-admin-text-secondary">{t('admin.products.selectAll')}</span>
           </div>
         </div>
 
         <div className="flex flex-col gap-3">
           {loading ? (
-            <p className="text-center text-sm text-admin-text-muted py-8">Loading products…</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.products.loadingProducts')}</p>
           ) : paginated.length > 0 ? (
             paginated.map((p) => (
               <div key={p.id} className="relative">
@@ -420,7 +420,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
               </div>
             ))
           ) : (
-            <p className="text-center text-sm text-admin-text-muted py-8">No products match your filters.</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.products.noProductsMatch')}</p>
           )}
         </div>
 
@@ -429,7 +429,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
             <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="w-8 h-8 rounded-lg flex items-center justify-center border border-admin-border disabled:opacity-40">
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="px-2">Page {page} of {totalPages}</span>
+            <span className="px-2">{t('admin.products.pageOf', { page, totalPages })}</span>
             <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-8 h-8 rounded-lg flex items-center justify-center border border-admin-border disabled:opacity-40">
               <ChevronRight className="w-4 h-4" />
             </button>

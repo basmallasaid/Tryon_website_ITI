@@ -3,8 +3,7 @@
 // import viteLogo from './assets/vite.svg'
 // import heroImg from './assets/hero.png'
 // import './App.css'
-import { lazy, Suspense, useMemo, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { lazy, Suspense } from 'react';
 
 import { Navigate, Outlet } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router';
@@ -109,13 +108,6 @@ function AppContent() {
 }
 
 function App() {
-  const { i18n } = useTranslation();
-
-  useEffect(() => {
-    document.documentElement.dir = i18n.dir();
-    document.documentElement.lang = i18n.language;
-  }, [i18n.language]);
-
   return (
     <AuthProvider>
       <WardrobeProvider>

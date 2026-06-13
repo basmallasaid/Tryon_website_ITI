@@ -1,7 +1,10 @@
+import adminI18n from '../../../i18n/admin/adminI18n';
+
 export default function TopCategoriesChart({ categories = [], topPercent = 0, loading = false }) {
+  const { t } = adminI18n;
   return (
     <div className="flex-1 bg-white border-2 border-[#D5D9DE] rounded-panel p-6 flex flex-col gap-6">
-      <h3 className="text-xl font-medium text-admin-text-primary tracking-[-0.2px]">Top Categories</h3>
+      <h3 className="text-xl font-medium text-admin-text-primary tracking-[-0.2px]">{t('admin.dashboard.topCategories')}</h3>
       <div className="flex items-center gap-8">
         <div
           className="w-[124px] h-[124px] rounded-full flex items-center justify-center flex-shrink-0"
@@ -11,9 +14,9 @@ export default function TopCategoriesChart({ categories = [], topPercent = 0, lo
         </div>
         <div className="flex flex-col gap-2">
           {loading ? (
-            <span className="text-xs text-admin-text-secondary">Loading…</span>
+            <span className="text-xs text-admin-text-secondary">{t('admin.dashboard.loading')}</span>
           ) : categories.length === 0 ? (
-            <span className="text-xs text-admin-text-secondary">No data</span>
+            <span className="text-xs text-admin-text-secondary">{t('admin.dashboard.noData')}</span>
           ) : (
             categories.map(({ color, label }) => (
               <div key={label} className="flex items-center gap-2">
