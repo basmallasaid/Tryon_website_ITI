@@ -3,6 +3,7 @@ import { User, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { generateAvatarApi, getAvatarByIdApi } from '../../api/avatarApi';
+import { getSettingsApi } from '../../api/userApi';
 import { useAuth } from '../../context/AuthContext';
 import { getAuth } from '../../utils/tokenUtils';
 import Button from '../../components/Button';
@@ -36,6 +37,21 @@ const INITIAL_FORM = {
   hair_color: '',
 };
 
+const parseNumeric = (val) => {
+  if (!val) return '';
+  const num = parseInt(val);
+  return isNaN(num) ? String(val) : String(num);
+};
+
+const parseAvatarToForm = (avatar) => ({
+  age: parseNumeric(avatar.age),
+  gender: avatar.gender || '',
+  weight: parseNumeric(avatar.weight),
+  height: parseNumeric(avatar.height),
+  skin_tone: avatar.skin_tone || '',
+  hair_color: avatar.hair_color || '',
+});
+
 const buildPayload = form => ({
   age: form.age ? `${form.age}y` : '',
   height: form.height ? `${form.height}cm` : '',
@@ -64,6 +80,8 @@ export default function AvatarGeneration() {
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
   const [apiError, setApiError] = useState('');
   const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const previewRef = useRef(null);
 
   useEffect(() => {
@@ -71,15 +89,42 @@ export default function AvatarGeneration() {
     if (!avatarIds || avatarIds.length === 0) return;
     getAvatarByIdApi(avatarIds[0])
       .then(res => {
-        const url = res.data?.avatar?.image_url;
-        if (url) setFetchedAvatarUrl(url);
+        const avatar = res.data?.avatar;
+        if (!avatar) return;
+        if (avatar.image_url) setFetchedAvatarUrl(avatar.image_url);
+        setForm(prev => ({ ...prev, ...parseAvatarToForm(avatar) }));
       })
       .catch(() => {});
   }, [user?.avatars]);
 
   const hasAvatar = !!(generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || user?.avatars?.length > 0);
   const displayImageUrl = generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || null;
-  const showUpgrade = hasAvatar || !!generatedImageUrl;
+  const isSubscribed = subscriptionStatus === 'active';
+  const subscriptionChecked = !subscriptionLoading;
+  const showUpgrade = subscriptionChecked && hasAvatar && !isSubscribed;
+
+  useEffect(() => {
+    if (subscriptionLoading) return;
+    if (hasAvatar && !isSubscribed) {
+      navigate('/pricing', { replace: true });
+    }
+  }, [subscriptionLoading, hasAvatar, isSubscribed, navigate]);
+
+  useEffect(() => {
+    if (!user?.email) {
+      setSubscriptionLoading(false);
+      return;
+    }
+    setSubscriptionLoading(true);
+    getSettingsApi({ email: user.email })
+      .then((res) => {
+        setSubscriptionStatus(res.data.subscriptionStatus);
+      })
+      .catch(() => {
+        setSubscriptionStatus(null);
+      })
+      .finally(() => setSubscriptionLoading(false));
+  }, [user?.email]);
 
   useEffect(() => {
     if (generatedImageUrl && previewRef.current) {
