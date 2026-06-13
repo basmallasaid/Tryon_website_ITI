@@ -68,7 +68,7 @@ function LogoutWatcher() {
 
   useEffect(() => {
     if (prevUser.current && !user) {
-      navigate('/', { replace: true, state: { openAuth: 'login' } });
+      navigate('/login', { replace: true });
     }
     prevUser.current = user;
   }, [user, navigate]);
@@ -89,7 +89,7 @@ function UserGuard() {
 
 function AuthGuard() {
   const auth = JSON.parse(localStorage.getItem('auth') || 'null');
-  if (!auth) return <Navigate to="/" replace state={{ openAuth: 'login' }} />;
+  if (!auth) return <Navigate to="/login" replace />;
   return <Outlet />;
 }
 
@@ -103,6 +103,7 @@ function AppContent() {
           element: <Layout />,
           children: [
             { index: true, element: <Home /> },
+            { path: 'login', element: <Navigate to="/" replace state={{ openAuth: 'login' }} /> },
             { path: 'about-tryon', element: <AboutTryon /> },
             { path: 'about-recycle', element: <AboutRecycle /> },
             { path: 'contact-us', element: <ContactUs /> },
@@ -115,9 +116,9 @@ function AppContent() {
                 { path: 'stores', element: <StoresPage /> },
                 { path: 'avatar', element: <AvatarGeneration /> },
                 { path: 'matching', element: <Matching /> },
+                { path: 'recycle', element: <Recycle /> },
                 { path: 'editprofile', element: <EditProfilePage /> },
                 { path: 'favorites', element: <Fav /> },
-                { path: 'recycle', element: <Recycle /> },
                 { path: 'wardrobe', element: <WardrobePage /> },
                 { path: '/wardrobe/edit/:id', element: <EditItemWardrobe /> },
               ],
