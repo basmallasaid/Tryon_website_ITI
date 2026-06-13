@@ -76,9 +76,9 @@ const WardrobePage = () => {
   const filteredItems = useMemo(() => {
     return activeFilter === 'All'
       ? items
-      : items.filter((item) => 
-          item.category?.toLowerCase() === activeFilter.toLowerCase()
-        );
+      : items.filter((item) =>
+        item.category?.toLowerCase() === activeFilter.toLowerCase()
+      );
   }, [items, activeFilter]);
 
   return (
@@ -113,26 +113,28 @@ const WardrobePage = () => {
         ) : (
           <div className="space-y-8">
             <div className="flex justify-between items-center px-2">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                   {t('wardrobe.showingItems', { count: filteredItems.length })}
-                </p>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                {t('wardrobe.showingItems', { count: filteredItems.length })}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                {filteredItems.map((item) => (
-                <WardrobeItemCard key={item._id} item={item} onClick={setSelectedItem} />
-                ))}
-
-                {/* Add new item button */}
-                <button
+              {/* Add new item button */}
+               <button
                 onClick={() => setIsAddModalOpen(true)}
                 className="aspect-[4/5] border-4 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 text-gray-300 hover:border-[#40B9FF] hover:text-[#40B9FF] transition-all bg-white/50"
-                >
+              >
                 <div className="p-4 bg-gray-50 rounded-full"><Plus size={32} /></div>
                 <span className="font-bold text-[10px] tracking-widest uppercase">
-                    {t('wardrobe.addItem')}
+                  {t('wardrobe.addItem')}
                 </span>
-                </button>
+              </button>
+              {filteredItems.map((item) => (
+                <WardrobeItemCard key={item._id} item={item} onClick={setSelectedItem} />
+              ))}
+
+              
+             
             </div>
           </div>
         )}
