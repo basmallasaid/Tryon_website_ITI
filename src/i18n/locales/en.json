@@ -15,7 +15,8 @@
     "logout": "Logout",
     "wardrobe": "Wardrobe",
     "dark": "Dark",
-    "light": "Light"
+    "light": "Light",
+    "favorites": "Favorites"
   },
   "hero": {
     "yourPersonal": "Your Personal",
@@ -587,5 +588,17 @@
     "yourSavedItems": "Your saved items",
     "editProfile": "Edit Profile",
     "signOut": "Sign out"
+  },
+  "fav": {
+    "title": "Favorites",
+    "subtitle": "Start exploring our curated collections to build your digital favorite screen.",
+    "emptyMessage": "Your favorites are lonely.",
+    "loginToView": "Log in to see your favorite items",
+    "retry": "Retry",
+    "all": "All",
+    "store": "Store",
+    "wardrobe": "Wardrobe",
+    "recentTryOn": "Recent Try-On",
+    "recentRecycle": "Recent Recycle"
   }
 }

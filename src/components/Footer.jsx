@@ -3,6 +3,7 @@ import ShareIcon from '../icons/ShareIcon';
 import AtSignIcon from '../icons/AtSignIcon';
 import PhoneIcon from '../icons/PhoneIcon';
 import MailIcon from '../icons/MailIcon';
+import TelegramIcon from '../icons/TelegramIcon';
 import { useTranslation } from 'react-i18next';
 
 const socialIcons = [
@@ -13,6 +14,7 @@ const socialIcons = [
 
 const contactInfo = [
   { icon: PhoneIcon, value: '+20123456789', href: 'tel:+20123456789' },
+  { icon: TelegramIcon, value: '+20123456789', href: 'https://t.me/+20123456789' },
   { icon: MailIcon, value: 'ReDolapy@gmail.com', href: 'mailto:ReDolapy@gmail.com' },
 ];
 

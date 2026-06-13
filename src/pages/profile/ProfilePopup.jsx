@@ -171,7 +171,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
           </div>
         </button>
 
-        <button className="w-full bg-[#F0F9FF] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[#E0F2FE] hover:scale-[1.02]">
+        <Link to="/favorites" onClick={onClose} className="w-full bg-[#F0F9FF] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[#E0F2FE] hover:scale-[1.02]">
           <div className="flex items-center gap-3">
             <div className="bg-white p-2 rounded-xl shadow-sm text-[#40B9FF]">
               <Heart size={18} />
@@ -181,7 +181,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
               <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">{t("profile.yourSavedItems")}</p>
             </div>
           </div>
-        </button>
+        </Link>
       </div>
 
       {/* Primary Action Button */}

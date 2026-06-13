@@ -10,6 +10,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 import { AuthProvider } from './context/AuthContext';
 import { WardrobeProvider } from './context/WardrobeContext';
+import { FavoritesProvider } from './context/FavoritesContext';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import AuthPage from './pages/Auth/AuthPage';
@@ -35,6 +36,7 @@ import Dashboard from './pages/admin/Dashboard';
 import Products from './pages/admin/Products';
 import EditProfilePage from './pages/profile/EditProfilePage';
 import ContactUs from './pages/contactUs/ContactUs';
+import Fav from './pages/fav/Fav';
 import WardrobePage from './pages/wardrobe/WardrobePage';
 import EditItemWardrobe from './components/wardrobe/EditItemWardrobe';
 import ItemDetailsModal from './components/wardrobe/ItemDetailsModal';
@@ -86,8 +88,9 @@ function AppContent() {
             { path: 'about-recycle', element: <AboutRecycle /> },
             { path: 'contact-us', element: <ContactUs /> },
             { path: 'editprofile', element: <EditProfilePage /> },
-            {path:'wardrobe',element:<WardrobePage/>},
-            { path: '/wardrobe/edit/:id',element: <EditItemWardrobe />}
+            { path: 'favorites', element: <Fav /> },
+            { path: 'wardrobe', element: <WardrobePage /> },
+            { path: '/wardrobe/edit/:id', element: <EditItemWardrobe /> }
           ],
         },
       ],
@@ -95,9 +98,7 @@ function AppContent() {
     {
       path: '/admin',
       element: <AdminGuard />,
-      children: [
-        { index: true, element: <AdminDashboardPage /> },
-      ],
+      children: [{ index: true, element: <AdminDashboardPage /> }],
     },
   ]);
   return (
@@ -114,13 +115,13 @@ function App() {
     document.documentElement.dir = i18n.dir();
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
+
   return (
     <AuthProvider>
       <WardrobeProvider>
-        {/* <Navbar />
-        <AuthPage /> */}
-
-        <AppContent />
+        <FavoritesProvider>
+          <AppContent />
+        </FavoritesProvider>
       </WardrobeProvider>
     </AuthProvider>
   );

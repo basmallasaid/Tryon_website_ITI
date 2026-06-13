@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Shirt, Grid3x3, Sparkles, LogIn, X, Circle, Package } from "lucide-react";
+import { Shirt, Grid3x3, Sparkles, LogIn, X, Circle, Package, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -8,6 +8,7 @@ import UploadArea from "../recycle/components/UploadArea";
 import WardrobeItem from "../../components/tryOn/WardrobeItem";
 import { useAuth } from "../../context/AuthContext";
 import { useWardrobe } from "../../context/WardrobeContext";
+import { useFavorites } from "../../context/FavoritesContext";
 import {
   getWardrobeMatches,
   analyzeImage,
@@ -42,6 +43,7 @@ export default function Matching() {
   const isArabic = i18n.language === "ar";
   const { user } = useAuth();
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
+  const { isFavorite, addItem, removeItem } = useFavorites();
   const navigate = useNavigate();
 
   const [itemSource, setItemSource] = useState(null);
@@ -560,6 +562,17 @@ export default function Matching() {
                 ) : (
                   storeMatches.map((match, index) => {
                     const imgUrl = getMatchImage(match);
+                    const productId = match.item?.id?.replace("store_", "");
+                    const isFav = productId ? isFavorite(productId) : false;
+                    const handleFav = (e) => {
+                      e.stopPropagation();
+                      if (!productId) return;
+                      if (isFav) {
+                        removeItem(productId);
+                      } else {
+                        addItem(productId, "PRODUCT");
+                      }
+                    };
                     return (
                       <div
                         key={match.item?.id || `sm-${index}`}
@@ -576,6 +589,15 @@ export default function Matching() {
                           <div className={`absolute top-1 ${isArabic ? "left-1" : "right-1"} z-10 bg-lime-500 text-white text-[9px] font-bold px-[6px] py-[2px] rounded-full`}>
                             {match.score}%
                           </div>
+                          <button
+                            onClick={handleFav}
+                            className="absolute top-1 left-1 z-10 p-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:scale-110 transition-all cursor-pointer"
+                          >
+                            <Heart
+                              size={12}
+                              className={isFav ? "fill-accent-pink text-accent-pink" : "text-gray-500"}
+                            />
+                          </button>
                           {imgUrl ? (
                             <img
                               src={imgUrl}
