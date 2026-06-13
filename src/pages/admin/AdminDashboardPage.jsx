@@ -14,10 +14,12 @@ import AddUserSection from './sections/AddUserSection';
 import ApiManagementSection from './sections/ApiManagementSection';
 import SettingsSection from './sections/SettingsSection';
 import { getContactMessagesApi, getEmailUnreadCountApi } from '../../api/adminApi';
+import adminI18n from '../../i18n/admin/adminI18n';
 
 const ROLE_OPTIONS = ['All', 'Admin', 'Premium', 'User'];
 
 export default function AdminDashboardPage() {
+  const { t } = adminI18n;
   const [activePage, setActivePage] = useState('dashboard');
   const [showAddStore, setShowAddStore] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
@@ -150,21 +152,21 @@ export default function AdminDashboardPage() {
         onClick={handleAddStore}
         className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors"
       >
-        <Plus className="w-4 h-4" /> Add Store
+        <Plus className="w-4 h-4" /> {t('admin.stores.addStore')}
       </button>
     ) : activePage === 'products' && !showAddProduct ? (
       <button
         onClick={handleAddProduct}
         className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors"
       >
-        <Plus className="w-4 h-4" /> Add product
+        <Plus className="w-4 h-4" /> {t('admin.products.addProduct')}
       </button>
     ) : activePage === 'notifications' && !showAddNotification ? (
       <button
         onClick={handleAddNotification}
         className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors"
       >
-        <Plus className="w-4 h-4" /> Add notifications
+        <Plus className="w-4 h-4" /> {t('admin.notifications.createNew')}
       </button>
     ) : activePage === 'users' && !showAddUser ? (
       <div className="flex items-center gap-2">
@@ -178,7 +180,7 @@ export default function AdminDashboardPage() {
             }`}
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
-            Filter
+            {t('admin.topbar.filter')}
             {userRoleFilter !== 'All' && (
               <span className="ml-1 px-1.5 py-0.5 bg-admin-brand text-white rounded-full text-[10px]">
                 {userRoleFilter}
@@ -219,7 +221,7 @@ export default function AdminDashboardPage() {
                     className="w-full flex items-center gap-2 px-3 py-2 text-xs text-admin-danger hover:bg-admin-danger/10 transition-colors"
                   >
                     <X className="w-3 h-3" />
-                    Clear filter
+                    {t('admin.topbar.clearFilter')}
                   </button>
                 </>
               )}
@@ -231,7 +233,7 @@ export default function AdminDashboardPage() {
           className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-lg text-xs font-medium hover:bg-admin-brand-light transition-colors"
         >
           <UserPlus className="w-3.5 h-3.5" />
-          Add User
+          {t('admin.users.addUser')}
         </button>
       </div>
     ) : null;

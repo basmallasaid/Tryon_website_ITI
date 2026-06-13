@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2 } from 'lucide-react';
 import { getAllNotificationsApi, deleteNotificationApi } from '../../../api/adminApi';
+import adminI18n from '../../../i18n/admin/adminI18n';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -84,6 +85,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
 }
 
 export default function NotificationsSection({ onAddNotification }) {
+  const { t } = adminI18n;
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,10 +134,10 @@ export default function NotificationsSection({ onAddNotification }) {
     <div className="p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-[28px] sm:text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">
-          Notification Center
+          {t('admin.notifications.title')}
         </h1>
         <p className="text-sm text-admin-text-secondary mt-2">
-          View all notifications sent to users.
+          {t('admin.notifications.subtitle')}
         </p>
       </div>
 
@@ -144,7 +146,7 @@ export default function NotificationsSection({ onAddNotification }) {
         <div className="px-6 py-4 border-b border-admin-border/40 flex items-center justify-between">
           <h2 className="text-sm font-bold text-admin-text-primary">All Notifications</h2>
           <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
-            <Bell className="w-4 h-4" /> Create New
+            <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
           </button>
         </div>
         <table className="w-full">
@@ -222,7 +224,7 @@ export default function NotificationsSection({ onAddNotification }) {
       <div className="md:hidden">
         <div className="flex items-center justify-between mb-4">
           <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand text-white rounded-xl text-xs font-medium">
-            <Bell className="w-4 h-4" /> Create New
+            <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
           </button>
         </div>
         <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
