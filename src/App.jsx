@@ -67,6 +67,12 @@ function UserGuard() {
   return <Outlet />;
 }
 
+function AuthGuard() {
+  const auth = JSON.parse(localStorage.getItem('auth') || 'null');
+  if (!auth) return <Navigate to="/" replace state={{ openAuth: 'login' }} />;
+  return <Outlet />;
+}
+
 function AppContent() {
   const router = createBrowserRouter([
     {
@@ -77,20 +83,25 @@ function AppContent() {
           element: <Layout />,
           children: [
             { index: true, element: <Home /> },
-            { path: 'tryOn', element: <TryOn /> },
             { path: 'about-tryon', element: <AboutTryon /> },
-            { path: 'pricing', element: <PricingPage /> },
-            { path: 'auth/callback', element: <GoogleCallback /> },
-            { path: 'stores', element: <StoresPage /> },
-            { path: 'avatar', element: <AvatarGeneration /> },
-            { path: 'matching', element: <Matching /> },
-            { path: 'recycle', element: <Recycle /> },
             { path: 'about-recycle', element: <AboutRecycle /> },
             { path: 'contact-us', element: <ContactUs /> },
-            { path: 'editprofile', element: <EditProfilePage /> },
-            { path: 'favorites', element: <Fav /> },
-            { path: 'wardrobe', element: <WardrobePage /> },
-            { path: '/wardrobe/edit/:id', element: <EditItemWardrobe /> }
+            { path: 'auth/callback', element: <GoogleCallback /> },
+            {
+              element: <AuthGuard />,
+              children: [
+                { path: 'tryOn', element: <TryOn /> },
+                { path: 'pricing', element: <PricingPage /> },
+                { path: 'stores', element: <StoresPage /> },
+                { path: 'avatar', element: <AvatarGeneration /> },
+                { path: 'matching', element: <Matching /> },
+                { path: 'editprofile', element: <EditProfilePage /> },
+                { path: 'favorites', element: <Fav /> },
+                { path: 'recycle', element: <Recycle /> },
+                { path: 'wardrobe', element: <WardrobePage /> },
+                { path: '/wardrobe/edit/:id', element: <EditItemWardrobe /> },
+              ],
+            },
           ],
         },
       ],
