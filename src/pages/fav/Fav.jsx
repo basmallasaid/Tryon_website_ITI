@@ -3,7 +3,6 @@ import { Heart, HeartOff, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { useFavorites } from "../../context/FavoritesContext";
-import { showToast } from "../../utils/toast";
 
 const SOURCE_LABELS = {
   Wardrobe: "WARDROBE",
@@ -19,10 +18,10 @@ const SOURCE_COLORS = {
   "RECENT RECYCLE": "bg-brand-secondary/10 text-brand-secondary",
 };
 
-function formatDate(dateStr) {
+function formatDate(dateStr, locale = "en") {
   if (!dateStr) return "";
   const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
+  return d.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -45,19 +44,33 @@ function getSourceLabel(item) {
 }
 
 function EmptyState() {
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   return (
-    <div className="min-h-screen bg-bg-secondary font-roboto flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-bg-secondary font-roboto flex flex-col items-center justify-center" dir={isArabic ? 'rtl' : 'ltr'}>
       <div className="w-32 h-32 rounded-full bg-surface-elevated flex items-center justify-center mb-6 shadow-sm">
         <Heart size={52} className="text-primary" />
       </div>
       <h2 className="text-[36px] leading-[38px] font-black text-text-primary text-center px-4">
-        Your favorites are lonely.
+        {t("fav.emptyMessage")}
       </h2>
     </div>
   );
 }
 
+const FILTERS = ["All", "Store", "Wardrobe", "Recent Try-On", "Recent Recycle"];
+
+const FILTER_KEY_MAP = {
+  "All": "fav.all",
+  "Store": "fav.store",
+  "Wardrobe": "fav.wardrobe",
+  "Recent Try-On": "fav.recentTryOn",
+  "Recent Recycle": "fav.recentRecycle",
+};
+
 function FavoritesList({ items, removeItem }) {
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   const [activeFilter, setActiveFilter] = useState("All");
   const [removingIds, setRemovingIds] = useState(new Set());
 
@@ -73,11 +86,11 @@ function FavoritesList({ items, removeItem }) {
 
   const handleRemove = async (item) => {
     const id = item._id || item.id;
+    if (removingIds.has(id)) return;
     setRemovingIds((prev) => new Set(prev).add(id));
     try {
       await removeItem(item.itemId || item.item_id || id);
     } catch {
-      showToast('error', 'Failed to remove item from favorites');
     } finally {
       setRemovingIds((prev) => {
         const next = new Set(prev);
@@ -87,20 +100,22 @@ function FavoritesList({ items, removeItem }) {
     }
   };
 
+  const getFilterLabel = (filter) => t(FILTER_KEY_MAP[filter]);
+
   return (
-    <div className="min-h-screen bg-bg-secondary font-roboto">
+    <div className="min-h-screen bg-bg-secondary font-roboto" dir={isArabic ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div className="mb-12">
+        <div className="mb-12 text-left rtl:text-right">
           <h1 className="text-4xl md:text-5xl font-black text-text-primary tracking-tight mb-3">
-            Favorites
+            {t("fav.title")}
           </h1>
           <p className="text-text-disabled text-base font-medium max-w-xl">
-            Start exploring our curated collections to build your digital favorite screen.
+            {t("fav.subtitle")}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-3 mb-10">
-          {["All", "Store", "Wardrobe", "Recent Try-On", "Recent Recycle"].map((filter) => (
+          {FILTERS.map((filter) => (
             <button
               key={filter}
               onClick={() => setActiveFilter(filter)}
@@ -110,7 +125,7 @@ function FavoritesList({ items, removeItem }) {
                   : "bg-surface-elevated text-text-disabled border border-border-strong hover:border-primary hover:text-primary"
               }`}
             >
-              {filter}
+              {getFilterLabel(filter)}
             </button>
           ))}
         </div>
@@ -121,7 +136,7 @@ function FavoritesList({ items, removeItem }) {
               <HeartOff size={40} className="text-text-disabled" />
             </div>
             <p className="text-text-disabled text-lg font-medium">
-              No {activeFilter.toLowerCase()} favorites found.
+              {t("fav.noFavoritesFilter", { filter: getFilterLabel(activeFilter).toLowerCase() })}
             </p>
           </div>
         ) : (
@@ -141,14 +156,14 @@ function FavoritesList({ items, removeItem }) {
                   <div className="relative aspect-[3/4] bg-bg-secondary overflow-hidden">
                     <img
                       src={imageUrl}
-                      alt={item.title || item.name || "Favorite item"}
+                      alt={item.title || item.name || t("fav.untitled")}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
                     <button
                       onClick={() => handleRemove(item)}
                       disabled={isRemoving}
-                      className="absolute top-3 right-3 p-2 bg-surface-elevated/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-rose-50 hover:scale-110 disabled:opacity-50 cursor-pointer z-10"
+                      className="absolute top-3 ltr:right-3 rtl:left-3 p-2 bg-surface-elevated/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-rose-50 hover:scale-110 disabled:opacity-50 cursor-pointer z-10"
                     >
                       {isRemoving ? (
                         <Loader2 size={16} className="animate-spin text-accent-pink" />
@@ -157,17 +172,17 @@ function FavoritesList({ items, removeItem }) {
                       )}
                     </button>
                     <span
-                      className={`absolute bottom-3 left-3 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${badgeColor}`}
+                      className={`absolute bottom-3 ltr:left-3 rtl:right-3 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${badgeColor}`}
                     >
                       {sourceLabel}
                     </span>
                   </div>
-                  <div className="p-5">
+                  <div className="p-5 text-left rtl:text-right">
                     <h3 className="text-sm font-black text-text-primary leading-tight truncate mb-2">
-                      {item.title || item.name || "Untitled"}
+                      {item.title || item.name || t("fav.untitled")}
                     </h3>
                     <p className="text-xs font-medium text-text-disabled">
-                      {formatDate(item.createdAt || item.created_at || item.date)}
+                      {formatDate(item.createdAt || item.created_at || item.date, i18n.language)}
                     </p>
                   </div>
                 </div>
@@ -181,20 +196,21 @@ function FavoritesList({ items, removeItem }) {
 }
 
 export default function Fav() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   const { user } = useAuth();
   const { items, loading, error, removeItem } = useFavorites();
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-bg-secondary font-roboto">
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+      <div className="min-h-screen bg-bg-secondary font-roboto" dir={isArabic ? 'rtl' : 'ltr'}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-left rtl:text-right">
           <div className="w-28 h-28 rounded-full bg-icon-disabled/30 flex items-center justify-center mb-6">
             <Heart size={44} className="text-text-disabled" />
           </div>
-          <h2 className="text-2xl font-black text-text-primary mb-2">Favorites</h2>
+          <h2 className="text-2xl font-black text-text-primary mb-2">{t("fav.title")}</h2>
           <p className="text-text-disabled text-sm font-medium text-center max-w-md">
-            {t("fav.loginToView", "Log in to see your favorite items")}
+            {t("fav.loginToView")}
           </p>
         </div>
       </div>
@@ -203,7 +219,7 @@ export default function Fav() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-secondary font-roboto">
+      <div className="min-h-screen bg-bg-secondary font-roboto" dir={isArabic ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 size={32} className="animate-spin text-brand-secondary" />
         </div>
@@ -213,14 +229,14 @@ export default function Fav() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-bg-secondary font-roboto">
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+      <div className="min-h-screen bg-bg-secondary font-roboto" dir={isArabic ? 'rtl' : 'ltr'}>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4 text-left rtl:text-right">
           <p className="text-accent-pink font-medium mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-2 bg-brand-secondary text-white rounded-xl font-bold hover:opacity-90 transition-all"
           >
-            {t("fav.retry", "Retry")}
+            {t("fav.retry")}
           </button>
         </div>
       </div>

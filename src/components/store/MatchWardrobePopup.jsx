@@ -1,5 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. إضافة الاستيراد
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { X, Loader2, AlertCircle, Sparkles, ChevronRight } from 'lucide-react';
 
 const ColorDot = ({ color }) => (
@@ -10,7 +11,8 @@ const ColorDot = ({ color }) => (
 );
 
 const MatchWardrobePopup = ({ isOpen, onClose, isArabic, matches, loading, error }) => {
-  const navigate = useNavigate(); // 2. تعريف navigate
+  const { t } = useTranslation();
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
@@ -29,11 +31,11 @@ const MatchWardrobePopup = ({ isOpen, onClose, isArabic, matches, loading, error
                 <Sparkles size={22} className="text-[var(--color-brand-secondary)]" />
              </div>
              <div>
-                <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-none mb-1">
-                    {isArabic ? 'مطابقة من الخزانة' : 'Match from wardrobe'}
+                 <h2 className="text-2xl font-black text-gray-900 tracking-tight leading-none mb-1">
+                    {t("stores.matchFromWardrobe")}
                 </h2>
                 <p className="text-[11px] text-gray-400 font-bold uppercase tracking-widest opacity-70">
-                    {isArabic ? 'بناءً على ذكاء الأنماط' : 'Based on style intelligence'}
+                    {t("stores.styleIntelligence")}
                 </p>
              </div>
           </div>
@@ -53,13 +55,13 @@ const MatchWardrobePopup = ({ isOpen, onClose, isArabic, matches, loading, error
                     <div className="absolute inset-0 bg-[var(--color-brand-secondary)]/10 animate-ping rounded-full"></div>
                 </div>
                 <p className="text-gray-500 font-black mt-6 tracking-tight">
-                    {isArabic ? 'جاري البحث في خزانتك...' : 'SEARCHING YOUR WARDROBE...'}
+                    {t("stores.searchingWardrobe")}
                 </p>
             </div>
             ) : error ? (
             <div className="flex flex-col items-center justify-center py-20 bg-rose-50/50 rounded-[2rem] border border-rose-100">
                 <AlertCircle size={48} className="text-rose-400 mb-4" />
-                <p className="text-rose-600 font-black text-lg uppercase tracking-tight">{isArabic ? 'فشل الاتصال' : 'Connection Failed'}</p>
+                <p className="text-rose-600 font-black text-lg uppercase tracking-tight">{t("stores.connectionFailed")}</p>
                 <p className="text-rose-400 text-xs mt-2 font-bold opacity-80">{error}</p>
             </div>
             ) : matches.length === 0 ? (
@@ -68,10 +70,10 @@ const MatchWardrobePopup = ({ isOpen, onClose, isArabic, matches, loading, error
                     <X size={32} className="text-gray-200" />
                 </div>
                 <p className="text-gray-400 font-black text-lg tracking-tight">
-                    {isArabic ? 'لا توجد قطع مطابقة حالياً' : 'NO MATCHING PIECES FOUND'}
+                    {t("stores.noMatchingPieces")}
                 </p>
                 <p className="text-gray-400 text-xs font-bold uppercase mt-2 max-w-xs leading-relaxed">
-                    Try adding more basics to your wardrobe for better AI suggestions.
+                    {t("stores.noMatchingHint")}
                 </p>
             </div>
             ) : (
@@ -122,7 +124,7 @@ const MatchWardrobePopup = ({ isOpen, onClose, isArabic, matches, loading, error
                                 }}
                                 className="flex items-center gap-2 text-[10px] font-black text-[var(--color-brand-secondary)] uppercase tracking-[0.1em] mt-auto hover:opacity-70 transition-opacity"
                             >
-                                {isArabic ? 'رؤية التفاصيل' : 'View Details'}
+                                {t("stores.viewDetails")}
                                 <ChevronRight size={14} strokeWidth={3} className={isArabic ? 'rotate-180' : ''} />
                             </button>
                         </div>

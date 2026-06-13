@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { getUserApi, updateProfileApi, deleteUserAccountApi, updateUserImageApi, deleteUserImageApi } from '../../api/userApi';
 import { getAvatarByIdApi } from '../../api/avatarApi';
@@ -7,6 +8,7 @@ import { Camera, UserPlus, Lock, SquarePen, AlertTriangle, Trash2 } from 'lucide
 import Swal from 'sweetalert2';
 import { showToast } from '../../utils/toast';
 export default function EditProfilePage() {
+    const { t } = useTranslation();
     const { user, login, logout } = useAuth();
     const navigate = useNavigate();
     const [firstName, setFirstName] = useState('');
@@ -114,12 +116,12 @@ export default function EditProfilePage() {
                 login({ ...user, userImage: newImageUrl });
             }
 
-            showToast('success', 'Profile image updated');
+            showToast('success', t("profile.profileImageUpdated"));
         } catch (error) {
             console.error('Failed to upload image:', error);
             URL.revokeObjectURL(previewUrl);
             setImagePreview(userImage || '');
-            showToast('error', error.response?.data?.message || 'Failed to upload image');
+            showToast('error', error.response?.data?.message || t("profile.failedUploadImage"));
         } finally {
             setUploadingImage(false);
             event.target.value = '';
@@ -128,12 +130,12 @@ export default function EditProfilePage() {
 
     const handleImageRemove = async () => {
         const result = await Swal.fire({
-            title: 'Remove Profile Image?',
-            text: 'Your profile picture will be removed.',
+            title: t("profile.removeProfileImage"),
+            text: t("profile.removeProfileImageDesc"),
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Remove',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: t("profile.yesRemove"),
+            cancelButtonText: t("profile.cancel"),
         });
 
         if (!result.isConfirmed) return;
@@ -145,10 +147,10 @@ export default function EditProfilePage() {
             setUserImageFile(null);
             login({ ...user, userImage: '' });
 
-            showToast('success', 'Profile image removed');
+            showToast('success', t("profile.profileImageRemoved"));
         } catch (error) {
             console.error('Failed to remove image:', error);
-            showToast('error', error.response?.data?.message || 'Failed to remove image');
+            showToast('error', error.response?.data?.message || t("profile.failedRemoveImage"));
         }
     };
 
@@ -160,18 +162,18 @@ export default function EditProfilePage() {
         if (!email) {
             return Swal.fire({
                 icon: 'warning',
-                title: 'Email Required',
-                text: 'Email is required to delete account.',
+                title: t("profile.emailRequired"),
+                text: t("profile.emailRequiredDesc"),
             });
         }
 
         const result = await Swal.fire({
-            title: 'Delete Account?',
-            text: 'This action cannot be undone.',
+            title: t("profile.deleteAccountConfirm"),
+            text: t("profile.deleteAccountDesc"),
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, Delete',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: t("profile.yesDelete"),
+            cancelButtonText: t("profile.cancel"),
         });
 
         if (!result.isConfirmed) return;
@@ -179,13 +181,13 @@ export default function EditProfilePage() {
         setDeleting(true);
         try {
             await deleteUserAccountApi(email);
-            showToast('success', 'Your account has been deleted successfully.');
+            showToast('success', t("profile.accountDeleted"));
 
             logout();
             navigate('/');
         } catch (error) {
             console.error('Failed to delete account:', error);
-            showToast('error', error.response?.data?.message || 'Failed to delete account');
+            showToast('error', error.response?.data?.message || t("profile.failedDeleteAccount"));
         } finally {
             setDeleting(false);
         }
@@ -244,10 +246,10 @@ export default function EditProfilePage() {
                 });
             }
 
-            showToast('success', 'Profile updated successfully');
+            showToast('success', t("profile.profileUpdated"));
         } catch (error) {
             console.error('Failed to save profile:', error);
-            showToast('error', error.response?.data?.message || 'Failed to save profile');
+            showToast('error', error.response?.data?.message || t("profile.failedSaveProfile"));
         } finally {
             setSaving(false);
         }
@@ -258,7 +260,7 @@ export default function EditProfilePage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 p-4 md:p-10 font-sans flex items-center justify-center">
-                <span className="text-gray-500">Loading profile...</span>
+                <span className="text-gray-500">{t("profile.loadingProfile")}</span>
             </div>
         );
     }
@@ -317,7 +319,7 @@ export default function EditProfilePage() {
 
                         <label
                             htmlFor="profileImageUpload"
-                            className={`absolute bottom-1 right-1 bg-[var(--Primary-Brand-color)] p-2 rounded-full border-4 border-white shadow-sm transition-transform cursor-pointer ${uploadingImage ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
+                            className={`absolute bottom-1 ltr:right-1 rtl:left-1 bg-[var(--Primary-Brand-color)] p-2 rounded-full border-4 border-white shadow-sm transition-transform cursor-pointer ${uploadingImage ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
                         >
                             <Camera className="text-white w-5 h-5" />
                         </label>
@@ -326,14 +328,14 @@ export default function EditProfilePage() {
                             <button
                                 type="button"
                                 onClick={handleImageRemove}
-                                className="absolute top-1 right-1 bg-white p-1.5 rounded-full border-2 border-gray-200 shadow-sm hover:scale-110 transition-transform cursor-pointer"
+                                className="absolute top-1 ltr:right-1 rtl:left-1 bg-white p-1.5 rounded-full border-2 border-gray-200 shadow-sm hover:scale-110 transition-transform cursor-pointer"
                             >
                                 <Trash2 className="text-red-500 w-4 h-4" />
                             </button>
                         )}
                     </div>
                     <h2 className="text-xl font-bold text-gray-800">{fullName}</h2>
-                    <p className="text-gray-400 text-xs mt-1 font-medium">Click the camera icon to change photo</p>
+                    <p className="text-gray-400 text-xs mt-1 font-medium">{t("profile.clickCameraToChange")}</p>
                 </div>
 
                 {/* Avatar Card */}
@@ -349,13 +351,13 @@ export default function EditProfilePage() {
                                     <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 </div>
                             </div>
-                            <p className="text-gray-500 text-sm font-semibold mb-4">Your Avatar</p>
+                            <p className="text-gray-500 text-sm font-semibold mb-4">{t("profile.yourAvatar")}</p>
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => navigate('/avatar')}
                                     className="bg-[var(--color-brand-secondary)] text-white px-8 py-2 rounded-lg text-sm font-bold shadow-sm hover:opacity-90"
                                 >
-                                    Edit
+                                    {t("profile.editAvatar")}
                                 </button>
                             </div>
                         </>
@@ -371,12 +373,12 @@ export default function EditProfilePage() {
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-gray-500 text-sm font-semibold mb-4">Create your Avatar</p>
+                            <p className="text-gray-500 text-sm font-semibold mb-4">{t("profile.createYourAvatar")}</p>
                             <button
                                 onClick={() => navigate('/avatar')}
                                 className="bg-[var(--color-brand-secondary)] text-white px-8 py-2 rounded-lg text-sm font-bold shadow-sm hover:opacity-90"
                             >
-                                Create
+                                {t("profile.createAvatar")}
                             </button>
                         </>
                     )}
@@ -386,13 +388,13 @@ export default function EditProfilePage() {
 
             {/* Main Personal Information Form */}
             <div className="w-full max-w-5xl bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-gray-100">
-                <h2 className="text-xl font-black text-gray-800 mb-10 ">Personal Information</h2>
+                <h2 className="text-xl font-black text-gray-800 mb-10">{t("profile.personalInformation")}</h2>
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                     {/* Name Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700">First Name</label>
+                            <label className="text-sm font-bold text-gray-700">{t("auth.firstName")}</label>
                             <div className="relative">
                                 <input
                                     type="text"
@@ -400,11 +402,11 @@ export default function EditProfilePage() {
                                     onChange={(e) => setFirstName(e.target.value)}
                                     className="w-full bg-gray-50 border-none rounded-xl p-4 text-gray-700 font-medium focus:ring-2 focus:ring-[#40B9FF]/20"
                                 />
-                                <SquarePen className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 cursor-pointer" />
+                                <SquarePen className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 cursor-pointer" />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700">Last Name</label>
+                            <label className="text-sm font-bold text-gray-700">{t("auth.lastName")}</label>
                             <div className="relative">
                                 <input
                                     type="text"
@@ -412,44 +414,44 @@ export default function EditProfilePage() {
                                     onChange={(e) => setLastName(e.target.value)}
                                     className="w-full bg-gray-50 border-none rounded-xl p-4 text-gray-700 font-medium focus:ring-2 focus:ring-[#40B9FF]/20"
                                 />
-                                <SquarePen className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 cursor-pointer" />
+                                <SquarePen className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 cursor-pointer" />
                             </div>
                         </div>
                     </div>
 
                     {/* Email Row */}
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700">Email</label>
+                        <label className="text-sm font-bold text-gray-700">{t("auth.email")}</label>
                         <div className="relative">
-                            <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                            <div className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2">
                                 <Lock className="w-5 h-5 text-gray-400" />
                             </div>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-gray-50 border-none rounded-xl p-4 pl-12 text-gray-700 font-medium focus:ring-2 focus:ring-[#40B9FF]/20"
+                                className="w-full bg-gray-50 border-none rounded-xl p-4 ltr:pl-12 rtl:pr-12 text-gray-700 font-medium focus:ring-2 focus:ring-[#40B9FF]/20"
                             />
                         </div>
                     </div>
 
                     {/* Gender Row */}
                     <div className="space-y-3">
-                        <label className="text-sm font-bold text-gray-700 ">Gender</label>
+                        <label className="text-sm font-bold text-gray-700">{t("profile.gender")}</label>
                         <div className="flex gap-4 mt-1">
                             <button
                                 type="button"
                                 onClick={() => setGender('Male')}
                                 className={`px-8 py-3 rounded-xl font-bold transition-all shadow-sm ${gender === 'Male' ? 'bg-[var(--Primary-Brand-color)] text-white' : 'bg-gray-50 text-gray-400'}`}
                             >
-                                Male
+                                {t("profile.male")}
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setGender('Female')}
                                 className={`px-8 py-3 rounded-xl font-bold transition-all shadow-sm ${gender === 'Female' ? 'bg-[#40B9FF] text-white' : 'bg-gray-50 text-gray-400'}`}
                             >
-                                Female
+                                {t("profile.female")}
                             </button>
                         </div>
                     </div>
@@ -459,14 +461,14 @@ export default function EditProfilePage() {
                     {/* Bottom Action Buttons */}
                     <div className="flex flex-col md:flex-row gap-4">
                         <button type="button" onClick={handleCancel} className="flex-1 bg-white border border-gray-200 text-gray-500 font-bold py-4 rounded-xl hover:bg-gray-50 transition-colors">
-                            Cancel
+                            {t("profile.cancel")}
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
                             className="flex-1 bg-[var(--color-brand-secondary)] text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:cursor-not-allowed disabled:opacity-70"
                         >
-                            {saving ? 'Saving...' : 'Save Changes'}
+                            {saving ? t("profile.saving") : t("profile.saveChanges")}
                         </button>
                     </div>
 
@@ -479,7 +481,7 @@ export default function EditProfilePage() {
                             className="w-full md:w-auto px-16 py-4 bg-[#fcf3ed] text-[var(--Secondary-Orange-Brand-color)] rounded-2xl font-bold flex items-center justify-center gap-3 border border-[#FFE0E3] hover:bg-[#fff0e0] transition-colors disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <AlertTriangle className="w-5 h-5" />
-                            {deleting ? 'Deleting...' : 'Delete Account'}
+                            {deleting ? t("profile.deleting") : t("profile.deleteAccount")}
                         </button>
                     </div>
 

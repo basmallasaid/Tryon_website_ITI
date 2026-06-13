@@ -2,7 +2,8 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   
   const overlayRight = view === "login" || view === "otp" || view === "reset";
   const isOtp = view === "otp";
@@ -14,7 +15,11 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
   return (
     <div 
       className={`absolute top-0 z-20 hidden h-full w-[40%] flex-col items-center justify-center bg-cover bg-center bg-no-repeat text-white transition-all duration-700 ease-in-out md:flex rounded-3xl shadow-2xl ${
-        overlayRight ? "translate-x-[150%]" : "translate-x-0"
+        isArabic ? 'right-0' : 'left-0'
+      } ${
+        overlayRight 
+          ? (isArabic ? "-translate-x-[150%]" : "translate-x-[150%]") 
+          : "translate-x-0"
       }`} 
       style={{ 
           backgroundImage: `${overlayGradient}, url('/login2.jpg')` 
@@ -56,8 +61,8 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
         ) : isLogin ? (
           <>
             <h1 className="font-extrabold leading-tight mb-4">
-              <span className="block text-4xl font-light italic opacity-90">Welcome</span>
-              <span className="block text-6xl tracking-tight">Back!</span>
+              <span className="block text-4xl font-light italic opacity-90">{t("auth.welcome")}</span>
+              <span className="block text-6xl tracking-tight">{t("auth.backOverlay")}</span>
             </h1>
             <p className="opacity-80 text-lg mb-12 max-w-xs">
               {t("auth.dontHaveAccount")}

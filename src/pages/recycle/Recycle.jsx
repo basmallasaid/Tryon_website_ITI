@@ -56,8 +56,7 @@ const buildPreviews = async (files) => {
 };
 
 export default function Recycle() {
-  const { t, i18n } = useTranslation();
-  const isAr = i18n.language === "ar";
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
   const navigate = useNavigate();
@@ -84,9 +83,9 @@ export default function Recycle() {
   const remainingSlots = MAX_SELECTION - totalSelected;
 
   const steps = [
-    { id: 1, title: isAr ? "اختيار العناصر" : "Select Items", subtitle: isAr ? "اختر 1-2 قطعة ملابس" : "Choose 1-2 clothing items" },
-    { id: 2, title: isAr ? "الحصول على أفكار" : "Get Ideas", subtitle: isAr ? "AI يولد أفكار إعادة التدوير" : "AI generates upcycling ideas" },
-    { id: 3, title: isAr ? "إنشاء التصميم" : "Generate Design", subtitle: isAr ? "إنشاء تصميمك المعاد تدويره" : "Create your upcycled design" },
+    { id: 1, title: t("recycle.selectItemsStep"), subtitle: t("recycle.chooseItemsStep") },
+    { id: 2, title: t("recycle.getIdeasStep"), subtitle: t("recycle.aiGeneratesStep") },
+    { id: 3, title: t("recycle.generateDesignStep"), subtitle: t("recycle.createDesignStep") },
   ];
 
   const currentStep = generating
@@ -96,12 +95,12 @@ export default function Recycle() {
       : 1;
 
   const selectedTitle = totalSelected > 0
-    ? `${totalSelected} item${totalSelected > 1 ? "s" : ""} selected`
-    : "No items selected yet";
+    ? t("recycle.itemsSelected", { count: totalSelected })
+    : t("recycle.noItemsSelectedYet");
 
   const selectedSubtitle = totalSelected > 0
-    ? "Select up to 2 items to recycle"
-    : "Select from your wardrobe or upload images";
+    ? t("recycle.selectUpTo")
+    : t("recycle.selectFromWardrobe");
 
   const selectedIdea = useMemo(
     () => ideas.find((i) => i.id === selectedIdeaId) || null,
@@ -313,16 +312,16 @@ export default function Recycle() {
               <div className="bg-gray-100 rounded-xl p-8 text-center">
                 <LogIn className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                 <p className="text-gray-600 font-medium">
-                  {isAr ? "يرجى تسجيل الدخول لعرض خزانة ملابسك" : "Please sign in to view your wardrobe"}
+                  {t("recycle.signInToView")}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   <span
                     onClick={() => navigate("/auth")}
                     className="text-blue-500 hover:underline cursor-pointer"
                   >
-                    {isAr ? "تسجيل الدخول" : "Sign in"}
+                    {t("recycle.signInLink")}
                   </span>{" "}
-                  {isAr ? "للوصول إلى العناصر المحفوظة" : "to access your saved items"}
+                  {t("recycle.toAccessItems")}
                 </p>
               </div>
             ) : wardrobeLoading ? (
@@ -334,13 +333,13 @@ export default function Recycle() {
                 <div className="flex items-center gap-3 mb-5">
                   <Shirt className="w-5 h-5 text-blue-500" />
                   <h3 className="font-bold text-lg" style={{ color: "#1a202c" }}>
-                    {isAr ? "من خزانة ملابسي" : "From My Wardrobe"}
+                    {t("recycle.fromMyWardrobe")}
                   </h3>
                   {remainingSlots < MAX_SELECTION && (
-                    <span className="text-xs text-gray-400 ml-auto">
+                    <span className="text-xs text-gray-400 ltr:ml-auto rtl:mr-auto">
                       {remainingSlots > 0
-                        ? isAr ? `${remainingSlots} متبقي` : `${remainingSlots} slot${remainingSlots > 1 ? 's' : ''} left`
-                        : isAr ? "الحد الأقصى تم الوصول إليه" : "Max reached"}
+                        ? t("recycle.slotsLeft", { count: remainingSlots })
+                        : t("recycle.maxReached")}
                     </span>
                   )}
                 </div>
@@ -349,7 +348,7 @@ export default function Recycle() {
                   <div className="bg-gray-50 rounded-xl p-8 text-center border border-dashed border-gray-200">
                     <Shirt className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                     <p className="text-gray-500 text-sm font-medium">
-                      {isAr ? "خزانة ملابسك فارغة" : "Your wardrobe is empty"}
+                      {t("recycle.wardrobeEmpty")}
                     </p>
                   </div>
                 ) : (
@@ -380,13 +379,13 @@ export default function Recycle() {
           <div className="flex items-center gap-3 mb-5">
             <Grid3x3 className="w-5 h-5 text-blue-500" />
             <h3 className="font-bold text-lg" style={{ color: "#1a202c" }}>
-              {isAr ? "رفع صور" : "Upload Images"}
+              {t("recycle.uploadImages")}
             </h3>
             {remainingSlots < MAX_SELECTION && (
               <span className="text-xs text-gray-400 ml-auto">
                 {remainingSlots > 0
-                  ? isAr ? `${remainingSlots} متبقي` : `${remainingSlots} slot${remainingSlots > 1 ? 's' : ''} left`
-                  : isAr ? "الحد الأقصى تم الوصول إليه" : "Max reached"}
+                  ? t("recycle.slotsLeft", { count: remainingSlots })
+                  : t("recycle.maxReached")}
               </span>
             )}
           </div>
@@ -460,7 +459,7 @@ export default function Recycle() {
                 }`}
               >
                 <Sparkles className="w-5 h-5" />
-                {isAr ? "إعادة تدوير" : "Recycle"}
+                {t("recycle.recycleButton")}
               </button>
             </div>
           </section>
@@ -471,7 +470,7 @@ export default function Recycle() {
           <div className="flex flex-col items-center justify-center py-20">
             <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
             <p className="text-gray-500 font-medium">
-              {isAr ? "جاري تحليل العناصر..." : "Analyzing your items..."}
+              {t("recycle.analyzingItems")}
             </p>
           </div>
         )}
@@ -484,13 +483,13 @@ export default function Recycle() {
                 className="text-2xl sm:text-3xl md:text-4xl font-bold"
                 style={{ color: "var(--Secondary-Text-color)" }}
               >
-                {isAr ? "أفكار التصميم" : "Design Ideas"}
+                {t("recycle.designIdeas")}
               </h2>
               <span
                 className="inline-flex items-center rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base text-white"
                 style={{ backgroundColor: "var(--Secondary-Brand-color)" }}
               >
-                {isAr ? "مقترح بواسطة AI" : "AI Suggested"}
+                {t("recycle.aiSuggested")}
               </span>
             </div>
 
@@ -531,8 +530,8 @@ export default function Recycle() {
               >
                 <Sparkles className="w-5 h-5" />
                 {generating
-                  ? (isAr ? "جاري الإنشاء..." : "Generating...")
-                  : (isAr ? "إنشاء التصميم" : "Generate Design")}
+                  ? t("recycle.generatingDesignBtn")
+                  : t("recycle.generateDesignBtn")}
               </button>
             </div>
           </section>
@@ -557,7 +556,7 @@ export default function Recycle() {
               className="inline-flex items-center justify-center gap-2 w-full max-w-md py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
             >
               <Sparkles className="w-5 h-5" />
-              {isAr ? "المحاولة مرة أخرى" : "Try Again"}
+              {t("recycle.tryAgain")}
             </button>
           </div>
         )}

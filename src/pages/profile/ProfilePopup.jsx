@@ -141,10 +141,10 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
           <div className="flex items-center gap-3">
             <Globe size={18} className="text-gray-500" />
             <span className="text-sm font-bold text-gray-700 uppercase">
-              {settings.language === 'ar' ? 'العربية' : 'English'}
+              {settings.language === 'ar' ? t("profile.languageArabic") : t("profile.languageEnglish")}
             </span>
           </div>
-          <ChevronRight size={14} className="text-gray-300 group-hover:translate-x-1 transition-transform" />
+          <ChevronRight size={14} className={`text-gray-300 group-hover:translate-x-1 transition-transform ${isArabic ? 'rotate-180' : ''}`} />
         </div>
         <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
           <div className="flex items-center gap-3">

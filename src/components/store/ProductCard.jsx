@@ -78,7 +78,7 @@ const ProductCard = ({ product, store, viewMode }) => {
           <div className="absolute top-4 z-20 flex w-full px-4 items-start">
               {hasMatches === true && (
                 <span className="bg-[var(--color-brand-secondary)] text-white text-[10px] px-3 py-1.5 rounded-full shadow-sm font-bold uppercase tracking-wider">
-                    {isArabic ? 'مطابقة الخزانة' : 'match wardrobe'}
+                    {t("stores.matchWardrobe")}
                 </span>
               )}
               <button
@@ -90,7 +90,7 @@ const ProductCard = ({ product, store, viewMode }) => {
           </div>
           <img src={imageUrl} alt={displayName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
           <a href={product.purchase_url || "#"} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-              <div className="flex items-center gap-2 text-white font-black">{isArabic ? 'زيارة المتجر' : 'View Store'}<ArrowRight size={22} className={isArabic ? 'rotate-180' : ''} /></div>
+              <div className="flex items-center gap-2 text-white font-black">{t("stores.viewStore")}<ArrowRight size={22} className={isArabic ? 'rotate-180' : ''} /></div>
           </a>
         </div>
 
@@ -99,7 +99,7 @@ const ProductCard = ({ product, store, viewMode }) => {
           <div>
             <div className="flex justify-between items-start gap-2 mb-1">
               <h3 className="text-[17px] font-black text-gray-900 leading-tight truncate">{displayName}</h3>
-              <span className="text-[17px] font-black text-gray-900 whitespace-nowrap">{product.price} {isArabic ? 'ج.م' : 'EGP'}</span>
+              <span className="text-[17px] font-black text-gray-900 whitespace-nowrap">{product.price} {product.currency || 'EGP'}</span>
             </div>
             <p className="text-gray-400 text-sm font-bold uppercase tracking-wider mb-4">{brandName}</p>
           </div>
@@ -110,12 +110,12 @@ const ProductCard = ({ product, store, viewMode }) => {
                 onClick={handleSeeMatch}
                 className="flex-1 bg-[var(--color-brand-secondary)] text-white py-3 rounded-[8px] text-[13px] font-black hover:bg-[#7bc01b] transition-all shadow-md shadow-lime-100"
               >
-                {isArabic ? 'رؤية المطابقة' : 'See Match'}
+                {t("stores.seeMatch")}
               </button>
             )}
             <button onClick={handleTryOn} className="flex-1 flex items-center justify-center gap-2 bg-[var(--Primary-Brand-color)] text-white py-3 rounded-[8px] text-[13px] font-black hover:bg-[var(--color-primary-hover)] transition-all shadow-md shadow-blue-100 group/tryon">
               <Sparkles size={16} className="group-hover/tryon:rotate-12 transition-transform" />
-              {isArabic ? 'تجربة' : 'Try-on'}
+              {t("stores.tryOn")}
             </button>
           </div>
         </div>
