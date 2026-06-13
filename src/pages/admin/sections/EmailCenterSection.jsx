@@ -8,6 +8,7 @@ import {
   getEmailsApi, getEmailThreadApi, markEmailReadApi, markAllEmailsReadApi, replyToEmailApi,
   getContactMessagesApi, markContactReadApi,
 } from '../../../api/adminApi';
+import adminI18n from '../../../i18n/admin/adminI18n';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -84,6 +85,7 @@ function mapContactToCard(m) {
 }
 
 export default function EmailCenterSection({ onReadChange }) {
+  const { t } = adminI18n;
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEmail, setSelectedEmail] = useState(null);
@@ -260,10 +262,10 @@ export default function EmailCenterSection({ onReadChange }) {
         <div className="flex items-start sm:items-center justify-between gap-4 flex-col sm:flex-row">
           <div>
             <h1 className="text-[28px] sm:text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">
-              Email Center
+              {t('admin.emailCenter.title')}
             </h1>
             <p className="text-sm text-admin-text-secondary mt-2">
-              Manage your inbox and respond to customer inquiries
+              {t('admin.emailCenter.subtitle')}
             </p>
           </div>
           <button
@@ -272,7 +274,7 @@ export default function EmailCenterSection({ onReadChange }) {
             className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg transition-colors disabled:opacity-50 shrink-0"
           >
             <CheckCheck className="w-4 h-4" />
-            {markingAll ? 'Marking...' : 'Mark All Read'}
+            {markingAll ? 'Marking...' : t('admin.emailCenter.markAllRead')}
           </button>
         </div>
       </div>
@@ -280,17 +282,17 @@ export default function EmailCenterSection({ onReadChange }) {
       {/* Desktop Table */}
       <div className="hidden md:block bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
         <div className="flex items-center gap-2 px-6 py-3 border-b border-admin-border/40">
-          {['Inbox', 'Unread', 'All'].map((filter) => (
+          {[{ key: 'Inbox', label: t('admin.emailCenter.inbox') }, { key: 'Unread', label: t('admin.emailCenter.unread') }, { key: 'All', label: t('admin.emailCenter.all') }].map(({ key, label }) => (
             <button
-              key={filter}
-              onClick={() => { setActiveFilter(filter); setCurrentPage(1); }}
+              key={key}
+              onClick={() => { setActiveFilter(key); setCurrentPage(1); }}
               className={`px-4 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                activeFilter === filter
+                activeFilter === key
                   ? 'bg-admin-brand text-white'
                   : 'bg-admin-border/30 text-admin-text-secondary hover:bg-admin-border/50'
               }`}
             >
-              {filter}
+              {label}
             </button>
           ))}
         </div>
@@ -313,7 +315,7 @@ export default function EmailCenterSection({ onReadChange }) {
                 <EmailRow key={email.id} email={email} onSelect={handleSelectEmail} />
               ))
             ) : (
-              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">No emails yet.</td></tr>
+              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.emailCenter.noEmails')}</td></tr>
             )}
           </tbody>
         </table>
@@ -343,17 +345,17 @@ export default function EmailCenterSection({ onReadChange }) {
       {/* Mobile View */}
       <div className="md:hidden">
         <div className="flex items-center gap-2 mb-4 overflow-x-auto">
-          {['Inbox', 'Unread', 'All'].map((filter) => (
+          {[{ key: 'Inbox', label: t('admin.emailCenter.inbox') }, { key: 'Unread', label: t('admin.emailCenter.unread') }, { key: 'All', label: t('admin.emailCenter.all') }].map(({ key, label }) => (
             <button
-              key={filter}
-              onClick={() => { setActiveFilter(filter); setCurrentPage(1); }}
+              key={key}
+              onClick={() => { setActiveFilter(key); setCurrentPage(1); }}
               className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
-                activeFilter === filter
+                activeFilter === key
                   ? 'bg-admin-brand text-white'
                   : 'bg-admin-border/30 text-admin-text-secondary hover:bg-admin-border/50'
               }`}
             >
-              {filter}
+              {label}
             </button>
           ))}
         </div>
@@ -366,7 +368,7 @@ export default function EmailCenterSection({ onReadChange }) {
               <EmailCard key={email.id} email={email} onSelect={handleSelectEmail} />
             ))
           ) : (
-            <p className="p-4 text-center text-sm text-admin-text-muted">No emails yet.</p>
+            <p className="p-4 text-center text-sm text-admin-text-muted">{t('admin.emailCenter.noEmails')}</p>
           )}
         </div>
 

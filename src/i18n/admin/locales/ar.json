@@ -1,0 +1,130 @@
+{
+  "admin": {
+    "dashboard": {
+      "title": "لوحة التحكم",
+      "welcome": "مرحباً بعودتك",
+      "overview": "إليك ما يحدث مع متجرك اليوم."
+    },
+    "stores": {
+      "title": "إدارة المتاجر",
+      "subtitle": "إدارة متاجرك المتصلة ومزامنة المخزون.",
+      "addStore": "إضافة متجر",
+      "editStore": "تعديل المتجر",
+      "storeName": "اسم المتجر",
+      "location": "الموقع",
+      "products": "المنتجات",
+      "status": "الحالة",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "connected": "متصل",
+      "search": "البحث في المتاجر...",
+      "noStores": "لم يتم العثور على متاجر."
+    },
+    "products": {
+      "title": "إدارة المنتجات",
+      "subtitle": "تصفح وإدارة كتالوج المنتجات عبر جميع المتاجر.",
+      "addProduct": "إضافة منتج",
+      "editProduct": "تعديل المنتج",
+      "productName": "اسم المنتج",
+      "price": "السعر",
+      "category": "الفئة",
+      "store": "المتجر",
+      "search": "البحث في المنتجات...",
+      "noProducts": "لم يتم العثور على منتجات.",
+      "sortBy": "ترتيب حسب",
+      "priceLow": "السعر: من الأقل إلى الأعلى",
+      "priceHigh": "السعر: من الأعلى إلى الأقل",
+      "nameAZ": "الاسم: من أ إلى ي"
+    },
+    "notifications": {
+      "title": "مركز الإشعارات",
+      "subtitle": "عرض جميع الإشعارات المرسلة للمستخدمين.",
+      "createNew": "إنشاء جديد",
+      "allNotifications": "جميع الإشعارات",
+      "noNotifications": "لا توجد إشعارات بعد."
+    },
+    "emailCenter": {
+      "title": "مركز البريد",
+      "subtitle": "إدارة صندوق الوارد والرد على استفسارات العملاء.",
+      "markAllRead": "تحديد الكل كمقروء",
+      "inbox": "الصندوق الوارد",
+      "unread": "غير مقروء",
+      "all": "الكل",
+      "noEmails": "لا توجد رسائل بريد بعد.",
+      "reply": "رد",
+      "send": "إرسال"
+    },
+    "users": {
+      "title": "إدارة المستخدمين",
+      "subtitle": "الإشراف على وصول الفريق والأدوار وتعيينات المتاجر.",
+      "addUser": "إضافة مستخدم",
+      "editUser": "تعديل المستخدم",
+      "totalUsers": "إجمالي المستخدمين",
+      "verified": "موثق",
+      "admins": "المديرين",
+      "newUsers": "جدد (7 أيام)",
+      "search": "البحث في المستخدمين...",
+      "noUsers": "لم يتم العثور على مستخدمين.",
+      "delete": "حذف",
+      "edit": "تعديل"
+    },
+    "apiManagement": {
+      "title": "إدارة API",
+      "subtitle": "إدارة مفاتيح API ورموز الوصول.",
+      "noKeys": "لم يتم العثور على مفاتيح API."
+    },
+    "settings": {
+      "title": "إعدادات المنصة",
+      "subtitle": "إدارة بيئة المؤسسة وتفضيلات الإشعارات وأمان الحساب العام.",
+      "preferences": "التفضيلات",
+      "systemLanguage": "لغة النظام",
+      "systemLanguageDesc": "اختر لغتك المفضلة لواجهة لوحة التحكم.",
+      "notifications": "الإشعارات",
+      "pushNotifications": "إشعارات الدفع",
+      "pushNotificationsDesc": "تلقى تنبيهات فورية لتغييرات المخزون وحالة الطلبات.",
+      "emailDigests": "ملخصات البريد الإلكتروني",
+      "emailDigestsDesc": "تقارير أداء أسبوعية وملخص أنشطة المتاجر.",
+      "marketing": "الاتصالات التسويقية",
+      "marketingDesc": "نصائح للنمو وإعلانات ميزات المؤسسة الجديدة.",
+      "accountSupport": "الحساب والدعم",
+      "privacyPolicy": "سياسة الخصوصية",
+      "termsOfService": "شروط الخدمة",
+      "knowledgeBase": "قاعدة المعرفة",
+      "logOut": "تسجيل الخروج",
+      "saveConfiguration": "حفظ الإعدادات",
+      "discardChanges": "تجاهل التغييرات",
+      "settingsSaved": "تم حفظ الإعدادات"
+    },
+    "common": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "edit": "تعديل",
+      "add": "إضافة",
+      "search": "بحث...",
+      "loading": "جاري التحميل...",
+      "noData": "لا توجد بيانات متاحة.",
+      "confirm": "تأكيد",
+      "back": "رجوع",
+      "next": "التالي",
+      "send": "إرسال",
+      "discard": "تجاهل",
+      "english": "الإنجليزية",
+      "arabic": "العربية"
+    },
+    "sidebar": {
+      "dashboard": "لوحة التحكم",
+      "stores": "المتاجر",
+      "products": "المنتجات",
+      "notifications": "الإشعارات",
+      "emailCenter": "مركز البريد",
+      "users": "المستخدمين",
+      "apiManagement": "إدارة API",
+      "settings": "الإعدادات"
+    },
+    "topbar": {
+      "filter": "تصفية",
+      "clearFilter": "مسح التصفية"
+    }
+  }
+}

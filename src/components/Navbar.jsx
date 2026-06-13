@@ -53,7 +53,7 @@ const Navbar = ({ onOpenAuth }) => {
     const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
     return (
-      fullName || currentUser.name || currentUser.user?.name || t("nav.user")
+      fullName || currentUser.name || currentUser.user?.name || currentUser.email || ""
     );
   };
 

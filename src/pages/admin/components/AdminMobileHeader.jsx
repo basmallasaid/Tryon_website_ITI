@@ -1,6 +1,13 @@
 import { Bell, Mail, Moon } from 'lucide-react';
+import { useAuth } from '../../../context/AuthContext';
+
+const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='40' fill='%231550D3'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-size='28' font-weight='bold' fill='white'%3EAdmin%3C/text%3E%3C/svg%3E";
 
 export default function AdminMobileHeader({ className = '', unreadContacts = 0 }) {
+  const { user } = useAuth();
+  const profile = user?.profile || user?.user?.profile;
+  const avatar = profile?.avatar || user?.userImage || null;
+
   return (
     <div className={`${className} sticky top-0 z-10 bg-[rgba(250,248,255,0.8)] backdrop-blur-md shadow-sm pt-1`}>
       <div className="flex justify-between items-center px-4 h-10">
@@ -22,9 +29,12 @@ export default function AdminMobileHeader({ className = '', unreadContacts = 0 }
           <button className="p-2 text-admin-text-secondary">
             <Moon className="w-5 h-5" />
           </button>
-          <div className="w-8 h-8 rounded-full bg-admin-brand-light flex items-center justify-center text-xs font-bold text-white">
-            AD
-          </div>
+          <img
+            src={avatar || DEFAULT_AVATAR}
+            alt="Admin"
+            onError={(e) => { e.target.src = DEFAULT_AVATAR; }}
+            className="w-8 h-8 rounded-full object-cover"
+          />
         </div>
       </div>
     </div>

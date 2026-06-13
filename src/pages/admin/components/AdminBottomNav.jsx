@@ -1,23 +1,25 @@
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, Store, Package, Bell, Menu, Mail, Users, KeyRound, Settings, X, ChevronRight } from 'lucide-react';
-
-const tabs = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'stores', label: 'Stores', icon: Store },
-  { id: 'products', label: 'Products', icon: Package },
-  { id: 'notifications', label: 'Notification', icon: Bell },
-  { id: 'more', label: 'More', icon: Menu },
-];
-
-const moreItems = [
-  { id: 'emailCenter', label: 'Email Center', icon: Mail },
-  { id: 'users', label: 'Users', icon: Users },
-  { id: 'apiManagement', label: 'API Management', icon: KeyRound },
-  { id: 'settings', label: 'Settings', icon: Settings },
-];
+import adminI18n from '../../../i18n/admin/adminI18n';
 
 export default function AdminBottomNav({ className = '', activePage, setActivePage }) {
   const [showMore, setShowMore] = useState(false);
+  const { t } = adminI18n;
+
+  const tabs = [
+    { id: 'dashboard', label: t('admin.sidebar.dashboard'), icon: LayoutDashboard },
+    { id: 'stores', label: t('admin.sidebar.stores'), icon: Store },
+    { id: 'products', label: t('admin.sidebar.products'), icon: Package },
+    { id: 'notifications', label: t('admin.sidebar.notifications'), icon: Bell },
+    { id: 'more', label: 'More', icon: Menu },
+  ];
+
+  const moreItems = [
+    { id: 'emailCenter', label: t('admin.sidebar.emailCenter'), icon: Mail },
+    { id: 'users', label: t('admin.sidebar.users'), icon: Users },
+    { id: 'apiManagement', label: t('admin.sidebar.apiManagement'), icon: KeyRound },
+    { id: 'settings', label: t('admin.sidebar.settings'), icon: Settings },
+  ];
 
   useEffect(() => {
     document.body.style.overflow = showMore ? 'hidden' : '';

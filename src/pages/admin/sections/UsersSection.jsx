@@ -3,6 +3,7 @@ import { Shirt, RefreshCw, Plus, Trash2, Filter, X, AlertTriangle, RotateCcw, Pe
 import UserRow from '../components/UserRow';
 import QuotaBar from '../components/QuotaBar';
 import { getUsersApi, getUserStatsApi, deleteUserApi, markUserNotifiedApi } from '../../../api/adminApi';
+import adminI18n from '../../../i18n/admin/adminI18n';
 
 const avatarColors = ['#8ED321', '#3B82F6', '#8B5CF6', '#F97316', '#EC4899', '#14B8A6', '#EF4444', '#06B6D4'];
 
@@ -86,6 +87,7 @@ function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete }) {
 }
 
 export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFilter, onSendDeletionNotification, onEditUser }) {
+  const { t } = adminI18n;
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -194,15 +196,15 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
   };
 
   const statCards = stats ? [
-    { label: 'TOTAL USERS', value: stats.total.toLocaleString(), valueColor: 'text-admin-text-primary' },
-    { label: 'VERIFIED', value: stats.active.toLocaleString(), valueColor: 'text-admin-success' },
-    { label: 'ADMINS', value: stats.admins.toLocaleString(), valueColor: 'text-admin-text-primary' },
-    { label: 'NEW (7 DAYS)', value: stats.recentWeek.toLocaleString(), valueColor: 'text-admin-amber' },
+    { label: t('admin.users.totalUsers'), value: stats.total.toLocaleString(), valueColor: 'text-admin-text-primary' },
+    { label: t('admin.users.verified'), value: stats.active.toLocaleString(), valueColor: 'text-admin-success' },
+    { label: t('admin.users.admins'), value: stats.admins.toLocaleString(), valueColor: 'text-admin-text-primary' },
+    { label: t('admin.users.newUsers'), value: stats.recentWeek.toLocaleString(), valueColor: 'text-admin-amber' },
   ] : [
-    { label: 'TOTAL USERS', value: '—', valueColor: 'text-admin-text-primary' },
-    { label: 'VERIFIED', value: '—', valueColor: 'text-admin-success' },
-    { label: 'ADMINS', value: '—', valueColor: 'text-admin-text-primary' },
-    { label: 'NEW (7 DAYS)', value: '—', valueColor: 'text-admin-amber' },
+    { label: t('admin.users.totalUsers'), value: '—', valueColor: 'text-admin-text-primary' },
+    { label: t('admin.users.verified'), value: '—', valueColor: 'text-admin-success' },
+    { label: t('admin.users.admins'), value: '—', valueColor: 'text-admin-text-primary' },
+    { label: t('admin.users.newUsers'), value: '—', valueColor: 'text-admin-amber' },
   ];
 
   return (
@@ -210,8 +212,8 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
       {/* Desktop / Tablet */}
       <div className="hidden md:block p-4 md:p-6 lg:p-0">
         <div className="mb-8">
-          <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">Users Management</h1>
-          <p className="text-sm text-admin-text-secondary mt-1">Oversee your team access, roles, and store assignments.</p>
+          <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.users.title')}</h1>
+          <p className="text-sm text-admin-text-secondary mt-1">{t('admin.users.subtitle')}</p>
         </div>
 
         {/* Summary Cards */}
@@ -233,7 +235,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
             <Filter className="w-[14px] h-[14px] text-admin-text-secondary" />
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder={t('admin.users.search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="bg-transparent text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted w-full"
@@ -306,7 +308,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
                   />
                 ))
               ) : (
-                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">No users found.</td></tr>
+                <tr><td colSpan={6} className="py-12 text-center text-sm text-admin-text-muted">{t('admin.users.noUsers')}</td></tr>
               )}
             </tbody>
           </table>
@@ -316,8 +318,8 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
       {/* Mobile */}
       <div className="md:hidden px-4 py-6 flex flex-col gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">Users Management</h1>
-          <p className="text-sm text-admin-text-secondary mt-1">Oversee your team access, roles, and store assignments.</p>
+          <h1 className="text-2xl font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.users.title')}</h1>
+          <p className="text-sm text-admin-text-secondary mt-1">{t('admin.users.subtitle')}</p>
         </div>
 
         {/* Summary Cards */}
@@ -383,7 +385,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
               />
             ))
           ) : (
-            <p className="text-center text-sm text-admin-text-muted py-8">No users found.</p>
+            <p className="text-center text-sm text-admin-text-muted py-8">{t('admin.users.noUsers')}</p>
           )}
         </div>
 
