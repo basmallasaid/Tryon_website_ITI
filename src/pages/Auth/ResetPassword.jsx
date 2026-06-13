@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { showToast } from "../../utils/toast";
 
 export default function ResetPassword({ isVisible, onReset, onBackToLogin, inModal }) {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) return alert(t("auth.passwordsNoMatch"));
+    if (newPassword !== confirmPassword) return showToast('warning', t("auth.passwordsNoMatch"));
     onReset(newPassword, confirmPassword);
   };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Swal from 'sweetalert2';
+import { showToast } from '../../utils/toast';
 import WardrobeHealth from '../../components/wardrobe/WardrobeHealth';
 import WardrobeFilters from '../../components/wardrobe/WardrobeFilters';
 import WardrobeItemCard from '../../components/wardrobe/WardrobeItemCard';
@@ -66,9 +67,9 @@ const WardrobePage = () => {
       await deleteWardrobeItemApi(itemId);
       setItems((prev) => prev.filter((item) => item._id !== itemId));
       setSelectedItem(null);
-      Swal.fire({ icon: 'success', title: t('wardrobe.deletedSuccess'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+      showToast('success', t('wardrobe.deletedSuccess'));
     } catch (err) {
-      Swal.fire({ icon: 'error', title: t('wardrobe.deleteFailed'), toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+      showToast('error', t('wardrobe.deleteFailed'));
     }
   };
 

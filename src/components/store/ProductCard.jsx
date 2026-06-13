@@ -2,12 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Sparkles, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useFavorites } from '../../context/FavoritesContext';
 import MatchWardrobePopup from './MatchWardrobePopup'; 
 import { getProductMatchesApi } from '../../api/userApi'; 
+
+const getProductId = (product) => product._id?.$oid || product._id || product.id;
 
 const ProductCard = ({ product, store, viewMode }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
+  const { isFavorite, addItem, removeItem } = useFavorites();
+  const productId = getProductId(product);
+  const favorited = isFavorite(productId);
   const [isMatchOpen, setIsMatchOpen] = useState(false);
   const [matches, setMatches] = useState([]); 
   const [loadingMatches, setLoadingMatches] = useState(false); 
@@ -26,7 +32,6 @@ const ProductCard = ({ product, store, viewMode }) => {
     const fetchMatches = async () => {
       setLoadingMatches(true);
       try {
-        const productId = product._id?.$oid || product._id || product.id;
         const res = await getProductMatchesApi(productId);
         if (!cancelled) {
           const matchData = res.data.matches || [];
@@ -41,7 +46,7 @@ const ProductCard = ({ product, store, viewMode }) => {
     };
     fetchMatches();
     return () => { cancelled = true; };
-  }, [product._id?.$oid || product._id || product.id]);
+  }, [productId]);
 
   const handleSeeMatch = () => {
     setIsMatchOpen(true);
@@ -49,6 +54,15 @@ const ProductCard = ({ product, store, viewMode }) => {
 
   const handleTryOn = () => {
     navigate('/tryOn', { state: { productImage: imageUrl, productName: displayName } });
+  };
+
+  const handleFavorite = (e) => {
+    e.stopPropagation();
+    if (favorited) {
+      removeItem(productId);
+    } else {
+      addItem(productId, 'PRODUCT');
+    }
   };
 
   return (
@@ -67,8 +81,11 @@ const ProductCard = ({ product, store, viewMode }) => {
                     {isArabic ? 'مطابقة الخزانة' : 'match wardrobe'}
                 </span>
               )}
-              <button className="ms-auto p-2 bg-white/90 backdrop-blur-md rounded-full text-gray-400 hover:text-rose-500 transition-all shadow-sm">
-                  <Heart size={20} />
+              <button
+                  onClick={handleFavorite}
+                  className={`ms-auto p-2 bg-white/90 backdrop-blur-md rounded-full transition-all shadow-sm hover:scale-110 ${favorited ? 'text-rose-500' : 'text-gray-400 hover:text-rose-500'}`}
+              >
+                  <Heart size={20} className={favorited ? 'fill-rose-500' : ''} />
               </button>
           </div>
           <img src={imageUrl} alt={displayName} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />

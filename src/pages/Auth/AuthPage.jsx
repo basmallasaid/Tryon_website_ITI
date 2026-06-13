@@ -10,6 +10,7 @@ import ForgotPassword from "./ForgotPassword";
 import OtpVerification from "./OtpVerification";
 import ResetPassword from "./ResetPassword";
 import SlidingOverlay from "../../components/SlidingOverlay";
+import { showToast } from "../../utils/toast";
 export default function AuthPage({ initialIsLogin = true, inModal = false, onClose }) {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -84,7 +85,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
                 onClose?.();
             }
         } catch (error) {
-            alert(error.response?.data?.message || t("auth.loginFailed"));
+            showToast('error', error.response?.data?.message || t("auth.loginFailed"));
         }
     };
 
@@ -98,7 +99,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             confirmPassword: e.target.confirmPassword.value,
         };
 
-        if (formData.password !== formData.confirmPassword) return alert(t("auth.passwordsNoMatch"));
+        if (formData.password !== formData.confirmPassword) return showToast('warning', t("auth.passwordsNoMatch"));
 
         try {
             const res = await registerApi({
@@ -127,7 +128,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             });
             onClose?.();
         } catch (error) {
-            alert(error.response?.data?.message || t("auth.registrationFailed"));
+            showToast('error', error.response?.data?.message || t("auth.registrationFailed"));
         }
     };
 
@@ -139,7 +140,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             setForgotEmail(email);
             setView("otp");
         } catch (error) {
-            alert(error.response?.data?.message || t("auth.failedToSendReset"));
+            showToast('error', error.response?.data?.message || t("auth.failedToSendReset"));
         }
     };
 
@@ -148,18 +149,18 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             await otpVerifyApi({ email: forgotEmail, otp });
             setView("reset");
         } catch (error) {
-            alert(error.response?.data?.message || t("auth.verificationFailed"));
+            showToast('error', error.response?.data?.message || t("auth.verificationFailed"));
         }
     };
 
     const handleResetPassword = async (password, confirmPassword) => {
-        if (password !== confirmPassword) return alert(t("auth.passwordsNoMatch"));
+        if (password !== confirmPassword) return showToast('warning', t("auth.passwordsNoMatch"));
         try {
             await resetPasswordApi({ email: forgotEmail, password, confirmPassword });
-            alert(t("auth.resetSuccess"));
+            showToast('success', t("auth.resetSuccess"));
             setView("login");
         } catch (error) {
-            alert(error.response?.data?.message || t("auth.failedToReset"));
+            showToast('error', error.response?.data?.message || t("auth.failedToReset"));
         }
     };
 
