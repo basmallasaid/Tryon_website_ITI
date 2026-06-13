@@ -29,6 +29,7 @@ const Navbar = ({ onOpenAuth }) => {
   const location = useLocation();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMobileFeaturesOpen, setIsMobileFeaturesOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -62,16 +63,21 @@ const Navbar = ({ onOpenAuth }) => {
   };
 
   const navLinks = [
-    { name: t("nav.features"), path: "/" },
-    { name: t("nav.tryOn"), path: "/tryOn" },
-    { name: t("nav.matching"), path: "/matching" },
-    { name: t("nav.recycle"), path: "/recycle" },
+    { name: t("nav.home"), path: "/" },
     { name: t("nav.stores"), path: "/stores" },
-    {name:"Wardrobe",path:"/wardrobe"},
+    { name: "Wardrobe", path: "/wardrobe" },
     { name: t("nav.pricing"), path: "/pricing" },
     { name: t("nav.about") },
     { name: t("nav.contactUs"), path: "/contact-us" },
   ];
+
+  const featureItems = [
+    { name: t("nav.tryOn"), path: "/tryOn" },
+    { name: t("nav.recycle"), path: "/recycle" },
+    { name: t("nav.matching"), path: "/matching" },
+  ];
+
+  const isFeaturesActive = featureItems.some((item) => item.path === location.pathname);
 
   useEffect(() => {
     if (!user) return;
@@ -102,7 +108,56 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* Navigation Links (Desktop) */}
       <div className="hidden min-[1100px]:flex items-center gap-10 max-[1300px]:gap-6">
-        {navLinks.map((link) => {
+        {/* Home */}
+        <Link
+          to="/"
+          className={`text-[15px] font-medium transition-all duration-200 inline-block relative group ${
+            location.pathname === "/"
+              ? "text-brand-secondary"
+              : "text-text-secondary hover:text-text-primary"
+          }`}
+        >
+          {t("nav.home")}
+          <span
+            className={`absolute -bottom-1 left-0 h-0.5 bg-brand-secondary transition-all duration-300 ${location.pathname === "/" ? "w-full" : "w-0 group-hover:w-full"}`}
+          />
+        </Link>
+
+        {/* Features Dropdown */}
+        <div className="relative group">
+          <button
+            className={`flex items-center gap-1 text-[15px] font-medium transition-all duration-200 ${
+              isFeaturesActive
+                ? "text-brand-secondary"
+                : "text-text-secondary hover:text-text-primary"
+            }`}
+          >
+            {t("nav.featuresDropdown")}
+            <ChevronDown
+              className={`w-3 h-3 transition-transform duration-200 group-hover:rotate-180 ${isFeaturesActive ? "rotate-180" : ""}`}
+            />
+          </button>
+          <div
+            className={`absolute top-full ${isArabic ? "left-0" : "left-0"} mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50`}
+          >
+            {featureItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`block px-4 py-2.5 text-sm font-medium transition-colors ${
+                  item.path === location.pathname
+                    ? "text-brand-secondary bg-blue-50/50"
+                    : "text-gray-700 hover:bg-gray-50 hover:text-brand-secondary"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Remaining Links */}
+        {navLinks.slice(1).map((link) => {
           return link.path ? (
             <Link
               key={link.name}
@@ -325,7 +380,58 @@ const Navbar = ({ onOpenAuth }) => {
         </div>
 
         <div className="flex flex-col px-4 py-6 space-y-1">
-          {navLinks.map((link) => (
+          {/* Home */}
+          <Link
+            to="/"
+            onClick={() => setIsMobileOpen(false)}
+            className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
+              location.pathname === "/"
+                ? "bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20"
+                : "text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            {t("nav.home")}
+          </Link>
+
+          {/* Features Collapsible */}
+          <div>
+            <button
+              onClick={() => setIsMobileFeaturesOpen(!isMobileFeaturesOpen)}
+              className={`flex items-center justify-between w-full px-4 py-3 rounded-xl text-base font-bold transition-all ${
+                isFeaturesActive
+                  ? "bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20"
+                  : "text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              <span>{t("nav.featuresDropdown")}</span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${
+                  isMobileFeaturesOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {isMobileFeaturesOpen && (
+              <div className="ml-4 mt-1 space-y-1 border-l-2 border-gray-100 pl-2">
+                {featureItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setIsMobileOpen(false)}
+                    className={`block px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                      item.path === location.pathname
+                        ? "bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20"
+                        : "text-gray-500 hover:bg-gray-50"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Remaining Links */}
+          {navLinks.slice(1).map((link) => (
             <Link
               key={link.name}
               to={link.path || "#"}
