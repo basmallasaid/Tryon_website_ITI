@@ -13,7 +13,8 @@ import { getCategoriesByGender } from '../../constants/wardrobeCategories';
 import { getWardrobeApi, deleteWardrobeItemApi, getAnalysisApi, addWardrobeItemFromAnalysisApi, updateAnalysisApi } from '../../api/userApi';
 
 const EditItemWardrobe = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const isArabic = i18n.language === "ar";
     const { id } = useParams();
     const location = useLocation();
     const [searchParams] = useSearchParams();
@@ -204,18 +205,18 @@ const EditItemWardrobe = () => {
                 : 'bg-white border-gray-100 text-gray-500 hover:border-gray-300 hover:bg-gray-50'
                 }`}
         >
-            {(t('wardrobe.opt_' + label) || label).toUpperCase()}
+            {(t('wardrobe.opt_' + label.toLowerCase()) || label).toUpperCase()}
         </button>
     );
 
     const currentCategories = getCategoriesByGender(formData.gender);
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10">
+        <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-10" dir={isArabic ? 'rtl' : 'ltr'}>
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-between mb-8">
                     <button onClick={() => navigate('/wardrobe')} className="group flex items-center gap-2 rtl:flex-row-reverse text-gray-500 font-semibold hover:text-gray-900">
-                        <div className="p-2 bg-white rounded-lg shadow-sm"><ArrowLeft size={18} /></div>
+                        <div className="p-2 bg-white rounded-lg shadow-sm"><ArrowLeft size={18} className={isArabic ? 'rotate-180' : ''} /></div>
                         {t('wardrobe.backToWardrobe')}
                     </button>
                     {!isNew && (
@@ -231,8 +232,8 @@ const EditItemWardrobe = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <div className="lg:col-span-4 space-y-6">
-                        <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center">
+                    <div className={`lg:col-span-4 space-y-6${isArabic ? ' lg:order-2' : ''}`}>
+                        <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-left rtl:text-right">
                             <div className="w-64 h-80 rounded-[2rem] overflow-hidden bg-gray-50 border-4 border-gray-50 shadow-md">
                                 <img src={imageUrl} alt="Item" className="w-full h-full object-cover" />
                             </div>
@@ -244,7 +245,7 @@ const EditItemWardrobe = () => {
                                     value={formData.name}
                                     onChange={(e) => handleUpdateField('name', e.target.value)}
                                     readOnly={!isNew}
-                                    className="w-full mt-1 bg-gray-50 border-none rounded-2xl p-4 text-gray-900 font-bold text-lg focus:ring-2 focus:ring-blue-500/20"
+                                    className="w-full mt-1 bg-gray-50 border-none rounded-2xl p-4 text-gray-900 font-bold text-lg text-left rtl:text-right focus:ring-2 focus:ring-blue-500/20"
                                 />
                             </div>
 
@@ -263,10 +264,10 @@ const EditItemWardrobe = () => {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-8">
-                        <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-gray-100 space-y-10">
+                    <div className={`lg:col-span-8${isArabic ? ' lg:order-1' : ''}`}>
+                        <form onSubmit={handleSubmit} className="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-sm border border-gray-100 space-y-10 text-left rtl:text-right">
                             <section>
-                                <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
+                                <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
                                     <User size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.intendedGender')}
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
@@ -282,7 +283,7 @@ const EditItemWardrobe = () => {
 
                             <div className="grid md:grid-cols-2 gap-10">
                                 <section>
-                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
                                         <Shirt size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.category')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -297,7 +298,7 @@ const EditItemWardrobe = () => {
                                 </section>
 
                                 <section>
-                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
                                         <CloudSun size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.season')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -314,7 +315,7 @@ const EditItemWardrobe = () => {
 
                             <div className="grid md:grid-cols-2 gap-10">
                                 <section>
-                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
                                         <Sparkles size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.style')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
@@ -329,7 +330,7 @@ const EditItemWardrobe = () => {
                                 </section>
 
                                 <section>
-                                    <h3 className="flex items-center gap-2 rtl:flex-row-reverse text-sm font-bold text-gray-900 mb-4">
+                                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-900 mb-4 rtl:flex-row">
                                         <Layers size={18} className="text-[var(--color-brand-secondary)]" /> {t('wardrobe.pattern')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">

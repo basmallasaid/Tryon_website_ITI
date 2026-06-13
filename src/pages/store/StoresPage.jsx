@@ -140,25 +140,25 @@ const StoresPage = () => {
 
         <div className="flex-1 p-2 md:p-4">
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-black text-[#101828] tracking-tight mb-3">Stores</h1>
+            <h1 className="text-3xl md:text-4xl font-black text-[#101828] tracking-tight mb-3">{t("stores.title")}</h1>
             <p className="text-gray-500 text-[15px] font-medium mb-6">
-              you can get Discount on all your Favorite Brands Now, when you{" "}
-              <span className="bg-gradient-to-r from-[#8ED321] to-[#40B9FF] bg-clip-text text-transparent font-bold cursor-pointer hover:underline">install the application!</span>
+              {t("stores.discountSubtitle")}{" "}
+              <span className="bg-gradient-to-r from-[#8ED321] to-[#40B9FF] bg-clip-text text-transparent font-bold cursor-pointer hover:underline">{t("stores.installApp")}</span>
             </p>
 
             <div className="relative mb-6">
-              <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none"><Search className="h-5 w-5 text-gray-400" /></div>
-              <input type="text" placeholder="Search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-4 bg-white border-transparent rounded-[1.2rem] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#40B9FF]/20 transition-all text-gray-600 font-medium" />
+              <div className="absolute inset-y-0 ltr:left-4 rtl:right-4 flex items-center pointer-events-none"><Search className="h-5 w-5 text-gray-400" /></div>
+              <input type="text" placeholder={t("stores.searchPlaceholder")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full ltr:pl-12 rtl:pr-12 pr-4 py-4 bg-white border-transparent rounded-[1.2rem] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#40B9FF]/20 transition-all text-gray-600 font-medium" />
             </div>
 
             <div className="flex flex-wrap items-center justify-between bg-white px-6 py-4 rounded-[1.5rem] shadow-sm border border-gray-50 gap-4">
               <p className="text-sm font-medium text-gray-500">
-                Showing <span className="text-gray-900 font-bold">{(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, filteredProducts.length)}</span> of {filteredProducts.length} products
+                {t("stores.showing")} <span className="text-gray-900 font-bold">{(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, filteredProducts.length)}</span> {t("stores.of")} {filteredProducts.length} {t("stores.products")}
               </p>
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2 cursor-pointer group">
-                  <span className="text-xs text-gray-400 font-medium tracking-tight">Sort by:</span>
-                  <span className="text-sm font-bold text-gray-900 group-hover:text-[#40B9FF] transition-colors">Newest</span>
+                  <span className="text-xs text-gray-400 font-medium tracking-tight">{t("stores.sortBy")}</span>
+                  <span className="text-sm font-bold text-gray-900 group-hover:text-[#40B9FF] transition-colors">{t("stores.newest")}</span>
                   <ChevronDown size={16} className="text-gray-400" />
                 </div>
                 <div className="flex items-center gap-1 bg-[#F4F3F5] p-1.5 rounded-2xl">
