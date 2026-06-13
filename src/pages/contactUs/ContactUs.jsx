@@ -1,54 +1,35 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Questions from "../home/components/Questions";
+import { Mail, Phone, Send, MessageSquare } from "lucide-react"; // استخدام مكتبة Lucide للأيقونات
 
 const contactCards = [
   {
-    icon: "mail",
+    icon: <Mail className="w-5 h-5" />,
+    label: "Email",
     value: "redolapy.admin@gmail.com",
     href: "mailto:redolapy.admin@gmail.com",
+    color: "from-blue-400 to-blue-600",
   },
   {
-    icon: "phone",
-    value: "+20123456789",
+    icon: <Phone className="w-5 h-5" />,
+    label: "Phone",
+    value: "+20 123 456 789",
     href: "tel:+20123456789",
+    color: "from-emerald-400 to-emerald-600",
   },
   {
-    icon: "telegram",
-    value: "+20123456789",
+    icon: <MessageSquare className="w-5 h-5" />,
+    label: "Telegram",
+    value: "@Redolapy_Support",
     href: "#",
+    color: "from-lime-400 to-lime-600",
   },
 ];
 
-function ContactIcon({ type, className }) {
-  if (type === "mail") {
-    return (
-      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect width="20" height="16" x="2" y="4" rx="2" />
-        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-      </svg>
-    );
-  }
-  if (type === "phone") {
-    return (
-      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-      </svg>
-    );
-  }
-  if (type === "telegram") {
-    return (
-      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 2 11 13" />
-        <path d="M22 2 15 22 11 13 2 9z" />
-      </svg>
-    );
-  }
-  return null;
-}
-
 export default function ContactUs() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
 
   const handleChange = (e) => {
@@ -58,108 +39,119 @@ export default function ContactUs() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Logic for submission
     setFormData({ name: "", email: "", message: "" });
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f6f7]">
-      {/* Main Content */}
-      <section className="px-6 sm:px-10 lg:px-20 pt-16 pb-16 lg:pt-24 lg:pb-24">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          {/* Left Column: Heading + Description + Contact Cards */}
-          <div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#121826] leading-tight">
-              {t("contactUs.heading")}
-            </h1>
-            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-bold mt-2 mb-6">
-              <span
-                style={{
-                  background: "linear-gradient(90deg, #40B9FF 0%, #69C9AC 50%, #AAE338 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                {t("contactUs.teamName")}
-              </span>
-            </h2>
-            <p className="text-[#6b7280] text-base sm:text-lg leading-relaxed whitespace-pre-line mb-10 max-w-md">
-              {t("contactUs.description")}
-            </p>
+    <div className={`min-h-screen bg-[#F8FAFC] ${isArabic ? "rtl" : "ltr"}`}>
+      <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+          
+          {/* Left Column: Content */}
+          <div className="lg:col-span-5 space-y-10">
+            <div className="space-y-4">
+              <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight">
+                {t("contactUs.heading")}
+              </h1>
+              <h2 className="text-3xl lg:text-5xl font-bold">
+                <span className="bg-gradient-to-r from-[#40B9FF] via-[#69C9AC] to-[#AAE338] bg-clip-text text-transparent">
+                  {t("contactUs.teamName")}
+                </span>
+              </h2>
+              <p className="text-slate-500 text-lg leading-relaxed max-w-md">
+                {t("contactUs.description")}
+              </p>
+            </div>
 
-            {/* Contact Cards */}
-            <div className="flex flex-col gap-4">
-              {contactCards.map((card) => (
-                <div
-                  key={card.icon}
-                  className="rounded-lg bg-gradient-to-r from-[#a6e22e] via-[#74D6B6] to-[#40b9ff] p-[4px] max-w-sm"
+            {/* Contact Cards Grid */}
+            <div className="grid gap-4">
+              {contactCards.map((card, index) => (
+                <a
+                  key={index}
+                  href={card.href}
+                  className="group flex items-center gap-5 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-brand-secondary/30 transition-all duration-300"
                 >
-                  <a
-                    href={card.href}
-                    className="flex items-center gap-4 bg-white rounded-[4px] px-5 py-3 w-full"
-                  >
-                    <ContactIcon type={card.icon} className="w-5 h-5 text-[#121826] shrink-0" />
-                    <span className="text-base font-semibold text-[#121826]">{card.value}</span>
-                  </a>
-                </div>
+                  <div className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm group-hover:scale-110 transition-transform`}>
+                    {card.icon}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{card.label}</p>
+                    <p className="text-slate-700 font-bold">{card.value}</p>
+                  </div>
+                </a>
               ))}
             </div>
           </div>
 
-          {/* Right Column: Contact Form */}
-          <div className="flex flex-col justify-start lg:pt-16">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-[#121826] mb-2">
-                  {t("contactUs.nameLabel")}
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder={t("contactUs.namePlaceholder")}
-                  className="w-full h-12 px-4 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-[#121826] mb-2">
-                  {t("contactUs.emailLabel")}
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t("contactUs.emailPlaceholder")}
-                  className="w-full h-12 px-4 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-[#121826] mb-2">
-                  {t("contactUs.messageLabel")}
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder={t("contactUs.messagePlaceholder")}
-                  rows={7}
-                  className="w-full px-4 py-3 rounded-lg border border-[#d5d9de] bg-white text-[#121826] text-sm placeholder:text-[#a0a6b2] outline-none resize-none focus:border-[#40b9ff] focus:ring-2 focus:ring-[#40b9ff]/20 transition-all"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full h-12 rounded-lg bg-[#40b9ff] hover:bg-[#33a8f0] active:scale-[0.98] text-white text-base font-semibold transition-all cursor-pointer"
-              >
-                {t("contactUs.sendButton")}
-              </button>
-            </form>
+          {/* Right Column: Form Card */}
+          <div className="lg:col-span-7">
+            <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 shadow-xl shadow-slate-200/50 border border-slate-50 relative overflow-hidden">
+              {/* Decorative background element */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-brand-secondary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
+              
+              <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700 ml-1">
+                      {t("contactUs.nameLabel")}
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder={t("contactUs.namePlaceholder")}
+                      className="w-full h-14 px-5 rounded-2xl bg-slate-50 border-none text-slate-900 focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-slate-700 ml-1">
+                      {t("contactUs.emailLabel")}
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder={t("contactUs.emailPlaceholder")}
+                      className="w-full h-14 px-5 rounded-2xl bg-slate-50 border-none text-slate-900 focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700 ml-1">
+                    {t("contactUs.messageLabel")}
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder={t("contactUs.messagePlaceholder")}
+                    rows={5}
+                    className="w-full p-5 rounded-2xl bg-slate-50 border-none text-slate-900 focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full h-16 rounded-2xl bg-[var(--color-primary)] text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-slate-200 active:scale-95 transition-all group"
+                >
+                  <span>{t("contactUs.sendButton")}</span>
+                  <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+                </button>
+              </form>
+            </div>
           </div>
+
         </div>
       </section>
 
       {/* FAQ Section */}
-      <Questions />
+      <div className="bg-white border-t border-slate-100">
+        <Questions />
+      </div>
     </div>
   );
 }
