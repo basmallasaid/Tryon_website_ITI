@@ -107,6 +107,23 @@
   --warning-bg: #451A03;
   --warning-text: #FBBF24;
   --overlay: rgba(0, 0, 0, 0.6);
+
+  /* ── Admin token overrides ── */
+  --color-admin-brand: #4FC3FF;
+  --color-admin-brand-light: #66B3FF;
+  --color-admin-brand-bg: var(--surface);
+  --color-admin-brand-activeBg: #2A2A2A;
+  --color-admin-sidebar: var(--bg-secondary);
+  --color-admin-border: var(--border);
+  --color-admin-text-primary: var(--text-primary);
+  --color-admin-text-secondary: var(--text-secondary);
+  --color-admin-text-muted: #8B95A5;
+  --color-admin-success: #86EFAC;
+  --color-admin-amber: #FBBF24;
+  --color-admin-danger: #FCA5A5;
+  --color-admin-input: var(--bg-secondary);
+  --color-admin-profile: var(--surface);
+  --color-admin-category: #2A2A2A;
 }
 
 @theme {
