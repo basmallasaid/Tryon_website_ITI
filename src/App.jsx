@@ -17,6 +17,7 @@ import Recycle from './pages/recycle/Recycle';
 import Matching from './pages/matching/Matching';
 import AboutRecycle from './pages/aboutRecycle/AboutRecycle';
 import AboutTryon from './pages/aboutTryOn/AboutTryon';
+import About from './pages/about/About';
 import PricingPage from './pages/pricing/PricingPage';
 import AvatarGeneration from './pages/avatar/AvatarGeneration';
 import EditProfilePage from './pages/profile/EditProfilePage';
@@ -99,6 +100,7 @@ function AppContent() {
             { path: 'login', element: <Navigate to="/" replace state={{ openAuth: 'login' }} /> },
             { path: 'about-tryon', element: <AboutTryon /> },
             { path: 'about-recycle', element: <AboutRecycle /> },
+            { path: 'about', element: <About /> },
             { path: 'contact-us', element: <ContactUs /> },
             { path: 'auth/callback', element: <GoogleCallback /> },
             {

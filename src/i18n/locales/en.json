@@ -622,6 +622,26 @@
     "step3Title": "See It Instantly",
     "step3Desc": "Get a realistic preview in seconds. See exactly how the outfit looks on you with lifelike detail."
   },
+  "aboutPage": {
+    "heroTitle1": "Redefining Fashion",
+    "heroTitle2": "With AI.",
+    "heroSubtitle": "Redefining fashion with AI-powered innovation.",
+    "heroDesc": "We are building the future of personal styling — where AI meets sustainability, and every wardrobe is smarter, greener, and more expressive. Our platform empowers you to discover your style, reduce waste, and make fashion personal again.",
+    "getStarted": "Get Started",
+    "ourMission": "Our Mission",
+    "missionSub": "Empowering sustainable style through artificial intelligence.",
+    "missionDesc": "At Redolapy, we believe fashion should be personal, sustainable, and accessible to everyone. Our mission is to transform how people interact with their wardrobes by combining cutting-edge AI with circular fashion principles. We help you make smarter choices — reducing textile waste while maximizing your style potential.",
+    "valuesTitle": "Why We Built This Platform",
+    "valuesSub": "Three pillars that drive everything we do.",
+    "value1Title": "AI-Powered Personalization",
+    "value1Desc": "Our advanced algorithms learn your unique style preferences, body measurements, and wardrobe inventory to deliver hyper-personalized recommendations that actually work for you.",
+    "value2Title": "Circular Fashion Economy",
+    "value2Desc": "We are committed to reducing fashion waste by promoting upcycling, smart recycling, and extending the lifecycle of every garment through intelligent recommendations.",
+    "value3Title": "Inclusive & Accessible",
+    "value3Desc": "Fashion is for everyone. Our platform is designed to be accessible, inclusive, and adaptable to all body types, style preferences, and budgets.",
+    "teamTitle": "Who are ReDolapy Team?",
+    "teamSub": "Get to Know our Team"
+  },
   "profile": {
     "notifications": "Notifications",
     "darkMode": "Dark Mode",
