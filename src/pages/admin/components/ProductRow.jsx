@@ -5,11 +5,16 @@ const statusStyles = {
   Draft: 'bg-admin-border/20 text-admin-text-muted',
 };
 
-export default function ProductRow({ product }) {
+export default function ProductRow({ product, selected, onToggle }) {
   return (
-    <tr className="border-b border-admin-border/40 hover:bg-admin-brand-activeBg/30 transition-colors">
+    <tr className={`border-b border-admin-border/40 hover:bg-admin-brand-activeBg/30 transition-colors ${selected ? 'bg-admin-brand-bg/40' : ''}`}>
       <td className="py-3 px-4">
-        <input type="checkbox" className="w-4 h-4 rounded border-admin-border accent-admin-brand" />
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => onToggle(product.id)}
+          className="w-4 h-4 rounded border-admin-border accent-admin-brand"
+        />
       </td>
 
       <td className="py-3 px-4">

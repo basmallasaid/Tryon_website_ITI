@@ -1,21 +1,331 @@
-import { useState } from 'react';
-import { ArrowLeft, Upload, Calendar, ChevronDown, Send, Play, MoreVertical } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, Calendar, ChevronDown, Send, CheckCircle, Users, User, Mail, Smartphone, Globe } from 'lucide-react';
+import { broadcastNotificationApi, sendToUserNotificationApi, getUsersApi } from '../../../api/adminApi';
+
+const CHANNELS = [
+  { id: 'app', label: 'In-App', icon: Smartphone, desc: 'Show inside the app' },
+  { id: 'email', label: 'Email', icon: Mail, desc: 'Send via email' },
+  { id: 'website', label: 'Push', icon: Globe, desc: 'Browser push notification' },
+];
+
+function TargetSection({ sendMode, setSendMode, emailSearch, setEmailSearch, targetEmail, setTargetEmail, showDropdown, setShowDropdown, filteredUsers }) {
+  const handleSelect = (email) => {
+    setTargetEmail(email);
+    setEmailSearch('');
+    setShowDropdown(false);
+  };
+
+  return (
+    <div className="bg-admin-brand-bg border border-admin-border/40 rounded-xl p-6 shadow-sm">
+      <h2 className="text-xl font-medium text-admin-text-primary mb-6">Target</h2>
+
+      <div className="flex items-center gap-2 mb-6">
+        <button
+          onClick={() => { setSendMode('broadcast'); setEmailSearch(''); setTargetEmail(''); }}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+            sendMode === 'broadcast' ? 'bg-admin-brand text-white' : 'bg-admin-border/20 text-admin-text-secondary hover:bg-admin-border/40'
+          }`}
+        >
+          <Users className="w-4 h-4" /> Broadcast to All
+        </button>
+        <button
+          onClick={() => setSendMode('individual')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+            sendMode === 'individual' ? 'bg-admin-brand text-white' : 'bg-admin-border/20 text-admin-text-secondary hover:bg-admin-border/40'
+          }`}
+        >
+          <User className="w-4 h-4" /> Individual User
+        </button>
+      </div>
+
+      {sendMode === 'individual' && (
+        <div className="relative">
+          <label className="block text-xs font-medium text-admin-text-primary mb-2">User Email *</label>
+          {targetEmail && (
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-3 py-1.5 bg-admin-brand/10 text-admin-brand rounded-full text-xs font-medium">
+                {targetEmail}
+              </span>
+              <button
+                onClick={() => { setTargetEmail(''); setEmailSearch(''); }}
+                className="text-admin-text-muted hover:text-admin-danger text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+          {!targetEmail && (
+            <input
+              type="email"
+              value={emailSearch}
+              onChange={(e) => setEmailSearch(e.target.value)}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+              placeholder="Search by name or email..."
+              className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
+            />
+          )}
+          {showDropdown && emailSearch.trim() && !targetEmail && (
+            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-admin-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+              {filteredUsers.length > 0 ? (
+                filteredUsers.slice(0, 10).map((u) => {
+                  const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email;
+                  return (
+                    <button
+                      key={u._id}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => handleSelect(u.email)}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-admin-brand-activeBg transition-colors text-left"
+                    >
+                      <div className="w-7 h-7 rounded-full bg-admin-brand/10 flex items-center justify-center text-[10px] font-bold text-admin-brand">
+                        {u.profile?.first_name?.[0] || u.email[0].toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-admin-text-primary truncate">{name}</p>
+                        <p className="text-xs text-admin-text-muted truncate">{u.email}</p>
+                      </div>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-3 text-xs text-admin-text-muted">No users found. Press Enter to use this email.</div>
+              )}
+            </div>
+          )}
+          {showDropdown && emailSearch.trim() && !targetEmail && (
+            <div
+              className="absolute z-20 bottom-0 left-0 right-0 bg-white border border-admin-border rounded-b-lg px-4 py-2 cursor-pointer hover:bg-admin-brand-activeBg"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setTargetEmail(emailSearch.trim());
+                setEmailSearch('');
+                setShowDropdown(false);
+              }}
+            >
+              <p className="text-xs text-admin-brand font-medium">Use "{emailSearch.trim()}" as email</p>
+            </div>
+          )}
+          <p className="text-[11px] text-admin-text-muted mt-2">Type to search users or enter an email directly.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileTargetSection({ sendMode, setSendMode, emailSearch, setEmailSearch, targetEmail, setTargetEmail, showDropdown, setShowDropdown, filteredUsers }) {
+  const handleSelect = (email) => {
+    setTargetEmail(email);
+    setEmailSearch('');
+    setShowDropdown(false);
+  };
+
+  return (
+    <div className="bg-admin-brand-bg border border-admin-border/40 rounded-xl p-4">
+      <h2 className="text-lg font-medium text-admin-text-primary mb-4">Target</h2>
+
+      <div className="flex items-center gap-2 mb-4">
+        <button
+          onClick={() => { setSendMode('broadcast'); setEmailSearch(''); setTargetEmail(''); }}
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${
+            sendMode === 'broadcast' ? 'bg-admin-brand text-white' : 'bg-white border border-admin-border text-admin-text-secondary'
+          }`}
+        >
+          <Users className="w-3.5 h-3.5" /> Broadcast
+        </button>
+        <button
+          onClick={() => setSendMode('individual')}
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${
+            sendMode === 'individual' ? 'bg-admin-brand text-white' : 'bg-white border border-admin-border text-admin-text-secondary'
+          }`}
+        >
+          <User className="w-3.5 h-3.5" /> Individual
+        </button>
+      </div>
+
+      {sendMode === 'individual' && (
+        <div className="relative">
+          {targetEmail && (
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-3 py-1.5 bg-admin-brand/10 text-admin-brand rounded-full text-xs font-medium">
+                {targetEmail}
+              </span>
+              <button
+                onClick={() => { setTargetEmail(''); setEmailSearch(''); }}
+                className="text-admin-text-muted hover:text-admin-danger text-xs"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+          {!targetEmail && (
+            <input
+              type="email"
+              value={emailSearch}
+              onChange={(e) => setEmailSearch(e.target.value)}
+              onFocus={() => setShowDropdown(true)}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+              placeholder="Search by name or email..."
+              className="w-full px-4 py-3 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
+            />
+          )}
+          {showDropdown && emailSearch.trim() && !targetEmail && (
+            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-admin-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+              {filteredUsers.length > 0 ? (
+                filteredUsers.slice(0, 8).map((u) => {
+                  const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email;
+                  return (
+                    <button
+                      key={u._id}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => handleSelect(u.email)}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-admin-brand-activeBg transition-colors text-left"
+                    >
+                      <div className="w-7 h-7 rounded-full bg-admin-brand/10 flex items-center justify-center text-[10px] font-bold text-admin-brand">
+                        {u.profile?.first_name?.[0] || u.email[0].toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-admin-text-primary truncate">{name}</p>
+                        <p className="text-xs text-admin-text-muted truncate">{u.email}</p>
+                      </div>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-3 text-xs text-admin-text-muted">No users found.</div>
+              )}
+            </div>
+          )}
+          {showDropdown && emailSearch.trim() && !targetEmail && (
+            <div
+              className="absolute z-20 bottom-0 left-0 right-0 bg-white border border-admin-border rounded-b-lg px-4 py-2.5 cursor-pointer hover:bg-admin-brand-activeBg"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setTargetEmail(emailSearch.trim());
+                setEmailSearch('');
+                setShowDropdown(false);
+              }}
+            >
+              <p className="text-xs text-admin-brand font-medium">Use "{emailSearch.trim()}" as email</p>
+            </div>
+          )}
+          <p className="text-[11px] text-admin-text-muted mt-2">Type to search or enter email directly.</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AddNotificationSection({ onBack }) {
+  const [sendMode, setSendMode] = useState('broadcast');
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [deepLinkPath, setDeepLinkPath] = useState('');
-  const [audience, setAudience] = useState('All Users');
-  const [scheduleTime, setScheduleTime] = useState('');
-  const [image, setImage] = useState(null);
+  const [targetEmail, setTargetEmail] = useState('');
+  const [emailSearch, setEmailSearch] = useState('');
+  const [users, setUsers] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [sentCount, setSentCount] = useState(0);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [channels, setChannels] = useState(['app']);
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setImage(reader.result);
-      reader.readAsDataURL(file);
+  const toggleChannel = (id) => {
+    setChannels((prev) => {
+      if (prev.includes(id)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((c) => c !== id);
+      }
+      return [...prev, id];
+    });
+  };
+
+  useEffect(() => {
+    if (sendMode === 'individual') {
+      getUsersApi()
+        .then((res) => setUsers(Array.isArray(res.data) ? res.data : []))
+        .catch(() => {});
     }
+  }, [sendMode]);
+
+  const filteredUsers = users.filter((u) => {
+    if (!emailSearch.trim()) return true;
+    const q = emailSearch.toLowerCase();
+    const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ');
+    return u.email.toLowerCase().includes(q) || name.toLowerCase().includes(q);
+  });
+
+  const handleSend = async () => {
+    if (!title.trim() || !message.trim()) {
+      alert('Please fill in both title and message.');
+      return;
+    }
+    if (sendMode === 'individual' && !targetEmail.trim()) {
+      alert('Please select or enter a user email.');
+      return;
+    }
+    if (channels.length === 0) {
+      alert('Please select at least one delivery channel.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const payload = {
+        title: title.trim(),
+        message: message.trim(),
+        channels,
+        data: { type: 'general' },
+      };
+      if (sendMode === 'broadcast') {
+        const res = await broadcastNotificationApi(payload);
+        setSentCount(res.data?.deviceCount || 0);
+        const chLabels = channels.map((c) => CHANNELS.find((ch) => ch.id === c)?.label).filter(Boolean).join(', ');
+        setSuccessMessage(`Broadcast to all users via ${chLabels}.`);
+      } else {
+        const res = await sendToUserNotificationApi({ ...payload, email: targetEmail.trim() });
+        setSentCount(res.data?.deviceCount || 0);
+        const chLabels = channels.map((c) => CHANNELS.find((ch) => ch.id === c)?.label).filter(Boolean).join(', ');
+        setSuccessMessage(`Sent to ${targetEmail.trim()} via ${chLabels}.`);
+      }
+      setSuccess(true);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to send notification.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <>
+        <div className="hidden lg:flex items-center justify-center min-h-screen p-8">
+          <div className="text-center max-w-md">
+            <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">Notification Sent!</h2>
+            <p className="text-sm text-admin-text-secondary mb-2">"{title}"</p>
+            <p className="text-xs text-admin-text-muted mb-6">{successMessage}</p>
+            <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
+              Back to Notifications
+            </button>
+          </div>
+        </div>
+        <div className="lg:hidden flex items-center justify-center min-h-screen p-8">
+          <div className="text-center max-w-md">
+            <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">Notification Sent!</h2>
+            <p className="text-sm text-admin-text-secondary mb-2">"{title}"</p>
+            <p className="text-xs text-admin-text-muted mb-6">{successMessage}</p>
+            <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
+              Back to Notifications
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const targetProps = {
+    sendMode, setSendMode, emailSearch, setEmailSearch,
+    targetEmail, setTargetEmail, showDropdown, setShowDropdown, filteredUsers,
   };
 
   return (
@@ -24,16 +334,15 @@ export default function AddNotificationSection({ onBack }) {
       <div className="hidden lg:block p-8">
         <div className="mb-8">
           <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">Create New Notification</h1>
-          <p className="text-sm text-admin-text-secondary mt-1">Configure and target your push notification to reach the right audience at the right time.</p>
+          <p className="text-sm text-admin-text-secondary mt-1">Configure and target your push notification to reach the right audience.</p>
         </div>
 
         <div className="space-y-6">
-          {/* Notification Content Card */}
           <div className="bg-admin-brand-bg border border-admin-border/40 rounded-xl p-6 shadow-sm">
             <h2 className="text-xl font-medium text-admin-text-primary mb-6">Notification Content</h2>
             <div className="space-y-6">
               <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Title</label>
+                <label className="block text-xs font-medium text-admin-text-primary mb-2">Title *</label>
                 <input
                   type="text"
                   value={title}
@@ -43,7 +352,7 @@ export default function AddNotificationSection({ onBack }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Message</label>
+                <label className="block text-xs font-medium text-admin-text-primary mb-2">Message *</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -52,79 +361,62 @@ export default function AddNotificationSection({ onBack }) {
                   className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors resize-none"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Image Upload (Dropzone)</label>
-                <div className="border-2 border-dashed border-admin-border rounded-xl p-8 flex flex-col items-center justify-center gap-3">
-                  <div className="w-12 h-12 bg-admin-profile rounded-full flex items-center justify-center">
-                    <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5.5 16C3.98333 16 2.6875 15.475 1.6125 14.425C0.5375 13.375 0 12.0917 0 10.575C0 9.275 0.391667 8.11667 1.175 7.1C1.95833 6.08333 2.98333 5.43333 4.25 5.15C4.66667 3.61667 5.5 2.375 6.75 1.425C8 0.475 9.41667 0 11 0C12.95 0 14.6042 0.679167 15.9625 2.0375C17.3208 3.39583 18 5.05 18 7C19.15 7.13333 20.1042 7.62917 20.8625 8.4875C21.6208 9.34583 22 10.35 22 11.5C22 12.75 21.5625 13.8125 20.6875 14.6875C19.8125 15.5625 18.75 16 17.5 16H12C11.45 16 10.9792 15.8042 10.5875 15.4125C10.1958 15.0208 10 14.55 10 14V8.85L8.4 10.4L7 9L11 5L15 9L13.6 10.4L12 8.85V14H17.5C18.2 14 18.7917 13.7583 19.275 13.275C19.7583 12.7917 20 12.2 20 11.5C20 10.8 19.7583 10.2083 19.275 9.725C18.7917 9.24167 18.2 9 17.5 9H16V7C16 5.61667 15.5125 4.4375 14.5375 3.4625C13.5625 2.4875 12.3833 2 11 2C9.61667 2 8.4375 2.4875 7.4625 3.4625C6.4875 4.4375 6 5.61667 6 7H5.5C4.53333 7 3.70833 7.34167 3.025 8.025C2.34167 8.70833 2 9.53333 2 10.5C2 11.4667 2.34167 12.2917 3.025 12.975C3.70833 13.6583 4.53333 14 5.5 14H8V16H5.5Z" fill="#434654"/>
-                    </svg>
-                  </div>
-                  <p className="text-xs font-bold text-admin-brand">Click to upload or drag and drop</p>
-                  <p className="text-[10px] text-admin-text-muted">PNG, JPG or GIF (max. 2MB)</p>
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Deep Link (URL)</label>
-                <div className="flex">
-                  <span className="flex items-center px-4 py-3 bg-admin-profile border border-r-0 border-admin-border rounded-l-lg text-sm text-admin-text-secondary">dolapy://</span>
-                  <input
-                    type="text"
-                    value={deepLinkPath}
-                    onChange={(e) => setDeepLinkPath(e.target.value)}
-                    placeholder="app/collection/summer-2024"
-                    className="flex-1 px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-r-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
-                  />
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Targeting & Schedule Card */}
           <div className="bg-admin-brand-bg border border-admin-border/40 rounded-xl p-6 shadow-sm">
-            <h2 className="text-xl font-medium text-admin-text-primary mb-6">Targeting & Schedule</h2>
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Audience Selection</label>
-                <div className="relative">
-                  <select
-                    value={audience}
-                    onChange={(e) => setAudience(e.target.value)}
-                    className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none appearance-none cursor-pointer focus:border-admin-brand transition-colors"
+            <h2 className="text-xl font-medium text-admin-text-primary mb-2">Send To</h2>
+            <p className="text-xs text-admin-text-muted mb-4">Choose where to deliver this notification. At least one required.</p>
+            <div className="flex gap-3">
+              {CHANNELS.map(({ id, label, icon: Icon, desc }) => {
+                const selected = channels.includes(id);
+                return (
+                  <button
+                    key={id}
+                    onClick={() => toggleChannel(id)}
+                    className={`flex-1 flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                      selected
+                        ? 'border-admin-brand bg-admin-brand/5'
+                        : 'border-admin-border/40 bg-white hover:border-admin-border'
+                    }`}
                   >
-                    <option>All Users</option>
-                    <option>Active Users</option>
-                    <option>New Users</option>
-                    <option>Premium Users</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-admin-text-muted pointer-events-none" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Schedule Time</label>
-                <div className="relative">
-                  <input
-                    type="datetime-local"
-                    value={scheduleTime}
-                    onChange={(e) => setScheduleTime(e.target.value)}
-                    className="w-full px-4 py-3 pl-10 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
-                  />
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-admin-text-muted pointer-events-none" />
-                </div>
-              </div>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      selected ? 'bg-admin-brand text-white' : 'bg-admin-border/20 text-admin-text-muted'
+                    }`}>
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="text-left">
+                      <p className={`text-sm font-medium ${selected ? 'text-admin-brand' : 'text-admin-text-primary'}`}>{label}</p>
+                      <p className="text-[10px] text-admin-text-muted">{desc}</p>
+                    </div>
+                    <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                      selected ? 'border-admin-brand bg-admin-brand' : 'border-admin-border'
+                    }`}>
+                      {selected && (
+                        <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Action Bar */}
+          <TargetSection {...targetProps} />
+
           <div className="flex items-center justify-end gap-4 pb-12">
             <button onClick={onBack} className="px-6 py-3 text-sm font-medium text-admin-text-primary rounded-xl hover:bg-admin-border/20 transition-colors">
               Cancel
             </button>
-            <button className="px-8 py-3 border-2 border-admin-brand text-admin-brand rounded-xl text-sm font-bold hover:bg-admin-brand/5 transition-colors">
-              Schedule
-            </button>
-            <button className="px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors">
-              Send Now
+            <button
+              onClick={handleSend}
+              disabled={submitting || !title.trim() || !message.trim() || (sendMode === 'individual' && !targetEmail.trim())}
+              className="px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50 flex items-center gap-2"
+            >
+              <Send className="w-4 h-4" />
+              {submitting ? 'Sending…' : sendMode === 'individual' ? 'Send to User' : 'Broadcast Now'}
             </button>
           </div>
         </div>
@@ -138,14 +430,11 @@ export default function AddNotificationSection({ onBack }) {
               <ArrowLeft className="w-5 h-5 text-admin-text-primary" />
             </button>
             <h1 className="text-lg font-bold text-admin-text-primary">Add Notification</h1>
-            <button className="p-1">
-              <MoreVertical className="w-5 h-5 text-admin-text-primary" />
-            </button>
+            <div className="w-7" />
           </div>
         </div>
 
         <div className="p-4 space-y-4">
-          {/* Content Details */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-5 h-5 text-admin-brand">
@@ -158,7 +447,7 @@ export default function AddNotificationSection({ onBack }) {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Notification Title</label>
+                <label className="block text-xs font-medium text-admin-text-primary mb-2">Notification Title *</label>
                 <input
                   type="text"
                   value={title}
@@ -168,7 +457,7 @@ export default function AddNotificationSection({ onBack }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Message Body</label>
+                <label className="block text-xs font-medium text-admin-text-primary mb-2">Message Body *</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -177,62 +466,66 @@ export default function AddNotificationSection({ onBack }) {
                   className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors resize-none"
                 />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Deep Link (URL)</label>
-                <div className="flex">
-                  <span className="flex items-center px-4 py-3 bg-admin-profile border border-r-0 border-admin-border rounded-l-lg text-sm text-admin-text-secondary">dolapy://</span>
-                  <input
-                    type="text"
-                    value={deepLinkPath}
-                    onChange={(e) => setDeepLinkPath(e.target.value)}
-                    placeholder="app/collection/summer-2024"
-                    className="flex-1 px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-r-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
-                  />
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Targeting & Schedule */}
           <div className="bg-admin-brand-bg border border-admin-border/40 rounded-xl p-4">
-            <h2 className="text-lg font-medium text-admin-text-primary mb-4">Targeting & Schedule</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Audience Selection</label>
-                <div className="relative">
-                  <select
-                    value={audience}
-                    onChange={(e) => setAudience(e.target.value)}
-                    className="w-full px-4 py-3 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none appearance-none cursor-pointer focus:border-admin-brand transition-colors"
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-5 h-5 text-admin-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-admin-brand tracking-wider">SEND TO</span>
+            </div>
+            <div className="space-y-2">
+              {CHANNELS.map(({ id, label, icon: Icon, desc }) => {
+                const selected = channels.includes(id);
+                return (
+                  <button
+                    key={id}
+                    onClick={() => toggleChannel(id)}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                      selected
+                        ? 'border-admin-brand bg-admin-brand/5'
+                        : 'border-admin-border/40 bg-white'
+                    }`}
                   >
-                    <option>All Users</option>
-                    <option>Active Users</option>
-                    <option>New Users</option>
-                    <option>Premium Users</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-admin-text-muted pointer-events-none" />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-admin-text-primary mb-2">Schedule Time</label>
-                <div className="relative">
-                  <input
-                    type="datetime-local"
-                    value={scheduleTime}
-                    onChange={(e) => setScheduleTime(e.target.value)}
-                    className="w-full px-4 py-3 pl-10 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
-                  />
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-admin-text-muted pointer-events-none" />
-                </div>
-              </div>
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                      selected ? 'bg-admin-brand text-white' : 'bg-admin-border/20 text-admin-text-muted'
+                    }`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <p className={`text-sm font-medium ${selected ? 'text-admin-brand' : 'text-admin-text-primary'}`}>{label}</p>
+                      <p className="text-[10px] text-admin-text-muted">{desc}</p>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                      selected ? 'border-admin-brand bg-admin-brand' : 'border-admin-border'
+                    }`}>
+                      {selected && (
+                        <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                          <path d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          <MobileTargetSection {...targetProps} />
         </div>
 
-        {/* Mobile Bottom Button */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-admin-border/30">
-          <button className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors">
-            <Play className="w-4 h-4" /> Create Notification
+          <button
+            onClick={handleSend}
+            disabled={submitting || !title.trim() || !message.trim() || (sendMode === 'individual' && !targetEmail.trim())}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50"
+          >
+            <Send className="w-4 h-4" />
+            {submitting ? 'Sending…' : sendMode === 'individual' ? 'Send to User' : 'Broadcast Now'}
           </button>
         </div>
       </div>

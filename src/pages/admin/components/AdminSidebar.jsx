@@ -14,7 +14,7 @@ const navItems = [
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
-export default function AdminSidebar({ className = '', activePage, setActivePage }) {
+export default function AdminSidebar({ className = '', activePage, setActivePage, unreadContacts = 0 }) {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
@@ -36,6 +36,7 @@ export default function AdminSidebar({ className = '', activePage, setActivePage
         <nav className="flex-1 overflow-y-auto px-2 flex flex-col gap-1">
           {navItems.map(({ id, label, icon: Icon }) => {
             const isActive = activePage === id;
+            const count = id === 'emailCenter' ? unreadContacts : 0;
             return (
               <button
                 key={id}
@@ -47,7 +48,14 @@ export default function AdminSidebar({ className = '', activePage, setActivePage
                 }`}
                 style={{ letterSpacing: '0.24px' }}
               >
-                <Icon className="w-[18px] h-[18px]" />
+                <div className="relative">
+                  <Icon className="w-[18px] h-[18px]" />
+                  {count > 0 && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-admin-danger text-white text-[9px] font-bold">
+                      {count > 99 ? '99+' : count}
+                    </span>
+                  )}
+                </div>
                 {label}
               </button>
             );

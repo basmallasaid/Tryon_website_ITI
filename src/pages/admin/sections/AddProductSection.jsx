@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowRight, Plus, Upload, X, Shirt, CheckCircle } from 'lucide-react';
-import { getStoresApi, createProductApi } from '../../../api/adminApi';
+import { getStoresApi, createProductApi, updateProductApi } from '../../../api/adminApi';
 
 const steps = ['Basic Info', 'Media', 'Category', 'Commerce', 'Settings'];
 
@@ -30,12 +30,14 @@ function SectionHeader({ title }) {
   );
 }
 
-export default function AddProductSection({ onBack }) {
+export default function AddProductSection({ onBack, editingProduct }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [stores, setStores] = useState([]);
   const [loadingStores, setLoadingStores] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  const isEditing = !!editingProduct;
 
   const [productName, setProductName] = useState('');
   const [description, setDescription] = useState('');
@@ -56,7 +58,13 @@ export default function AddProductSection({ onBack }) {
         const res = await getStoresApi();
         const data = Array.isArray(res.data) ? res.data : [];
         setStores(data);
-        if (data.length > 0) setStoreId(data[0]._id);
+        if (isEditing && editingProduct) {
+          const store = data.find(s => s._id === editingProduct.store_id);
+          if (store) setStoreId(store._id);
+          else if (data.length > 0) setStoreId(data[0]._id);
+        } else if (data.length > 0) {
+          setStoreId(data[0]._id);
+        }
       } catch (err) {
         console.error('Failed to fetch stores:', err);
       } finally {
@@ -64,7 +72,23 @@ export default function AddProductSection({ onBack }) {
       }
     };
     fetchStores();
-  }, []);
+  }, [isEditing, editingProduct]);
+
+  useEffect(() => {
+    if (isEditing && editingProduct) {
+      setProductName(editingProduct.name || '');
+      setDescription(editingProduct.description || '');
+      setPrice(editingProduct.price?.toString() || '');
+      setPurchaseUrl(editingProduct.purchase_url || '');
+      setTryOn(editingProduct.try_on_enabled ?? true);
+      setImageUrl(editingProduct.images?.[0] || '');
+      setStoreId(editingProduct.store_id || '');
+      setColorTags(editingProduct.color_tags?.length ? editingProduct.color_tags : ['Luxury', 'Evening', 'Silk']);
+      setSeasonTags(editingProduct.season_tags || []);
+      const catLabel = reverseCategoryMap[editingProduct.category];
+      if (catLabel) setPrimaryCategory(catLabel);
+    }
+  }, [isEditing, editingProduct]);
 
   const addTag = () => {
     if (tagInput.trim() && !colorTags.includes(tagInput.trim())) {
@@ -105,10 +129,14 @@ export default function AddProductSection({ onBack }) {
         try_on_enabled: tryOn,
         is_active: true,
       };
-      await createProductApi(payload);
+      if (isEditing) {
+        await updateProductApi(editingProduct._id, payload);
+      } else {
+        await createProductApi(payload);
+      }
       setSuccess(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create product.');
+      alert(err.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} product.`);
     } finally {
       setSubmitting(false);
     }
@@ -121,8 +149,8 @@ export default function AddProductSection({ onBack }) {
       <div className="flex items-center justify-center min-h-screen p-8">
         <div className="text-center max-w-md">
           <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-admin-text-primary mb-2">Product Created!</h2>
-          <p className="text-sm text-admin-text-secondary mb-6">"{productName}" has been added to the catalog.</p>
+          <h2 className="text-2xl font-bold text-admin-text-primary mb-2">{isEditing ? 'Product Updated!' : 'Product Created!'}</h2>
+          <p className="text-sm text-admin-text-secondary mb-6">"{productName}" has been {isEditing ? 'updated' : 'added to the catalog'}.</p>
           <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
             Back to Products
           </button>
@@ -167,7 +195,7 @@ export default function AddProductSection({ onBack }) {
         <div className="w-px h-6 bg-admin-border" />
         {isLastStep ? (
           <button onClick={handleSubmit} disabled={submitting} className="flex items-center gap-2 px-6 py-2 bg-admin-success text-white rounded-xl text-sm font-medium hover:opacity-90 transition-colors disabled:opacity-50">
-            {submitting ? 'Creating…' : 'Create Product'}
+            {submitting ? (isEditing ? 'Updating…' : 'Creating…') : (isEditing ? 'Update Product' : 'Create Product')}
           </button>
         ) : (
           <button onClick={() => setCurrentStep((s) => Math.min(s + 1, steps.length))} className="flex items-center gap-2 px-6 py-2 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
@@ -186,7 +214,7 @@ export default function AddProductSection({ onBack }) {
         <div className="flex-1 overflow-y-auto px-8 pt-8 pb-32">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-5 h-5 text-admin-brand"><Shirt className="w-5 h-5" /></div>
-            <h1 className="text-2xl font-bold text-admin-text-primary tracking-[-0.2px]">Add New Product</h1>
+            <h1 className="text-2xl font-bold text-admin-text-primary tracking-[-0.2px]">{isEditing ? 'Edit Product' : 'Add New Product'}</h1>
           </div>
 
           <Stepper />
@@ -320,7 +348,7 @@ export default function AddProductSection({ onBack }) {
           <button onClick={onBack} className="p-2 -ml-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold text-admin-text-primary">Add New Product</h1>
+          <h1 className="text-lg font-bold text-admin-text-primary">{isEditing ? 'Edit Product' : 'Add New Product'}</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-6">
@@ -464,7 +492,7 @@ export default function AddProductSection({ onBack }) {
           <button onClick={onBack} className="flex-1 py-3 border border-admin-border rounded-xl text-sm font-medium text-admin-text-secondary">Cancel</button>
           {isLastStep ? (
             <button onClick={handleSubmit} disabled={submitting} className="flex-[2] flex items-center justify-center gap-2 py-3 bg-admin-success text-white rounded-xl text-sm font-medium shadow-md disabled:opacity-50">
-              {submitting ? 'Creating…' : 'Create Product'}
+              {submitting ? (isEditing ? 'Updating…' : 'Creating…') : (isEditing ? 'Update Product' : 'Create Product')}
             </button>
           ) : (
             <button onClick={() => setCurrentStep((s) => Math.min(s + 1, steps.length))} className="flex-[2] flex items-center justify-center gap-2 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium shadow-md">

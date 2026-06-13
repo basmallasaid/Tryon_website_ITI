@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Info, Image as ImageIcon, Tag, CheckCircle } from 'lucide-react';
-import { createStoreApi } from '../../../api/adminApi';
+import { createStoreApi, updateStoreApi } from '../../../api/adminApi';
 
-export default function AddStoreSection({ onBack }) {
+export default function AddStoreSection({ onBack, editingStore }) {
+  const isEditing = !!editingStore;
+
   const [storeName, setStoreName] = useState('');
   const [description, setDescription] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -12,6 +14,19 @@ export default function AddStoreSection({ onBack }) {
   const [logoUrl, setLogoUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (isEditing && editingStore) {
+      setStoreName(editingStore.name || '');
+      setDescription(editingStore.description || '');
+      const url = editingStore.website_url || '';
+      setWebsiteUrl(url.replace(/^https?:\/\//, ''));
+      setDiscountCode(editingStore.discount_code || '');
+      setDiscountPercent(editingStore.discount_percent || 0);
+      setIsActive(editingStore.is_active ?? true);
+      setLogoUrl(editingStore.logo_url || '');
+    }
+  }, [isEditing, editingStore]);
 
   const handleSubmit = async () => {
     if (!storeName.trim() || !description.trim() || !websiteUrl.trim() || !logoUrl.trim()) {
@@ -29,10 +44,14 @@ export default function AddStoreSection({ onBack }) {
         discount_percent: discountPercent || null,
         is_active: isActive,
       };
-      await createStoreApi(payload);
+      if (isEditing) {
+        await updateStoreApi(editingStore._id, payload);
+      } else {
+        await createStoreApi(payload);
+      }
       setSuccess(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create store.');
+      alert(err.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} store.`);
     } finally {
       setSubmitting(false);
     }
@@ -43,8 +62,8 @@ export default function AddStoreSection({ onBack }) {
       <div className="flex items-center justify-center min-h-screen p-8">
         <div className="text-center max-w-md">
           <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-admin-text-primary mb-2">Store Created!</h2>
-          <p className="text-sm text-admin-text-secondary mb-6">"{storeName}" has been added to the network.</p>
+          <h2 className="text-2xl font-bold text-admin-text-primary mb-2">{isEditing ? 'Store Updated!' : 'Store Created!'}</h2>
+          <p className="text-sm text-admin-text-secondary mb-6">"{storeName}" has been {isEditing ? 'updated' : 'added to the network'}.</p>
           <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
             Back to Stores
           </button>
@@ -59,12 +78,17 @@ export default function AddStoreSection({ onBack }) {
       <div className="hidden lg:block p-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">Add New Store</h1>
-            <p className="text-sm text-admin-text-secondary mt-1">Configure your new digital storefront and brand identity.</p>
+            <h1 className="text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{isEditing ? 'Edit Store' : 'Add New Store'}</h1>
+            <p className="text-sm text-admin-text-secondary mt-1">{isEditing ? 'Update store configuration and brand identity.' : 'Configure your new digital storefront and brand identity.'}</p>
           </div>
-          <button onClick={handleSubmit} disabled={submitting} className="flex items-center gap-2 px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50">
-            {submitting ? 'Saving…' : 'Save Store'}
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={onBack} className="px-6 py-3 border border-admin-border rounded-xl text-sm font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg transition-colors">
+              Cancel
+            </button>
+            <button onClick={handleSubmit} disabled={submitting} className="flex items-center gap-2 px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50">
+              {submitting ? 'Saving…' : isEditing ? 'Update Store' : 'Save Store'}
+            </button>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -185,7 +209,7 @@ export default function AddStoreSection({ onBack }) {
           <button onClick={onBack} className="p-2 -ml-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold text-admin-text-primary">Add Store</h1>
+          <h1 className="text-xl font-bold text-admin-text-primary">{isEditing ? 'Edit Store' : 'Add Store'}</h1>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-5">
@@ -296,10 +320,11 @@ export default function AddStoreSection({ onBack }) {
           </div>
         </div>
 
-        <div className="px-4 py-4 bg-white border-t border-admin-border/30">
-          <button onClick={handleSubmit} disabled={submitting} className="w-full flex items-center justify-center gap-2 py-4 bg-admin-brand text-white rounded-2xl text-base font-medium shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50">
+        <div className="px-4 py-4 bg-white border-t border-admin-border/30 flex items-center gap-3">
+          <button onClick={onBack} className="flex-1 py-3 border border-admin-border rounded-xl text-sm font-medium text-admin-text-secondary">Cancel</button>
+          <button onClick={handleSubmit} disabled={submitting} className="flex-[2] flex items-center justify-center gap-2 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50">
             <CheckCircle className="w-5 h-5" />
-            {submitting ? 'Creating…' : 'Save & Create Store'}
+            {submitting ? 'Saving…' : isEditing ? 'Update Store' : 'Save & Create Store'}
           </button>
         </div>
       </div>

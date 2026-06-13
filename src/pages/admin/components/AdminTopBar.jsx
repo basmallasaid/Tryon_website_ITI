@@ -1,25 +1,21 @@
-import { Search, Bell, Mail, Moon, ChevronDown } from 'lucide-react';
+import { Bell, Mail, Moon, ChevronDown } from 'lucide-react';
 
-export default function AdminTopBar({ className = '', actions }) {
+export default function AdminTopBar({ className = '', actions, unreadContacts = 0 }) {
   return (
-    <div className={`${className} items-center justify-between px-6 pt-10 pb-4`}>
-      <div className="w-[412px] h-[54px] flex items-center gap-2 bg-admin-input border border-admin-border rounded-2xl px-4">
-        <Search className="w-[13.5px] h-[13.5px] text-admin-text-secondary" />
-        <input
-          type="text"
-          placeholder="Search global database..."
-          className="flex-1 bg-transparent text-sm font-normal text-admin-text-muted outline-none placeholder:text-admin-text-muted"
-        />
-      </div>
-
+    <div className={`${className} items-center justify-end px-6 pt-10 pb-4`}>
       <div className="flex items-center gap-4">
         {actions}
 
         <button className="p-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
           <Bell className="w-5 h-5" />
         </button>
-        <button className="p-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
+        <button className="p-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors relative">
           <Mail className="w-5 h-5" />
+          {unreadContacts > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-admin-danger text-white text-[9px] font-bold">
+              {unreadContacts > 99 ? '99+' : unreadContacts}
+            </span>
+          )}
         </button>
         <button className="p-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
           <Moon className="w-5 h-5" />

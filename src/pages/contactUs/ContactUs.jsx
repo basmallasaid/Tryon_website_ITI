@@ -31,13 +31,15 @@ export default function ContactUs() {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Logic for submission
     setFormData({ name: "", email: "", message: "" });

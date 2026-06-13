@@ -4,17 +4,17 @@ import AdminTopBar from './components/AdminTopBar';
 import AdminMobileHeader from './components/AdminMobileHeader';
 import AdminBottomNav from './components/AdminBottomNav';
 
-export default function AdminLayout({ activePage, setActivePage, topBarActions, children }) {
+export default function AdminLayout({ activePage, setActivePage, topBarActions, unreadContacts, children }) {
   return (
     <div className="font-geist bg-admin-page min-h-screen">
-      <AdminSidebar className="hidden lg:flex" activePage={activePage} setActivePage={setActivePage} />
+      <AdminSidebar className="hidden lg:flex" activePage={activePage} setActivePage={setActivePage} unreadContacts={unreadContacts} />
 
-      <AdminMobileHeader className="lg:hidden" />
+      <AdminMobileHeader className="lg:hidden" unreadContacts={unreadContacts} />
 
       <main className="lg:ml-[280px]">
-        <AdminTopBar className="hidden lg:flex sticky top-0 z-10 bg-white h-[110px]" actions={topBarActions} />
+        <AdminTopBar className="hidden lg:flex sticky top-0 z-10 bg-white h-[110px]" actions={topBarActions} unreadContacts={unreadContacts} />
 
-        <div className="pb-[72px] lg:pb-0 lg:p-8 mt-[186px] lg:mt-0">
+        <div className="pb-[72px] lg:pb-0 lg:p-8">
           {children}
         </div>
       </main>

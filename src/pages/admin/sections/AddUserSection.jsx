@@ -1,46 +1,78 @@
 import { useState } from 'react';
-import { ArrowLeft, User, Store, Star, Shirt, RefreshCw, Minus, Plus } from 'lucide-react';
+import { ArrowLeft, User, Store, Star, Shirt, RefreshCw, Minus, Plus, CheckCircle } from 'lucide-react';
+import { createAdminUserApi } from '../../../api/adminApi';
 import AddIcon from '../../../icons/AddIcon';
 import ShieldCheckIcon from '../../../icons/ShieldCheckIcon';
 
 const roles = [
-  { id: 'User', icon: User, title: 'User', description: 'Standard enterprise access with individual limits.' },
-  { id: 'Store Owner', icon: Store, title: 'Store Owner', description: 'Management rights for a single store location.' },
-  { id: 'Premium', icon: Star, title: 'Premium', description: 'Advanced tools and unlimited catalog syncing.' },
+  { id: 'user', icon: User, title: 'User', description: 'Standard enterprise access with individual limits.' },
+  { id: 'admin', icon: Star, title: 'Admin', description: 'Full access to dashboard and all management tools.' },
+  { id: 'premium', icon: Store, title: 'Premium', description: 'Advanced tools and unlimited catalog syncing.' },
 ];
-
-function Stepper({ value, onChange, min = 0 }) {
-  return (
-    <div className="flex items-center gap-3">
-      <button
-        onClick={() => onChange(Math.max(min, value - 1))}
-        disabled={value <= min}
-        className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#C3C5D7] bg-white text-[#434654] hover:bg-[#FAF8FF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-      >
-        <Minus className="w-4 h-4" />
-      </button>
-      <span className="w-12 text-center text-xl font-semibold text-[#191B23]">{value}</span>
-      <button
-        onClick={() => onChange(value + 1)}
-        className="w-9 h-9 flex items-center justify-center rounded-lg border border-[#C3C5D7] bg-white text-[#434654] hover:bg-[#FAF8FF] transition-colors"
-      >
-        <Plus className="w-4 h-4" />
-      </button>
-    </div>
-  );
-}
 
 export default function AddUserSection({ onBack }) {
   const [form, setForm] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
-    employeeId: '',
-    role: 'User',
-    tryOnLimit: 25,
-    recycleLimit: 10,
+    password: '',
+    role: 'user',
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const update = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
+
+  const handleSubmit = async () => {
+    if (!form.email.trim() || !form.password.trim()) {
+      alert('Email and password are required.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await createAdminUserApi({
+        email: form.email.trim(),
+        password: form.password,
+        first_name: form.firstName.trim() || null,
+        last_name: form.lastName.trim() || null,
+        role: form.role,
+      });
+      setSuccess(true);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to create user.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <>
+        {/* Desktop */}
+        <div className="hidden lg:flex items-center justify-center min-h-screen p-8">
+          <div className="text-center max-w-md">
+            <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">User Created!</h2>
+            <p className="text-sm text-admin-text-secondary mb-6">{form.email} has been added.</p>
+            <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
+              Back to Users
+            </button>
+          </div>
+        </div>
+        {/* Mobile */}
+        <div className="lg:hidden flex items-center justify-center min-h-screen p-8">
+          <div className="text-center max-w-md">
+            <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">User Created!</h2>
+            <p className="text-sm text-admin-text-secondary mb-6">{form.email} has been added.</p>
+            <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
+              Back to Users
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -60,9 +92,12 @@ export default function AddUserSection({ onBack }) {
             <button onClick={onBack} className="px-8 py-3 border border-[#C3C5D7] text-[#434654] rounded-xl text-sm font-bold hover:bg-[#FAF8FF] transition-colors">
               Cancel
             </button>
-            <button className="flex items-center gap-2 px-8 py-3 bg-[#1550D3] text-white rounded-xl text-sm font-bold shadow-md hover:bg-[#1550D3]/90 transition-colors">
-              <Plus className="w-4 h-4" />
-              Add User
+            <button
+              onClick={handleSubmit}
+              disabled={submitting || !form.email.trim() || !form.password.trim()}
+              className="flex items-center gap-2 px-8 py-3 bg-[#1550D3] text-white rounded-xl text-sm font-bold shadow-md hover:bg-[#1550D3]/90 transition-colors disabled:opacity-50"
+            >
+              {submitting ? 'Creating…' : 'Add User'}
             </button>
           </div>
         </div>
@@ -75,108 +110,84 @@ export default function AddUserSection({ onBack }) {
               <h2 className="text-base text-[#191B23]">User Identity</h2>
             </div>
             <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-base text-[#434654] mb-2">First Name</label>
+                  <input
+                    type="text"
+                    value={form.firstName}
+                    onChange={e => update('firstName', e.target.value)}
+                    placeholder="Alexander"
+                    className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-base text-[#434654] mb-2">Last Name</label>
+                  <input
+                    type="text"
+                    value={form.lastName}
+                    onChange={e => update('lastName', e.target.value)}
+                    placeholder="McQueen"
+                    className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
+                  />
+                </div>
+              </div>
               <div>
-                <label className="block text-base text-[#434654] mb-2">Full Name</label>
+                <label className="block text-base text-[#434654] mb-2">Email Address *</label>
                 <input
-                  type="text"
-                  value={form.name}
-                  onChange={e => update('name', e.target.value)}
-                  placeholder="e.g. Alexander McQueen"
+                  type="email"
+                  value={form.email}
+                  onChange={e => update('email', e.target.value)}
+                  placeholder="alexander@dolapy.com"
                   className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-base text-[#434654] mb-2">Email Address</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={e => update('email', e.target.value)}
-                    placeholder="alexander@dolapy.com"
-                    className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-base text-[#434654] mb-2">Employee ID</label>
-                  <input
-                    type="text"
-                    value={form.employeeId}
-                    onChange={e => update('employeeId', e.target.value)}
-                    placeholder="DLP-9921-X"
-                    className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
-                  />
-                </div>
+              <div>
+                <label className="block text-base text-[#434654] mb-2">Password *</label>
+                <input
+                  type="password"
+                  value={form.password}
+                  onChange={e => update('password', e.target.value)}
+                  placeholder="Min 6 characters"
+                  className="w-full pt-[13px] pb-[14px] px-4 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-base text-[#191B23] outline-none placeholder:text-[#6B7280] focus:border-[#1550D3] transition-colors"
+                />
               </div>
             </div>
           </div>
 
-          {/* Permissions & Limits Card */}
-          <div className="bg-white border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm space-y-8">
-            {/* Account Role */}
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-5 h-5 text-[#1550D3]"><ShieldCheckIcon className="w-5 h-5" /></div>
-                <h2 className="text-xl font-medium text-[#191B23]">Account Role</h2>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                {roles.map(role => {
-                  const Icon = role.icon;
-                  const selected = form.role === role.id;
-                  return (
-                    <button
-                      key={role.id}
-                      onClick={() => update('role', role.id)}
-                      className={`relative flex items-center gap-4 text-left p-5 rounded-xl border transition-all ${
-                        selected
-                          ? 'border-[#1550D3] bg-[#FAF8FF] shadow-sm'
-                          : 'border-[#C3C5D7] bg-white hover:border-[#1550D3]/40'
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${selected ? 'bg-[#1550D3] text-white' : 'bg-[#FAF8FF] text-[#434654]'}`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className={`text-sm font-semibold mb-1 ${selected ? 'text-[#1550D3]' : 'text-[#191B23]'}`}>{role.title}</h3>
-                        <p className="text-xs text-[#434654] leading-relaxed">{role.description}</p>
-                      </div>
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selected ? 'border-[#1550D3]' : 'border-[#C3C5D7]'}`}>
-                        {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#1550D3]" />}
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+          {/* Account Role */}
+          <div className="bg-white border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-5 h-5 text-[#1550D3]"><ShieldCheckIcon className="w-5 h-5" /></div>
+              <h2 className="text-xl font-medium text-[#191B23]">Account Role</h2>
             </div>
-
-            <div className="border-t border-[#C3C5D7]/50" />
-
-            {/* Usage Limits */}
-            <div>
-              <h2 className="text-xl font-medium text-[#191B23] mb-6">Usage Limits</h2>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <Shirt className="w-4 h-4 text-[#1550D3]" />
-                      <span className="text-sm font-medium text-[#191B23]">Try-On Limit</span>
+            <div className="grid grid-cols-3 gap-4">
+              {roles.map(role => {
+                const Icon = role.icon;
+                const selected = form.role === role.id;
+                return (
+                  <button
+                    key={role.id}
+                    onClick={() => update('role', role.id)}
+                    className={`relative flex items-center gap-4 text-left p-5 rounded-xl border transition-all ${
+                      selected
+                        ? 'border-[#1550D3] bg-[#FAF8FF] shadow-sm'
+                        : 'border-[#C3C5D7] bg-white hover:border-[#1550D3]/40'
+                    }`}
+                  >
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${selected ? 'bg-[#1550D3] text-white' : 'bg-[#FAF8FF] text-[#434654]'}`}>
+                      <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md tracking-wider">MONTHLY</span>
-                  </div>
-                  <Stepper value={form.tryOnLimit} onChange={v => update('tryOnLimit', v)} min={0} />
-                  <p className="text-xs text-[#434654] mt-3">Maximum virtual fitting room sessions allowed.</p>
-                </div>
-                <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4 text-[#1550D3]" />
-                      <span className="text-sm font-medium text-[#191B23]">Recycle Limit</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`text-sm font-semibold mb-1 ${selected ? 'text-[#1550D3]' : 'text-[#191B23]'}`}>{role.title}</h3>
+                      <p className="text-xs text-[#434654] leading-relaxed">{role.description}</p>
                     </div>
-                    <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md tracking-wider">SUSTAINABILITY</span>
-                  </div>
-                  <Stepper value={form.recycleLimit} onChange={v => update('recycleLimit', v)} min={0} />
-                  <p className="text-xs text-[#434654] mt-3">Garment recycling program participation cap.</p>
-                </div>
-              </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${selected ? 'border-[#1550D3]' : 'border-[#C3C5D7]'}`}>
+                      {selected && <div className="w-2.5 h-2.5 rounded-full bg-[#1550D3]" />}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -193,17 +204,23 @@ export default function AddUserSection({ onBack }) {
 
         <div className="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-5">
           <div className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Full Name</label>
-              <input type="text" value={form.name} onChange={e => update('name', e.target.value)} placeholder="e.g. Alexander McQueen" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">First Name</label>
+                <input type="text" value={form.firstName} onChange={e => update('firstName', e.target.value)} placeholder="Alexander" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Last Name</label>
+                <input type="text" value={form.lastName} onChange={e => update('lastName', e.target.value)} placeholder="McQueen" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+              </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Email Address</label>
+              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Email Address *</label>
               <input type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="alexander@dolapy.com" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Employee ID</label>
-              <input type="text" value={form.employeeId} onChange={e => update('employeeId', e.target.value)} placeholder="DLP-9921-X" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
+              <label className="block text-xs font-medium text-[#434654] mb-1.5 px-1">Password *</label>
+              <input type="password" value={form.password} onChange={e => update('password', e.target.value)} placeholder="Min 6 characters" className="w-full px-4 py-3 bg-[#FAF8FF] border border-[#C3C5D7] rounded-lg text-sm text-[#191B23] outline-none placeholder:text-[#434654]/50" />
             </div>
           </div>
 
@@ -232,32 +249,15 @@ export default function AddUserSection({ onBack }) {
               );
             })}
           </div>
-
-          <h3 className="text-xs font-bold text-[#191B23] tracking-widest uppercase">Usage Limits</h3>
-          <div className="space-y-4">
-            <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-[#191B23]">Try-On Limit</span>
-                <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md">MONTHLY</span>
-              </div>
-              <Stepper value={form.tryOnLimit} onChange={v => update('tryOnLimit', v)} min={0} />
-              <p className="text-xs text-[#434654] mt-2">Maximum virtual fitting room sessions allowed.</p>
-            </div>
-            <div className="bg-[#FAF8FF] border border-[#C3C5D7] rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-[#191B23]">Recycle Limit</span>
-                <span className="text-[10px] font-bold text-[#1550D3] bg-[#1550D3]/10 px-2 py-1 rounded-md">SUSTAINABILITY</span>
-              </div>
-              <Stepper value={form.recycleLimit} onChange={v => update('recycleLimit', v)} min={0} />
-              <p className="text-xs text-[#434654] mt-2">Garment recycling program participation cap.</p>
-            </div>
-          </div>
         </div>
 
         <div className="px-4 py-4 bg-white border-t border-admin-border/30">
-          <button className="w-full flex items-center justify-center gap-2 py-4 bg-[#1550D3] text-white rounded-2xl text-base font-medium shadow-md hover:bg-[#1550D3]/90 transition-colors">
-            <Plus className="w-5 h-5" />
-            Add
+          <button
+            onClick={handleSubmit}
+            disabled={submitting || !form.email.trim() || !form.password.trim()}
+            className="w-full flex items-center justify-center gap-2 py-4 bg-[#1550D3] text-white rounded-2xl text-base font-medium shadow-md hover:bg-[#1550D3]/90 transition-colors disabled:opacity-50"
+          >
+            {submitting ? 'Creating…' : 'Add User'}
           </button>
         </div>
       </div>

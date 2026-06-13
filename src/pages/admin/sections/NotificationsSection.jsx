@@ -1,46 +1,128 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Bell } from 'lucide-react';
-import NotificationRow from '../components/NotificationRow';
-import NotificationCard from '../components/NotificationCard';
-import { getNotificationsApi } from '../../../api/adminApi';
+import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2 } from 'lucide-react';
+import { getAllNotificationsApi, deleteNotificationApi } from '../../../api/adminApi';
 
-const ITEMS_PER_PAGE = 4;
-
-function formatRelativeTime(dateStr) {
-  if (!dateStr) return '';
-  const now = Date.now();
-  const then = new Date(dateStr).getTime();
-  const diff = Math.floor((now - then) / 1000);
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-  if (diff < 172800) return 'yesterday';
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
+const ITEMS_PER_PAGE = 5;
 
 function formatDate(dateStr) {
   if (!dateStr) return '—';
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function formatTime(dateStr) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+const typeConfig = {
+  tryon: { label: 'Try-On', color: 'bg-admin-brand/10 text-admin-brand' },
+  recycle: { label: 'Recycle', color: 'bg-admin-amber/10 text-admin-amber' },
+  store: { label: 'Store', color: 'bg-admin-success/10 text-admin-success' },
+  pricing: { label: 'Pricing', color: 'bg-admin-danger/10 text-admin-danger' },
+  general: { label: 'General', color: 'bg-admin-border/20 text-admin-text-secondary' },
+};
+
+function NotificationDetail({ notification, onBack, onDelete }) {
+  const config = typeConfig[notification.type] || typeConfig.general;
+  const userEmail = notification.userId?.email || 'Unknown';
+  const userName = [notification.userId?.profile?.first_name, notification.userId?.profile?.last_name].filter(Boolean).join(' ') || userEmail;
+
+  return (
+    <div className="p-4 sm:p-8">
+      <div className="flex items-center gap-3 mb-8">
+        <button onClick={onBack} className="p-2 hover:bg-admin-border/20 rounded-lg transition-colors">
+          <ArrowLeft className="w-5 h-5 text-admin-text-primary" />
+        </button>
+        <h1 className="text-[20px] font-bold text-admin-text-primary">Notification Details</h1>
+      </div>
+
+      <div className="bg-white border border-admin-border/40 rounded-xl shadow-sm">
+        <div className="p-6 border-b border-admin-border/30">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-admin-brand/20 flex items-center justify-center">
+                <Bell className="w-5 h-5 text-admin-brand" />
+              </div>
+              <div>
+                <p className="text-base font-bold text-admin-text-primary">{userName}</p>
+                <p className="text-sm text-admin-text-muted">{userEmail}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-admin-text-secondary">{formatDate(notification.createdAt)}</p>
+              <p className="text-xs text-admin-text-muted">{formatTime(notification.createdAt)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 bg-admin-brand-bg/50 border-b border-admin-border/30 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-admin-brand">{notification.title}</span>
+            <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full ${config.color}`}>
+              {config.label}
+            </span>
+          </div>
+        </div>
+
+        <div className="p-8">
+          <div className="space-y-4 text-sm text-admin-text-primary leading-relaxed">
+            <p>{notification.body}</p>
+          </div>
+        </div>
+
+        <div className="p-4 border-t border-admin-border/30 flex justify-end">
+          <button
+            onClick={() => onDelete(notification._id)}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-admin-danger hover:bg-admin-danger/10 rounded-lg transition-colors"
+          >
+            <Trash2 className="w-4 h-4" /> Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function NotificationsSection({ onAddNotification }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedNotification, setSelectedNotification] = useState(null);
 
   useEffect(() => {
-    const fetchNotifications = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await getNotificationsApi();
-        setNotifications(Array.isArray(res.data?.notifications) ? res.data.notifications : []);
+        const notifRes = await getAllNotificationsApi();
+        setNotifications(Array.isArray(notifRes.data?.notifications) ? notifRes.data.notifications : []);
       } catch (err) {
         console.error('Failed to fetch notifications:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchNotifications();
+    fetchAll();
   }, []);
+
+  const handleDelete = async (id) => {
+    if (!confirm('Delete this notification?')) return;
+    try {
+      await deleteNotificationApi(id);
+      setNotifications((prev) => prev.filter((n) => n._id !== id));
+      if (selectedNotification?._id === id) setSelectedNotification(null);
+    } catch (err) {
+      console.error('Failed to delete:', err);
+    }
+  };
+
+  if (selectedNotification) {
+    return (
+      <NotificationDetail
+        notification={selectedNotification}
+        onBack={() => setSelectedNotification(null)}
+        onDelete={handleDelete}
+      />
+    );
+  }
 
   const totalPages = Math.ceil(notifications.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -53,39 +135,69 @@ export default function NotificationsSection({ onAddNotification }) {
           Notification Center
         </h1>
         <p className="text-sm text-admin-text-secondary mt-2">
-          Your recent notifications for <span className="font-semibold text-admin-text-primary">Fashion Store</span>
+          View all notifications sent to users.
         </p>
       </div>
 
       {/* Desktop Table */}
       <div className="hidden md:block bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-admin-border/40">
-          <h2 className="text-sm font-bold text-admin-text-primary">Recent Notifications</h2>
+        <div className="px-6 py-4 border-b border-admin-border/40 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-admin-text-primary">All Notifications</h2>
+          <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
+            <Bell className="w-4 h-4" /> Create New
+          </button>
         </div>
         <table className="w-full">
           <thead>
             <tr className="border-b border-admin-border/40">
               <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Title</th>
               <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Message</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Sent To</th>
               <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Type</th>
-              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Created Date</th>
+              <th className="text-left text-[11px] font-bold text-admin-text-muted uppercase tracking-wider py-3 px-4">Date</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">Loading notifications…</td></tr>
+              <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">Loading…</td></tr>
             ) : currentItems.length > 0 ? (
-              currentItems.map((n) => (
-                <NotificationRow key={n._id} notification={n} />
-              ))
+              currentItems.map((n) => {
+                const config = typeConfig[n.type] || typeConfig.general;
+                const userEmail = n.userId?.email || '—';
+                return (
+                  <tr
+                    key={n._id}
+                    onClick={() => setSelectedNotification(n)}
+                    className="border-b border-admin-border/40 hover:bg-admin-brand-activeBg/30 transition-colors cursor-pointer"
+                  >
+                    <td className="py-3 px-4">
+                      <p className="text-sm font-bold text-admin-text-primary">{n.title}</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <p className="text-sm text-admin-text-secondary line-clamp-1 max-w-xs">{n.body}</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <p className="text-sm text-admin-text-secondary">{userEmail}</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full ${config.color}`}>
+                        {config.label}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <p className="text-sm text-admin-text-secondary">{formatDate(n.createdAt)}</p>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
-              <tr><td colSpan={4} className="py-12 text-center text-sm text-admin-text-muted">No notifications yet.</td></tr>
+              <tr><td colSpan={5} className="py-12 text-center text-sm text-admin-text-muted">No notifications yet.</td></tr>
             )}
           </tbody>
         </table>
         <div className="flex items-center justify-between px-6 py-4 border-t border-admin-border/40">
           <p className="text-xs text-admin-text-muted">
-            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length} notifications`}
+            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length}`}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -115,18 +227,41 @@ export default function NotificationsSection({ onAddNotification }) {
         </div>
         <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
           {loading ? (
-            <p className="p-4 text-center text-sm text-admin-text-muted">Loading notifications…</p>
+            <p className="p-4 text-center text-sm text-admin-text-muted">Loading…</p>
           ) : currentItems.length > 0 ? (
-            currentItems.map((n) => (
-              <NotificationCard key={n._id} notification={n} />
-            ))
+            currentItems.map((n) => {
+              const config = typeConfig[n.type] || typeConfig.general;
+              const userEmail = n.userId?.email || '—';
+              return (
+                <div
+                  key={n._id}
+                  onClick={() => setSelectedNotification(n)}
+                  className="flex items-start gap-3 p-4 border-b border-admin-border/30 cursor-pointer hover:bg-admin-brand-activeBg/20 transition-colors"
+                >
+                  <div className="shrink-0 mt-1">
+                    <div className={`w-2.5 h-2.5 rounded-full bg-admin-brand`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-admin-text-primary truncate">{n.title}</p>
+                      <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded-full ${config.color}`}>
+                        {config.label}
+                      </span>
+                    </div>
+                    <p className="text-xs text-admin-text-secondary mt-0.5">{userEmail}</p>
+                    <p className="text-xs text-admin-text-secondary mt-1 line-clamp-2">{n.body}</p>
+                  </div>
+                  <span className="text-[11px] text-admin-text-muted whitespace-nowrap shrink-0">{formatDate(n.createdAt)}</span>
+                </div>
+              );
+            })
           ) : (
             <p className="p-4 text-center text-sm text-admin-text-muted">No notifications yet.</p>
           )}
         </div>
         <div className="flex items-center justify-between mt-4 px-1">
           <p className="text-xs text-admin-text-muted">
-            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length} notifications`}
+            {loading ? 'Loading…' : `Showing ${notifications.length === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, notifications.length)} of ${notifications.length}`}
           </p>
           <div className="flex items-center gap-2">
             <button
