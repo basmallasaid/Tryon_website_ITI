@@ -361,8 +361,6 @@ const Navbar = ({ onOpenAuth }) => {
                     user={user}
                     logout={logout}
                     isArabic={isArabic}
-                    isDarkMode={isDarkMode}
-                    toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
                     changeLanguage={changeLanguage}
                     onClose={() => setIsProfileOpen(false)}
                   />

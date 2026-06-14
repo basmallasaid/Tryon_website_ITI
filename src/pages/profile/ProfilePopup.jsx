@@ -11,6 +11,7 @@ import {
   LogOut,
   Phone,
   Smartphone,
+  Shield,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -206,6 +207,27 @@ const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose }) => {
 
       {/* Action Cards */}
       <div className="space-y-3 mb-6">
+        {user?.role === 'admin' && (
+          <Link
+            to="/admin"
+            onClick={onClose}
+            className="w-full bg-[var(--primary-light)] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[var(--accent-light)] hover:scale-[1.02]"
+          >
+            <div className="flex items-center gap-3">
+              <div className="bg-surface-elevated p-2 rounded-xl shadow-sm text-[var(--primary)]">
+                <Shield size={18} />
+              </div>
+              <div className="text-left">
+                <p className="font-black text-text-primary text-[13px]">
+                  {t('profile.adminDashboard')}
+                </p>
+                <p className="text-[10px] text-text-secondary font-medium uppercase tracking-tighter">
+                  Admin Panel
+                </p>
+              </div>
+            </div>
+          </Link>
+        )}
         <Link
           to="/pricing"
           onClick={onClose}
