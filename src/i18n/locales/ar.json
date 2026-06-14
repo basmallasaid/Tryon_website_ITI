@@ -16,7 +16,8 @@
     "wardrobe": "الخزانة",
     "dark": "داكن",
     "light": "فاتح",
-    "favorites": "المفضلة"
+    "favorites": "المفضلة",
+    "recommendations": "التوصيات"
   },
   "hero": {
     "yourPersonal": " stylist الخاص بك",
@@ -716,6 +717,36 @@
     "failedSaveProfile": "فشل حفظ الملف الشخصي",
     "languageArabic": "العربية",
     "languageEnglish": "English"
+  },
+  "recommendation": {
+    "greetingMorning": "صباح الخير",
+    "greetingAfternoon": "مساء الخير",
+    "greetingEvening": "مساء الخير",
+    "guest": "زائر",
+    "subtitle": "دعنا نرتقي بإطلالتك اليوم.",
+    "todaysRecommendation": "توصية اليوم",
+    "viewDetails": "عرض تفاصيل الإطلالة",
+    "todaysLook": "إطلالة اليوم",
+    "weatherBasedDesc": "مناسبة لطقس {{condition}}، {{temp}}° اليوم",
+    "recommendedForYou": "مصممة خصيصاً لك بناءً على أسلوبك",
+    "whyWeChoseThis": "لماذا اخترنا هذا",
+    "aiAnalysis": "تحليل الذكاء الاصطناعي",
+    "defaultAnalysis": "بناءً على ملف أسلوبك والاتجاهات الحالية، اخترنا هذه الإطلالة لتحقيق أقصى قدر من الراحة والأناقة.",
+    "matchScore": "نسبة التطابق",
+    "historyTitle": "التوصيات السابقة",
+    "weeklyTitle": "هذا الأسبوع",
+    "today": "اليوم",
+    "noOutfit": "لا توجد توصية بعد",
+    "addItemsHint": "أضف عناصر إلى خزانة ملابسك للبدء",
+    "noOutfitForDay": "لا توجد إطلالة",
+    "noHistory": "لا توجد توصيات سابقة بعد",
+    "errorFetching": "تعذر جلب توصية اليوم",
+    "outfitReady": "إطلالتك جاهزة!",
+    "clothingItem": "قطعة ملابس",
+    "top": "علوي",
+    "bottom": "سفلي",
+    "savedOutfit": "إطلالة محفوظة",
+    "matched": "مطابق"
   },
   "fav": {
     "title": "المفضلة",

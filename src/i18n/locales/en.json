@@ -16,7 +16,8 @@
     "wardrobe": "Wardrobe",
     "dark": "Dark",
     "light": "Light",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "recommendations": "Recommendations"
   },
   "hero": {
     "yourPersonal": "Your Personal",
@@ -719,6 +720,36 @@
     "failedSaveProfile": "Failed to save profile",
     "languageArabic": "العربية",
     "languageEnglish": "English"
+  },
+  "recommendation": {
+    "greetingMorning": "Good Morning",
+    "greetingAfternoon": "Good Afternoon",
+    "greetingEvening": "Good Evening",
+    "guest": "Guest",
+    "subtitle": "Let's dress smart today.",
+    "todaysRecommendation": "Today's recommendation",
+    "viewDetails": "View Outfit Details",
+    "todaysLook": "Today's Look",
+    "weatherBasedDesc": "Perfect for {{condition}}, {{temp}}° today",
+    "recommendedForYou": "Curated just for you based on your style",
+    "whyWeChoseThis": "Why we chose this",
+    "aiAnalysis": "AI Analysis",
+    "defaultAnalysis": "Based on your style profile and current trends, we curated this outfit to maximize both comfort and style.",
+    "matchScore": "match score",
+    "historyTitle": "Previous recommendations",
+    "weeklyTitle": "This Week",
+    "today": "Today",
+    "noOutfit": "No recommendation yet",
+    "addItemsHint": "Add items to your wardrobe to get started",
+    "noOutfitForDay": "No outfit",
+    "noHistory": "No previous recommendations yet",
+    "errorFetching": "Could not fetch today's recommendation",
+    "outfitReady": "Your outfit is ready!",
+    "clothingItem": "Clothing Item",
+    "top": "Top",
+    "bottom": "Bottom",
+    "savedOutfit": "Saved outfit",
+    "matched": "Matched"
   },
   "fav": {
     "title": "Favorites",
