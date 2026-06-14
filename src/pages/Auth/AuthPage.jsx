@@ -38,7 +38,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
         const left = window.screenX + (window.innerWidth - width) / 2;
         const top = window.screenY + (window.innerHeight - height) / 2;
         window.googleAuthPopup = window.open(
-            "http://localhost:5000/api/auth/google",
+            `${import.meta.env.VITE_API_URL}/auth/google`,
             "google-auth",
             `width=${width},height=${height},left=${left},top=${top}`
         );
