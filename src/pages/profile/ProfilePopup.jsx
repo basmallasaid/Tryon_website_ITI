@@ -160,7 +160,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
 
       {/* Action Cards */}
       <div className="space-y-3 mb-6">
-        <button className="w-full bg-[#F0F9FF] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[#E0F2FE] hover:scale-[1.02]">
+        <Link to="/pricing" onClick={onClose} className="w-full bg-[#F0F9FF] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[#E0F2FE] hover:scale-[1.02]">
           <div className="flex items-center gap-3">
             <div className="bg-white p-2 rounded-xl shadow-sm text-[#40B9FF]">
               <CreditCard size={18} />
@@ -170,7 +170,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
               <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tighter">{t("profile.secureSettings")}</p>
             </div>
           </div>
-        </button>
+        </Link>
 
         <Link to="/favorites" onClick={onClose} className="w-full bg-[#F0F9FF] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[#E0F2FE] hover:scale-[1.02]">
           <div className="flex items-center gap-3">
