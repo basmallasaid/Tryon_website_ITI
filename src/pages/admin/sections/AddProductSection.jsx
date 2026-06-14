@@ -279,7 +279,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
                     {colorTags.map((t) => (
                       <span key={t} className="flex items-center gap-1 px-3 py-1 bg-admin-success/20 text-admin-success text-xs font-bold rounded-full">
                         {t}
-                        <button onClick={() => removeTag(t)} className="hover:text-admin-danger transition-colors"><X className="w-3 h-3" /></button>
+                        <button onClick={() => removeTag(t)} className="hover:text-accent-orange transition-colors"><X className="w-3 h-3" /></button>
                       </span>
                     ))}
                     <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())} placeholder="Add tag..." className="flex-1 min-w-[80px] text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted" />
@@ -291,7 +291,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
                     {seasonTags.map((t) => (
                       <span key={t} className="flex items-center gap-1 px-3 py-1 bg-admin-amber/20 text-admin-amber text-xs font-bold rounded-full">
                         {t}
-                        <button onClick={() => removeSeason(t)} className="hover:text-admin-danger transition-colors"><X className="w-3 h-3" /></button>
+                        <button onClick={() => removeSeason(t)} className="hover:text-accent-orange transition-colors"><X className="w-3 h-3" /></button>
                       </span>
                     ))}
                     <input type="text" value={seasonInput} onChange={(e) => setSeasonInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSeason())} placeholder="e.g. spring, summer..." className="flex-1 min-w-[80px] text-xs text-admin-text-primary outline-none placeholder:text-admin-text-muted" />

@@ -180,10 +180,10 @@ export default function PlatformSettingsSection() {
         <div className="bg-surface-elevated border border-admin-border/30 rounded-xl p-4 sm:p-8 shadow-sm">
           <button
             onClick={handleLogout}
-            className="flex items-center justify-between w-full p-3 sm:p-4 rounded-lg border bg-admin-danger/5 border-admin-danger/20 text-admin-danger hover:bg-admin-danger/10 transition-colors"
+            className="flex items-center justify-between w-full p-3 sm:p-4 rounded-lg border bg-accent-orange/5 border-accent-orange/20 text-accent-orange hover:bg-accent-orange/10 transition-colors"
           >
             <div className="flex items-center gap-3">
-              <LogOut className="w-4 h-5 text-admin-danger" />
+              <LogOut className="w-4 h-5 text-accent-orange" />
               <span className="text-sm sm:text-base font-bold">{t('admin.settings.logOut')}</span>
             </div>
           </button>

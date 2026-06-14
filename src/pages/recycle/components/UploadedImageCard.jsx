@@ -18,7 +18,7 @@ const UploadedImageCard = ({ image, index, onRemove }) => {
           type="button"
           onClick={() => onRemove(index)}
           aria-label={`${t("recycle.piece")} ${index + 1}`}
-          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-surface-elevated/90 text-text-secondary shadow-md transition-all duration-200 hover:bg-error-text hover:text-white hover:scale-110"
+          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-surface-elevated/90 text-text-secondary shadow-md transition-all duration-200 hover:bg-accent-orange hover:text-white hover:scale-110"
         >
           <X className="h-4 w-4" />
         </button>

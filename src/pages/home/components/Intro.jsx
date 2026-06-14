@@ -36,7 +36,7 @@ const Intro = () => {
           <div className="flex flex-col gap-8">
             {steps.map((step) => (
               <div key={step.num} className="flex items-center gap-6">
-                <div className="w-10 h-10 rounded-full bg-accent-orange flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0">
                   <span className="font-['Plus_Jakarta_Sans'] font-bold text-base leading-6 text-surface-elevated">
                     {step.num}
                   </span>

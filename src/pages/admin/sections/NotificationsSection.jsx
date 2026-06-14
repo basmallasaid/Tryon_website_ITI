@@ -76,7 +76,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
         <div className="p-4 border-t border-admin-border/30 flex justify-end">
           <button
             onClick={() => onDelete(notification._id)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-admin-danger hover:bg-admin-danger/10 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-accent-orange hover:bg-accent-orange/10 rounded-lg transition-colors"
           >
             <Trash2 className="w-4 h-4" /> {t('admin.common.delete')}
           </button>
