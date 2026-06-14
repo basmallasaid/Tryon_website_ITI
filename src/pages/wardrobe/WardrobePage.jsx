@@ -21,17 +21,17 @@ const WardrobePage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // 1. استخراج التصنيفات الموجودة فعلياً في البيانات القادمة من الباك إند
+
   const dynamicCategories = useMemo(() => {
     if (items.length === 0) return ['All'];
 
-    // نأخذ كل الـ categories من الملابس، نحذف الفارغ، ونوحد شكل النص (أول حرف كبير)
+  
     const existingCats = items
       .map((item) => item.category)
-      .filter((cat) => cat) // التأكد أن التصنيف ليس null أو undefined
+      .filter((cat) => cat) 
       .map((cat) => cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase());
 
-    // نستخدم Set لحذف التكرار، ثم نضيف 'All' في البداية
+    
     return ['All', ...new Set(existingCats)];
   }, [items]);
 
@@ -73,7 +73,7 @@ const WardrobePage = () => {
     }
   };
 
-  // 2. منطق الفلترة المعتمد على التصنيف المختار
+ 
   const filteredItems = useMemo(() => {
     return activeFilter === 'All'
       ? items
@@ -87,7 +87,7 @@ const WardrobePage = () => {
       <div className="max-w-7xl mx-auto space-y-12">
         <WardrobeHealth itemCount={items.length} />
 
-        {/* 3. تمرير الفلاتر الديناميكية */}
+        
         <WardrobeFilters
           categories={dynamicCategories}
           activeFilter={activeFilter}
@@ -120,7 +120,7 @@ const WardrobePage = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-              {/* Add new item button */}
+             
                <button
                 onClick={() => setIsAddModalOpen(true)}
                 className="aspect-[4/5] border-4 border-dashed border-[var(--border)] rounded-[2.5rem] flex flex-col items-center justify-center gap-4 text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all bg-surface-elevated/50"

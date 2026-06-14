@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 
 import StepIndicator from './components/StepIndicator';
 import UploadArea from './components/UploadArea';
+import EmptyState from '../../components/EmptyState';
+import LoadingScreen from '../../components/LoadingScreen';
 import UploadedImageCard from './components/UploadedImageCard';
 import DesignIdeaCard from './components/DesignIdeaCard';
 import SettingsRow from './components/SettingsRow';
@@ -356,12 +358,7 @@ export default function Recycle() {
                 </div>
 
                 {wardrobeItems.length === 0 ? (
-                  <div className="bg-[var(--bg-secondary)] rounded-xl p-8 text-center border border-dashed border-[var(--border)]">
-                    <Shirt className="w-8 h-8 text-text-disabled mx-auto mb-2" />
-                    <p className="text-text-secondary text-sm font-medium">
-                      {t('recycle.wardrobeEmpty')}
-                    </p>
-                  </div>
+                  <EmptyState message={t('recycle.wardrobeEmpty')} />
                 ) : (
                   <div className="flex gap-[15px] flex-wrap">
                     {wardrobeItems.map(item => {
@@ -474,16 +471,6 @@ export default function Recycle() {
           </section>
         )}
 
-        {/* Analyzing Loading */}
-        {analyzing && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)] mb-4" />
-            <p className="text-text-secondary font-medium">
-              {t('recycle.analyzingItems')}
-            </p>
-          </div>
-        )}
-
         {/* Design Ideas Section */}
         {ideas.length > 0 && (
           <section ref={ideasRef} className="mt-14 sm:mt-20">
@@ -538,9 +525,7 @@ export default function Recycle() {
                 }`}
               >
                 <Sparkles className="w-5 h-5" />
-                {generating
-                  ? t('recycle.generatingDesignBtn')
-                  : t('recycle.generateDesignBtn')}
+                {generating ? t('recycle.generatingDesignBtn') : t('recycle.generateDesignBtn')}
               </button>
             </div>
           </section>
@@ -570,6 +555,7 @@ export default function Recycle() {
           </div>
         )}
       </div>
+      <LoadingScreen visible={analyzing || generating} />
     </div>
   );
 }

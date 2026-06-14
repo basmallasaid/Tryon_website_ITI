@@ -773,5 +773,18 @@
     "addedSuccess": "Added to favorites successfully",
     "addedError": "Failed to add item to favorites",
     "loadError": "Unable to load favorites"
+  },
+  "loading": {
+    "title": "Getting ready...",
+    "msg1": "Styling your perfect look...",
+    "msg2": "Teaching AI about your fashion taste...",
+    "msg3": "Searching your wardrobe for hidden gems...",
+    "msg4": "Convincing the outfit to cooperate...",
+    "msg5": "Making fashion magic happen...",
+    "msg6": "Preparing your next favorite outfit...",
+    "msg7": "Matching colors like a professional stylist...",
+    "msg8": "Almost ready, your style is cooking...",
+    "msg9": "Consulting with digital fashion experts...",
+    "msg10": "Polishing every detail to perfection..."
   }
 }

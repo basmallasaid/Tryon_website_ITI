@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import EmptyState from '../../components/EmptyState';
+import LoadingScreen from '../../components/LoadingScreen';
 
 import StepIndicator from '../recycle/components/StepIndicator';
 import UploadArea from '../recycle/components/UploadArea';
@@ -438,15 +440,7 @@ export default function Matching() {
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)]" />
                 </div>
               ) : wardrobeItems.length === 0 ? (
-                <div className="bg-[var(--bg-secondary)] rounded-xl p-8 text-center">
-                  <Shirt className="w-10 h-10 text-text-disabled mx-auto mb-3" />
-                  <p className="text-text-secondary font-medium">
-                    {t('matching.wardrobeEmpty')}
-                  </p>
-                  <p className="text-xs text-text-disabled mt-1">
-                    {t('matching.addItemsToStart')}
-                  </p>
-                </div>
+                <EmptyState message={t('matching.wardrobeEmpty')} description={t('matching.addItemsToStart')} />
               ) : (
                 <>
                   <div
@@ -583,16 +577,6 @@ export default function Matching() {
               </button>
             </div>
           </section>
-        )}
-
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)] mb-4" />
-            <p className="text-text-secondary font-medium">
-              {t('matching.findingMatches')}
-            </p>
-          </div>
         )}
 
         {/* Results */}
@@ -798,6 +782,7 @@ export default function Matching() {
           </section>
         )}
       </div>
+      <LoadingScreen visible={isLoading} />
     </div>
   );
 }

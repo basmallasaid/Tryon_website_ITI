@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Sparkles,
   Shirt,
+  Sparkles,
   Grid3x3,
   X,
   LogIn,
@@ -13,6 +13,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import StepIndicator from '../recycle/components/StepIndicator';
+import EmptyState from '../../components/EmptyState';
+import LoadingScreen from '../../components/LoadingScreen';
 import UploadArea from '../recycle/components/UploadArea';
 import UploadedImageCard from '../recycle/components/UploadedImageCard';
 import ModelSelectionCard from '../../components/tryOn/ModelSelectionCard';
@@ -804,15 +806,7 @@ export default function TryOn() {
                       <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)]" />
                     </div>
                   ) : wardrobeItems.length === 0 ? (
-                    <div className="bg-[var(--bg-secondary)] rounded-xl p-8 text-center">
-                      <Shirt className="w-10 h-10 text-text-disabled mx-auto mb-3" />
-                      <p className="text-text-secondary font-medium">
-                        {t('tryOn.wardrobeEmpty')}
-                      </p>
-                      <p className="text-xs text-text-disabled mt-1">
-                        {t('tryOn.addItemsToStart')}
-                      </p>
-                    </div>
+                    <EmptyState message={t('tryOn.wardrobeEmpty')} description={t('tryOn.addItemsToStart')} />
                   ) : (
                     <div className="flex gap-[15px] flex-wrap justify-center sm:justify-start">
                       {wardrobeItems.map(item => {
@@ -992,72 +986,53 @@ export default function TryOn() {
                   : 'bg-[var(--Disabled-Text-color)] cursor-not-allowed'
               } ${isArabic ? 'flex-row-reverse' : ''}`}
             >
-              {generating ? (
-                <>
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                  {t('tryOn.generating')}
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  {t('tryOn.generateTryOn')}
-                </>
-              )}
+              <Sparkles className="w-5 h-5" />
+              {generating ? t('tryOn.generating') : t('tryOn.generateTryOn')}
             </button>
           </div>
         </section>
 
         {/* Result */}
-        {(generating || generatedImageUrl) && (
+        {generatedImageUrl && (
           <section ref={resultRef} className="mt-12 sm:mt-16">
-            {generating ? (
-              <div className="rounded-2xl shadow-xl bg-[var(--bg-secondary)] flex flex-col items-center justify-center py-20">
-                <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)] mb-4" />
-                <p className="text-text-secondary font-medium">
-                  {t('tryOn.generatingTryOn')}
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="rounded-2xl overflow-hidden shadow-xl bg-[var(--bg-secondary)]">
-                  <img
-                    src={generatedImageUrl}
-                    alt={t('tryOn.tryOnResult')}
-                    className="w-full h-auto max-h-[600px] object-contain"
-                  />
-                </div>
-                <div className="flex justify-center gap-4 mt-6">
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg hover:scale-105 active:scale-95"
-                    style={{
-                      backgroundColor: saving
-                        ? 'var(--Disabled-Text-color)'
-                        : 'var(--primary)',
-                    }}
-                  >
-                    {saving
-                      ? t('tryOn.saving')
-                      : saveMsg === 'saved'
-                        ? t('tryOn.saved')
-                        : saveMsg === 'error'
-                          ? t('tryOn.failed')
-                          : t('tryOn.save')}
-                  </button>
-                  <button
-                    onClick={handleReset}
-                    className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white bg-secondary hover:opacity-90 hover:scale-105 active:scale-95 transition-all shadow-lg ${isArabic ? 'flex-row-reverse' : ''}`}
-                  >
-                    <Sparkles className="w-5 h-5" />
-                    {t('tryOn.tryAgain')}
-                  </button>
-                </div>
-              </>
-            )}
+            <div className="rounded-2xl overflow-hidden shadow-xl bg-[var(--bg-secondary)]">
+              <img
+                src={generatedImageUrl}
+                alt={t('tryOn.tryOnResult')}
+                className="w-full h-auto max-h-[600px] object-contain"
+              />
+            </div>
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg hover:scale-105 active:scale-95"
+                style={{
+                  backgroundColor: saving
+                    ? 'var(--Disabled-Text-color)'
+                    : 'var(--primary)',
+                }}
+              >
+                {saving
+                  ? t('tryOn.saving')
+                  : saveMsg === 'saved'
+                    ? t('tryOn.saved')
+                    : saveMsg === 'error'
+                      ? t('tryOn.failed')
+                      : t('tryOn.save')}
+              </button>
+              <button
+                onClick={handleReset}
+                className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white bg-secondary hover:opacity-90 hover:scale-105 active:scale-95 transition-all shadow-lg ${isArabic ? 'flex-row-reverse' : ''}`}
+              >
+                <Sparkles className="w-5 h-5" />
+                {t('tryOn.tryAgain')}
+              </button>
+            </div>
           </section>
         )}
       </div>
+      <LoadingScreen visible={generating} />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Heart, HeartOff, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { useFavorites } from "../../context/FavoritesContext";
+import EmptyState from "../../components/EmptyState";
 
 const SOURCE_LABELS = {
   Wardrobe: "WARDROBE",
@@ -41,21 +42,6 @@ function getCategory(item) {
 function getSourceLabel(item) {
   const cat = getCategory(item);
   return SOURCE_LABELS[cat] || cat.toUpperCase() || "FROM STORE";
-}
-
-function EmptyState() {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
-  return (
-    <div className="min-h-screen bg-bg-secondary font-roboto flex flex-col items-center justify-center" dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className="w-32 h-32 rounded-full bg-surface-elevated flex items-center justify-center mb-6 shadow-sm">
-        <Heart size={52} className="text-primary" />
-      </div>
-      <h2 className="text-[36px] leading-[38px] font-black text-text-primary text-center px-4">
-        {t("fav.emptyMessage")}
-      </h2>
-    </div>
-  );
 }
 
 const FILTERS = ["All", "Store", "Wardrobe", "Recent Try-On", "Recent Recycle"];
@@ -243,7 +229,7 @@ export default function Fav() {
     );
   }
 
-  if (items.length === 0) return <EmptyState />;
+  if (items.length === 0) return <EmptyState message={t("fav.emptyMessage")} />;
 
   return <FavoritesList items={items} removeItem={removeItem} />;
 }

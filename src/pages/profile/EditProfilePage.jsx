@@ -493,7 +493,7 @@ export default function EditProfilePage() {
                             type="button"
                             onClick={handleDeleteAccount}
                             disabled={deleting}
-                            className="w-full md:w-auto px-16 py-4 bg-[var(--accent-light)] text-[var(--Secondary-Orange-Brand-color)] rounded-2xl font-bold flex items-center justify-center gap-3 border border-[var(--accent-light)] hover:bg-[var(--accent-light)] transition-colors disabled:cursor-not-allowed disabled:opacity-70"
+                            className="w-full md:w-auto px-16 py-4 bg-[#ffa35c] text-[white] rounded-2xl font-bold flex items-center justify-center gap-3 border border-[var(--Secondary-Orange-Brand-color)] hover:bg-[#ffb37a] transition-colors disabled:cursor-not-allowed disabled:opacity-70"
                         >
                             <AlertTriangle className="w-5 h-5" />
                             {deleting ? t("profile.deleting") : t("profile.deleteAccount")}

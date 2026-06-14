@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { translateProducts } from '../../utils/translate';
+import EmptyState from '../../components/EmptyState';
 
 const normalizeId = id => {
   if (!id) return null;
@@ -278,6 +279,8 @@ const StoresPage = () => {
                 />
               ))}
             </div>
+          ) : filteredProducts.length === 0 ? (
+            <EmptyState message={t('stores.noProducts')} />
           ) : (
             <>
               <div
