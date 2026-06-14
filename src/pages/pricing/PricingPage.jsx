@@ -415,7 +415,7 @@ export default function PricingPage() {
             </div>
 
             <div className="w-[798px] h-[94px] flex items-center justify-center max-[1100px]:w-full max-[1100px]:px-4">
-              <div className="relative flex items-center bg-bg-secondary rounded-full w-full h-full">
+              <div className="relative flex items-center bg-[#EDEDED] rounded-full w-full h-full">
                 <span
                   className="absolute rounded-full border border-[var(--border)] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
                   style={{
@@ -501,7 +501,7 @@ export default function PricingPage() {
                   }}
                 />
 
-                <div className="relative z-10 w-full h-full flex flex-col gap-8 py-8 max-[1100px]:py-6 px-10 bg-surface-elevated">
+                <div className="relative z-10 w-full h-full flex flex-col gap-8 py-8 max-[1100px]:py-6 px-10">
                   <div className="w-[116px] rounded-full py-1 px-3 bg-accent-orange flex items-center justify-center">
                     <span className="font-medium text-sm leading-[117%] text-surface-elevated">
                       {t("pricing.popular")}
