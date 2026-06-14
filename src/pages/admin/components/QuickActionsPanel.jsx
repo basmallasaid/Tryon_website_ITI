@@ -18,7 +18,7 @@ export default function QuickActionsPanel() {
         {actions.map(({ icon: Icon, label }) => (
           <button
             key={label}
-            className="flex flex-col items-center justify-center gap-2 py-5 bg-white/10 rounded-lg hover:bg-white/20 transition-colors text-white text-xs font-medium"
+            className="flex flex-col items-center justify-center gap-2 py-5 bg-surface-elevated/10 rounded-lg hover:bg-surface-elevated/20 transition-colors text-white text-xs font-medium"
             style={{ letterSpacing: '0.24px' }}
           >
             <Icon className="w-5 h-5 text-white" />

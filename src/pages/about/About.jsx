@@ -6,6 +6,7 @@ import Mirror from '../home/components/Mirror';
 export default function About() {
   return (
     <div className="bg-bg-primary">
+      <style>{'section { background: var(--background) !important; }'}</style>
       <HeroSection />
       <Sustainability />
       <Mirror />

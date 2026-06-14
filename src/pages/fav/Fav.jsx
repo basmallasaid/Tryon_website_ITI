@@ -163,7 +163,7 @@ function FavoritesList({ items, removeItem }) {
                     <button
                       onClick={() => handleRemove(item)}
                       disabled={isRemoving}
-                      className="absolute top-3 ltr:right-3 rtl:left-3 p-2 bg-surface-elevated/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-rose-50 hover:scale-110 disabled:opacity-50 cursor-pointer z-10"
+                      className="absolute top-3 ltr:right-3 rtl:left-3 p-2 bg-surface-elevated/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-[var(--accent-light)] hover:scale-110 disabled:opacity-50 cursor-pointer z-10"
                     >
                       {isRemoving ? (
                         <Loader2 size={16} className="animate-spin text-accent-pink" />

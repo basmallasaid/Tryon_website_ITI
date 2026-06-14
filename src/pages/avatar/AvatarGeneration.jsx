@@ -38,13 +38,13 @@ const INITIAL_FORM = {
   hair_color: '',
 };
 
-const parseNumeric = (val) => {
+const parseNumeric = val => {
   if (!val) return '';
   const num = parseInt(val);
   return isNaN(num) ? String(val) : String(num);
 };
 
-const parseAvatarToForm = (avatar) => ({
+const parseAvatarToForm = avatar => ({
   age: parseNumeric(avatar.age),
   gender: avatar.gender || '',
   weight: parseNumeric(avatar.weight),
@@ -99,8 +99,14 @@ export default function AvatarGeneration() {
       .catch(() => {});
   }, [user?.avatars]);
 
-  const hasAvatar = !!(generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || user?.avatars?.length > 0);
-  const displayImageUrl = generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || null;
+  const hasAvatar = !!(
+    generatedImageUrl ||
+    fetchedAvatarUrl ||
+    user?.generatedAvatar ||
+    user?.avatars?.length > 0
+  );
+  const displayImageUrl =
+    generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || null;
   const isSubscribed = subscriptionStatus === 'active';
   const subscriptionChecked = !subscriptionLoading;
   const showUpgrade = subscriptionChecked && hasAvatar && !isSubscribed;
@@ -119,7 +125,7 @@ export default function AvatarGeneration() {
     }
     setSubscriptionLoading(true);
     getSettingsApi({ email: user.email })
-      .then((res) => {
+      .then(res => {
         setSubscriptionStatus(res.data.subscriptionStatus);
       })
       .catch(() => {
@@ -226,7 +232,7 @@ export default function AvatarGeneration() {
               className="rounded-2xl bg-surface-elevated p-6 sm:p-8"
               style={{
                 border: '2px solid transparent',
-                backgroundImage: `linear-gradient(var(--color-surface-elevated), var(--color-surface-elevated)), linear-gradient(90deg, #FF8A3D, var(--color-primary), #A6E22E)`,
+                backgroundImage: `linear-gradient(var(--surface), var(--surface)), linear-gradient(90deg, #FF8A3D, var(--primary), #A6E22E)`,
                 backgroundOrigin: 'border-box',
                 backgroundClip: 'padding-box, border-box',
               }}
@@ -258,9 +264,9 @@ export default function AvatarGeneration() {
                         const isSelected = form.gender === o;
                         const borderColor = isSelected
                           ? o === 'male'
-                            ? 'var(--color-primary)'
-                            : '#E91E63'
-                          : 'var(--color-border-strong)';
+                            ? 'var(--primary)'
+                            : 'var(--accent)'
+                          : 'var(--Border-Strong)';
                         return (
                           <button
                             key={o}
@@ -273,10 +279,10 @@ export default function AvatarGeneration() {
                                 ? o === 'male'
                                   ? 'rgba(64, 185, 255, 0.08)'
                                   : 'rgba(233, 30, 99, 0.08)'
-                                : 'var(--color-surface-elevated)',
+                                : 'var(--surface)',
                               color: isSelected
-                                ? 'var(--color-text-primary)'
-                                : 'var(--color-text-disabled)',
+                                ? 'var(--text-primary)'
+                                : 'var(--Disabled-Text-color)',
                             }}
                           >
                             {t('avatar.' + o)}
@@ -332,11 +338,11 @@ export default function AvatarGeneration() {
                             backgroundColor: s.color,
                             borderColor:
                               form.skin_tone === s.id
-                                ? 'var(--color-primary)'
-                                : 'var(--color-border-strong)',
+                                ? 'var(--primary)'
+                                : 'var(--Border-Strong)',
                             boxShadow:
                               form.skin_tone === s.id
-                                ? '0 0 0 3px var(--color-primary)'
+                                ? '0 0 0 3px var(--primary)'
                                 : '0 0 0 1px rgba(0,0,0,0.08)',
                           }}
                         >
@@ -352,8 +358,8 @@ export default function AvatarGeneration() {
                           style={{
                             color:
                               form.skin_tone === s.id
-                                ? 'var(--color-text-primary)'
-                                : 'var(--color-text-disabled)',
+                                ? 'var(--text-primary)'
+                                : 'var(--Disabled-Text-color)',
                           }}
                         >
                           {t('avatar.skinTones.' + s.id)}
@@ -381,11 +387,11 @@ export default function AvatarGeneration() {
                             backgroundColor: h.color,
                             borderColor:
                               form.hair_color === h.id
-                                ? 'var(--color-primary)'
-                                : 'var(--color-border-strong)',
+                                ? 'var(--primary)'
+                                : 'var(--Border-Strong)',
                             boxShadow:
                               form.hair_color === h.id
-                                ? '0 0 0 3px var(--color-primary)'
+                                ? '0 0 0 3px var(--primary)'
                                 : '0 0 0 1px rgba(0,0,0,0.08)',
                           }}
                         >
@@ -401,8 +407,8 @@ export default function AvatarGeneration() {
                           style={{
                             color:
                               form.hair_color === h.id
-                                ? 'var(--color-text-primary)'
-                                : 'var(--color-text-disabled)',
+                                ? 'var(--text-primary)'
+                                : 'var(--Disabled-Text-color)',
                           }}
                         >
                           {t('avatar.hairColors.' + h.id)}
@@ -416,7 +422,9 @@ export default function AvatarGeneration() {
               <div className="mt-8">
                 <Button
                   variant="styling"
-                  onClick={showUpgrade ? () => navigate('/pricing') : handleGenerate}
+                  onClick={
+                    showUpgrade ? () => navigate('/pricing') : handleGenerate
+                  }
                   disabled={!showUpgrade && (!allFilled || processing)}
                   className={`w-full gap-3 ${
                     !showUpgrade && (!allFilled || processing)
@@ -460,7 +468,7 @@ export default function AvatarGeneration() {
                   <div className="flex flex-col items-center gap-3">
                     <div
                       className="h-12 w-12 animate-spin rounded-full border-4 border-border-strong"
-                      style={{ borderTopColor: 'var(--color-brand-secondary)' }}
+                      style={{ borderTopColor: 'var(--secondary)' }}
                     />
                     <p className="text-sm text-text-disabled">
                       {t('avatar.generatingAvatar')}

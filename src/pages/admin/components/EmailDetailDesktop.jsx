@@ -39,7 +39,7 @@ export default function EmailDetailDesktop({ email, thread, loadingThread, reply
       ) : (
         <>
           {/* Root Message */}
-          <div className="bg-white border border-admin-border/40 rounded-xl shadow-sm mb-6">
+          <div className="bg-surface-elevated border border-admin-border/40 rounded-xl shadow-sm mb-6">
             <div className="p-6 border-b border-admin-border/30">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
@@ -87,7 +87,7 @@ export default function EmailDetailDesktop({ email, thread, loadingThread, reply
                   : reply.senderEmail;
                 const isFromAdmin = reply.emailType === 'ADMIN_TO_USER';
                 return (
-                  <div key={reply._id} className={`bg-white border rounded-xl shadow-sm ${isFromAdmin ? 'border-admin-brand/30 ml-4' : 'border-admin-border/40'}`}>
+                  <div key={reply._id} className={`bg-surface-elevated border rounded-xl shadow-sm ${isFromAdmin ? 'border-admin-brand/30 ml-4' : 'border-admin-border/40'}`}>
                     <div className="p-4 border-b border-admin-border/20 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isFromAdmin ? 'bg-admin-brand text-white' : 'bg-admin-brand/20 text-admin-brand'}`}>
@@ -115,7 +115,7 @@ export default function EmailDetailDesktop({ email, thread, loadingThread, reply
           )}
 
           {/* Compose Reply */}
-          <div className="bg-white border border-admin-border/40 rounded-xl shadow-sm">
+          <div className="bg-surface-elevated border border-admin-border/40 rounded-xl shadow-sm">
             <div className="p-4 bg-admin-brand-bg/50 border-b border-admin-border/30 flex items-center gap-2">
               <svg className="w-4 h-4 text-admin-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9 17l-5-5 5-5" />
@@ -152,7 +152,7 @@ export default function EmailDetailDesktop({ email, thread, loadingThread, reply
                   value={replyText}
                   onChange={(e) => onReplyTextChange(e.target.value)}
                   placeholder="Type your reply..."
-                  className="w-full px-4 py-3 bg-white border border-admin-border/40 rounded-xl text-sm text-admin-text-primary outline-none resize-none focus:border-admin-brand transition-colors placeholder:text-admin-text-muted"
+                  className="w-full px-4 py-3 bg-surface-elevated border border-admin-border/40 rounded-xl text-sm text-admin-text-primary outline-none resize-none focus:border-admin-brand transition-colors placeholder:text-admin-text-muted"
                 />
               </div>
             </div>

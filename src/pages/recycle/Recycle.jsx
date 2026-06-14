@@ -1,29 +1,37 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Shirt, Grid3x3, Sparkles, LogIn, X, Package, Circle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Shirt,
+  Grid3x3,
+  Sparkles,
+  LogIn,
+  X,
+  Package,
+  Circle,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-import StepIndicator from "./components/StepIndicator";
-import UploadArea from "./components/UploadArea";
-import UploadedImageCard from "./components/UploadedImageCard";
-import DesignIdeaCard from "./components/DesignIdeaCard";
-import SettingsRow from "./components/SettingsRow";
-import GeneratedDesign from "./components/GeneratedDesign";
-import WardrobeItem from "../../components/tryOn/WardrobeItem";
-import { useAuth } from "../../context/AuthContext";
-import { useWardrobe } from "../../context/WardrobeContext";
+import StepIndicator from './components/StepIndicator';
+import UploadArea from './components/UploadArea';
+import UploadedImageCard from './components/UploadedImageCard';
+import DesignIdeaCard from './components/DesignIdeaCard';
+import SettingsRow from './components/SettingsRow';
+import GeneratedDesign from './components/GeneratedDesign';
+import WardrobeItem from '../../components/tryOn/WardrobeItem';
+import { useAuth } from '../../context/AuthContext';
+import { useWardrobe } from '../../context/WardrobeContext';
 import {
   analyzeRecycleApi,
   generateRecycleIdeaApi,
-} from "../../api/recycleApi";
-import { showToast } from "../../utils/toast";
+} from '../../api/recycleApi';
+import { showToast } from '../../utils/toast';
 
 const MAX_SELECTION = 2;
 
-const imgSrc = (image) => {
+const imgSrc = image => {
   if (!image) return null;
-  if (typeof image === "string") {
-    if (image.startsWith("data:") || image.startsWith("http")) return image;
+  if (typeof image === 'string') {
+    if (image.startsWith('data:') || image.startsWith('http')) return image;
     return `data:image/jpeg;base64,${image}`;
   }
   if (image.url) return image.url;
@@ -32,26 +40,28 @@ const imgSrc = (image) => {
 };
 
 const base64ToFile = (base64, filename) => {
-  const url = base64?.startsWith("data:") ? base64 : `data:image/jpeg;base64,${base64}`;
-  const [header, data] = url.split(",");
-  const mime = header?.match(/:(.*?);/)?.[1] || "image/jpeg";
-  const ext = mime.split("/")[1] || "jpg";
+  const url = base64?.startsWith('data:')
+    ? base64
+    : `data:image/jpeg;base64,${base64}`;
+  const [header, data] = url.split(',');
+  const mime = header?.match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const ext = mime.split('/')[1] || 'jpg';
   const bytes = atob(data);
   const arr = new Uint8Array(bytes.length);
   for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
   return new File([arr], `${filename}.${ext}`, { type: mime });
 };
 
-const buildPreviews = async (files) => {
+const buildPreviews = async files => {
   const results = await Promise.all(
     files.map(
-      (file) =>
-        new Promise((resolve) => {
+      file =>
+        new Promise(resolve => {
           const reader = new FileReader();
           reader.onload = () => resolve({ file, preview: reader.result });
           reader.readAsDataURL(file);
-        })
-    )
+        }),
+    ),
   );
   return results;
 };
@@ -69,8 +79,8 @@ export default function Recycle() {
   const [ideas, setIdeas] = useState([]);
   const [sessionId, setSessionId] = useState(null);
   const [selectedIdeaId, setSelectedIdeaId] = useState(null);
-  const [model, setModel] = useState("qwen-image-2.0-pro");
-  const [aspectRatio, setAspectRatio] = useState("1536*1024");
+  const [model, setModel] = useState('qwen-image-2.0-pro');
+  const [aspectRatio, setAspectRatio] = useState('1536*1024');
   const [generating, setGenerating] = useState(false);
   const [generatedIdea, setGeneratedIdea] = useState(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
@@ -84,34 +94,44 @@ export default function Recycle() {
   const remainingSlots = MAX_SELECTION - totalSelected;
 
   const steps = [
-    { id: 1, title: t("recycle.selectItemsStep"), subtitle: t("recycle.chooseItemsStep") },
-    { id: 2, title: t("recycle.getIdeasStep"), subtitle: t("recycle.aiGeneratesStep") },
-    { id: 3, title: t("recycle.generateDesignStep"), subtitle: t("recycle.createDesignStep") },
+    {
+      id: 1,
+      title: t('recycle.selectItemsStep'),
+      subtitle: t('recycle.chooseItemsStep'),
+    },
+    {
+      id: 2,
+      title: t('recycle.getIdeasStep'),
+      subtitle: t('recycle.aiGeneratesStep'),
+    },
+    {
+      id: 3,
+      title: t('recycle.generateDesignStep'),
+      subtitle: t('recycle.createDesignStep'),
+    },
   ];
 
-  const currentStep = generating
-    ? 3
-    : ideas.length > 0
-      ? 2
-      : 1;
+  const currentStep = generating ? 3 : ideas.length > 0 ? 2 : 1;
 
-  const selectedTitle = totalSelected > 0
-    ? t("recycle.itemsSelected", { count: totalSelected })
-    : t("recycle.noItemsSelectedYet");
+  const selectedTitle =
+    totalSelected > 0
+      ? t('recycle.itemsSelected', { count: totalSelected })
+      : t('recycle.noItemsSelectedYet');
 
-  const selectedSubtitle = totalSelected > 0
-    ? t("recycle.selectUpTo")
-    : t("recycle.selectFromWardrobe");
+  const selectedSubtitle =
+    totalSelected > 0
+      ? t('recycle.selectUpTo')
+      : t('recycle.selectFromWardrobe');
 
   const selectedIdea = useMemo(
-    () => ideas.find((i) => i.id === selectedIdeaId) || null,
-    [ideas, selectedIdeaId]
+    () => ideas.find(i => i.id === selectedIdeaId) || null,
+    [ideas, selectedIdeaId],
   );
 
   useEffect(() => {
     return () => {
-      galleryFiles.forEach((img) => {
-        if (img.preview && img.preview.startsWith("blob:")) {
+      galleryFiles.forEach(img => {
+        if (img.preview && img.preview.startsWith('blob:')) {
           URL.revokeObjectURL(img.preview);
         }
       });
@@ -120,43 +140,46 @@ export default function Recycle() {
 
   useEffect(() => {
     if (ideas.length > 0 && ideasRef.current) {
-      ideasRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      ideasRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [ideas]);
 
   useEffect(() => {
     if (selectedIdeaId && generateRef.current) {
-      generateRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      generateRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
     }
   }, [selectedIdeaId]);
 
   useEffect(() => {
     if ((generating || generatedIdea) && resultRef.current) {
       setTimeout(() => {
-        resultRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+        resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }, 300);
     }
   }, [generating, generatedIdea]);
 
-  const toggleWardrobeItem = (id) => {
-    setWardrobeSelectedIds((prev) => {
-      if (prev.includes(id)) return prev.filter((i) => i !== id);
+  const toggleWardrobeItem = id => {
+    setWardrobeSelectedIds(prev => {
+      if (prev.includes(id)) return prev.filter(i => i !== id);
       if (prev.length + galleryFiles.length >= MAX_SELECTION) return prev;
       return [...prev, id];
     });
   };
 
-  const handleGalleryFilesSelected = async (files) => {
+  const handleGalleryFilesSelected = async files => {
     const allowed = remainingSlots > 0 ? files.slice(0, remainingSlots) : [];
     if (allowed.length === 0) return;
     const previews = await buildPreviews(allowed);
-    setGalleryFiles((prev) => [...prev, ...previews]);
+    setGalleryFiles(prev => [...prev, ...previews]);
   };
 
-  const handleRemoveGalleryImage = (index) => {
-    setGalleryFiles((prev) => {
+  const handleRemoveGalleryImage = index => {
+    setGalleryFiles(prev => {
       const img = prev[index];
-      if (img?.preview?.startsWith("blob:")) URL.revokeObjectURL(img.preview);
+      if (img?.preview?.startsWith('blob:')) URL.revokeObjectURL(img.preview);
       return prev.filter((_, i) => i !== index);
     });
     setIdeas([]);
@@ -178,16 +201,16 @@ export default function Recycle() {
     try {
       const formData = new FormData();
 
-      const selectedWardrobeItems = wardrobeItems.filter((item) =>
-        wardrobeSelectedIds.includes(item._id)
+      const selectedWardrobeItems = wardrobeItems.filter(item =>
+        wardrobeSelectedIds.includes(item._id),
       );
-      selectedWardrobeItems.forEach((item) => {
+      selectedWardrobeItems.forEach(item => {
         const file = base64ToFile(item.image, `wardrobe_${item._id}`);
-        formData.append("images", file);
+        formData.append('images', file);
       });
 
-      galleryFiles.forEach((gf) => {
-        formData.append("images", gf.file);
+      galleryFiles.forEach(gf => {
+        formData.append('images', gf.file);
       });
 
       const res = await analyzeRecycleApi(formData);
@@ -201,7 +224,7 @@ export default function Recycle() {
     }
 
     setTimeout(() => {
-      ideasRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      ideasRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 300);
   };
 
@@ -215,7 +238,7 @@ export default function Recycle() {
         sessionId,
         selectedIdeaId,
         model,
-        aspectRatio
+        aspectRatio,
       );
       const data = res.data || {};
       if (data.image_url) {
@@ -231,8 +254,8 @@ export default function Recycle() {
   };
 
   const handleReset = () => {
-    galleryFiles.forEach((img) => {
-      if (img.preview?.startsWith("blob:")) URL.revokeObjectURL(img.preview);
+    galleryFiles.forEach(img => {
+      if (img.preview?.startsWith('blob:')) URL.revokeObjectURL(img.preview);
     });
     setWardrobeSelectedIds([]);
     setGalleryFiles([]);
@@ -248,8 +271,8 @@ export default function Recycle() {
     <div
       className="min-h-screen"
       style={{
-        backgroundColor: "var(--primary-bgc)",
-        color: "var(--Primary-Text-color)",
+        backgroundColor: 'var(--primary-bgc)',
+        color: 'var(--Primary-Text-color)',
       }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
@@ -258,97 +281,98 @@ export default function Recycle() {
           <h1
             className="text-3xl sm:text-4xl md:text-5xl"
             style={{
-              fontWeight: "var(--Bold)",
-              lineHeight: "1.2",
+              fontWeight: 'var(--Bold)',
+              lineHeight: '1.2',
             }}
           >
-            <span style={{ color: "var(--Primary-Text-color)" }}>Redolapy </span>
+            <span style={{ color: 'var(--Primary-Text-color)' }}>
+              Redolapy{' '}
+            </span>
             <span
               style={{
-                background: "linear-gradient(90deg, #40B9FF 0%, #69C9AC 50%, #AAE338 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                background:
+                  'linear-gradient(90deg, #40B9FF 0%, #69C9AC 50%, #AAE338 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
               }}
             >
-              {t("recycle.subtitle")}
+              {t('recycle.subtitle')}
             </span>
           </h1>
           <p
             className="mt-3 text-base sm:text-lg md:text-xl"
             style={{
-              color: "var(--Primary-Text-color)",
-              fontWeight: "var(--Semi-Bold)",
+              color: 'var(--Primary-Text-color)',
+              fontWeight: 'var(--Semi-Bold)',
               opacity: 0.85,
             }}
           >
-            {t("recycle.heroDesc")}
+            {t('recycle.heroDesc')}
           </p>
         </section>
 
         {/* Step Indicator */}
         <section className="mt-8 sm:mt-10">
-          <StepIndicator
-            currentStep={currentStep}
-            steps={steps}
-          />
+          <StepIndicator currentStep={currentStep} steps={steps} />
         </section>
 
         {/* Wardrobe Section */}
         <section className="mt-12 sm:mt-16">
           <div className="max-w-6xl mx-auto">
             {!user ? (
-              <div className="bg-gray-100 rounded-xl p-8 text-center">
-                <LogIn className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600 font-medium">
-                  {t("recycle.signInToView")}
+              <div className="bg-[var(--bg-secondary)] rounded-xl p-8 text-center">
+                <LogIn className="w-10 h-10 text-text-disabled mx-auto mb-3" />
+                <p className="text-text-secondary font-medium">
+                  {t('recycle.signInToView')}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-text-disabled mt-1">
                   <span
-                    onClick={() => navigate("/auth")}
-                    className="text-blue-500 hover:underline cursor-pointer"
+                    onClick={() => navigate('/auth')}
+                    className="text-info-text hover:underline cursor-pointer"
                   >
-                    {t("recycle.signInLink")}
-                  </span>{" "}
-                  {t("recycle.toAccessItems")}
+                    {t('recycle.signInLink')}
+                  </span>{' '}
+                  {t('recycle.toAccessItems')}
                 </p>
               </div>
             ) : wardrobeLoading ? (
               <div className="flex justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)]" />
               </div>
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-5">
-                  <Shirt className="w-5 h-5 text-blue-500" />
-                  <h3 className="font-bold text-lg" style={{ color: "#1a202c" }}>
-                    {t("recycle.fromMyWardrobe")}
+                  <Shirt className="w-5 h-5 text-info-text" />
+                  <h3 className="font-bold text-lg text-text-primary">
+                    {t('recycle.fromMyWardrobe')}
                   </h3>
                   {remainingSlots < MAX_SELECTION && (
-                    <span className="text-xs text-gray-400 ltr:ml-auto rtl:mr-auto">
+                    <span className="text-xs text-text-disabled ltr:ml-auto rtl:mr-auto">
                       {remainingSlots > 0
-                        ? t("recycle.slotsLeft", { count: remainingSlots })
-                        : t("recycle.maxReached")}
+                        ? t('recycle.slotsLeft', { count: remainingSlots })
+                        : t('recycle.maxReached')}
                     </span>
                   )}
                 </div>
 
                 {wardrobeItems.length === 0 ? (
-                  <div className="bg-gray-50 rounded-xl p-8 text-center border border-dashed border-gray-200">
-                    <Shirt className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                    <p className="text-gray-500 text-sm font-medium">
-                      {t("recycle.wardrobeEmpty")}
+                  <div className="bg-[var(--bg-secondary)] rounded-xl p-8 text-center border border-dashed border-[var(--border)]">
+                    <Shirt className="w-8 h-8 text-text-disabled mx-auto mb-2" />
+                    <p className="text-text-secondary text-sm font-medium">
+                      {t('recycle.wardrobeEmpty')}
                     </p>
                   </div>
                 ) : (
                   <div className="flex gap-[15px] flex-wrap">
-                    {wardrobeItems.map((item) => {
+                    {wardrobeItems.map(item => {
                       const isSelected = wardrobeSelectedIds.includes(item._id);
-                      const canSelect = isSelected || totalSelected < MAX_SELECTION;
+                      const canSelect =
+                        isSelected || totalSelected < MAX_SELECTION;
                       return (
                         <WardrobeItem
                           key={item._id}
                           src={imgSrc(item.image)}
-                          alt={item.name || "Clothing item"}
+                          alt={item.name || 'Clothing item'}
                           selected={isSelected}
                           disabled={!canSelect}
                           onClick={() => toggleWardrobeItem(item._id)}
@@ -365,15 +389,15 @@ export default function Recycle() {
         {/* Gallery Section */}
         <section className="mt-10 sm:mt-14 max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-5">
-            <Grid3x3 className="w-5 h-5 text-blue-500" />
-            <h3 className="font-bold text-lg" style={{ color: "#1a202c" }}>
-              {t("recycle.uploadImages")}
+            <Grid3x3 className="w-5 h-5 text-info-text" />
+            <h3 className="font-bold text-lg text-text-primary">
+              {t('recycle.uploadImages')}
             </h3>
             {remainingSlots < MAX_SELECTION && (
-              <span className="text-xs text-gray-400 ml-auto">
+              <span className="text-xs text-text-disabled ml-auto">
                 {remainingSlots > 0
-                  ? t("recycle.slotsLeft", { count: remainingSlots })
-                  : t("recycle.maxReached")}
+                  ? t('recycle.slotsLeft', { count: remainingSlots })
+                  : t('recycle.maxReached')}
               </span>
             )}
           </div>
@@ -404,18 +428,24 @@ export default function Recycle() {
         {!ideas.length && (
           <section className="mt-12 sm:mt-16">
             <div className="max-w-6xl mx-auto">
-              <div
-                className="rounded-[15px] p-5 flex items-center gap-4"
-                style={{ backgroundColor: "#edf2ff" }}
-              >
-                <div className="w-[45px] h-[45px] rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: "#dbeafe" }}>
-                  <Package className="w-5 h-5" style={{ color: "#1e293b" }} />
+              <div className="rounded-[15px] p-5 flex items-center gap-4 bg-info-bg">
+                <div className="w-[45px] h-[45px] rounded-full flex items-center justify-center shrink-0 bg-info-bg">
+                  <Package
+                    className="w-5 h-5"
+                    style={{ color: 'var(--Primary-Text-color)' }}
+                  />
                 </div>
                 <div>
-                  <p className="font-bold" style={{ color: "#1e293b", fontSize: "0.95rem" }}>
+                  <p
+                    className="font-bold text-text-primary"
+                    style={{ fontSize: '0.95rem' }}
+                  >
                     {selectedTitle}
                   </p>
-                  <p style={{ color: "#64748b", fontSize: "0.85rem" }}>
+                  <p
+                    className="text-text-secondary"
+                    style={{ fontSize: '0.85rem' }}
+                  >
                     {selectedSubtitle}
                   </p>
                 </div>
@@ -433,12 +463,12 @@ export default function Recycle() {
                 disabled={!isReady}
                 className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg w-full max-w-md justify-center ${
                   isReady
-                    ? "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
-                    : "bg-gray-400 cursor-not-allowed"
+                    ? 'bg-secondary hover:opacity-90 hover:scale-105 active:scale-95 cursor-pointer'
+                    : 'bg-[var(--Disabled-Text-color)] cursor-not-allowed'
                 }`}
               >
                 <Sparkles className="w-5 h-5" />
-                {t("recycle.recycleButton")}
+                {t('recycle.recycleButton')}
               </button>
             </div>
           </section>
@@ -447,9 +477,9 @@ export default function Recycle() {
         {/* Analyzing Loading */}
         {analyzing && (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
-            <p className="text-gray-500 font-medium">
-              {t("recycle.analyzingItems")}
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--border)] border-t-[var(--primary)] mb-4" />
+            <p className="text-text-secondary font-medium">
+              {t('recycle.analyzingItems')}
             </p>
           </div>
         )}
@@ -460,15 +490,15 @@ export default function Recycle() {
             <div className="flex items-center justify-between max-w-6xl mx-auto mb-8 sm:mb-14 px-1 gap-4 flex-wrap">
               <h2
                 className="text-2xl sm:text-3xl md:text-4xl font-bold"
-                style={{ color: "var(--Secondary-Text-color)" }}
+                style={{ color: 'var(--Secondary-Text-color)' }}
               >
-                {t("recycle.designIdeas")}
+                {t('recycle.designIdeas')}
               </h2>
               <span
                 className="inline-flex items-center rounded-2xl px-3 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base text-white"
-                style={{ backgroundColor: "var(--Secondary-Brand-color)" }}
+                style={{ backgroundColor: 'var(--Secondary-Brand-color)' }}
               >
-                {t("recycle.aiSuggested")}
+                {t('recycle.aiSuggested')}
               </span>
             </div>
 
@@ -503,14 +533,14 @@ export default function Recycle() {
                 disabled={!selectedIdeaId || generating}
                 className={`inline-flex items-center gap-2 px-14 py-4 rounded-xl font-bold text-white transition-all shadow-lg w-full max-w-md justify-center ${
                   !selectedIdeaId || generating
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 cursor-pointer"
+                    ? 'bg-[var(--Disabled-Text-color)] cursor-not-allowed'
+                    : 'bg-secondary hover:opacity-90 hover:scale-105 active:scale-95 cursor-pointer'
                 }`}
               >
                 <Sparkles className="w-5 h-5" />
                 {generating
-                  ? t("recycle.generatingDesignBtn")
-                  : t("recycle.generateDesignBtn")}
+                  ? t('recycle.generatingDesignBtn')
+                  : t('recycle.generateDesignBtn')}
               </button>
             </div>
           </section>
@@ -532,10 +562,10 @@ export default function Recycle() {
           <div className="flex justify-center pb-10 mt-16">
             <button
               onClick={handleReset}
-              className="inline-flex items-center justify-center gap-2 w-full max-w-md py-4 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 w-full max-w-md py-4 rounded-xl font-bold text-white bg-secondary hover:opacity-90 hover:scale-105 active:scale-95 transition-all shadow-lg cursor-pointer"
             >
               <Sparkles className="w-5 h-5" />
-              {t("recycle.tryAgain")}
+              {t('recycle.tryAgain')}
             </button>
           </div>
         )}

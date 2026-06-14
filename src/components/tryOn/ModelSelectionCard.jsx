@@ -9,14 +9,14 @@ export default function ModelSelectionCard({ children, selected, onClick, badge,
       onClick={onClick}
       className={`relative p-6 rounded-2xl cursor-pointer flex items-center justify-between transition-all outline-none w-full h-full ${
         selected
-          ? "bg-[#E6F6FFCC] border-2 border-[#4FC3FF]"
-          : "bg-white border border-gray-100 shadow-sm"
+          ? "bg-[var(--primary-light)]/60 border-2 border-[var(--primary)]"
+          : "bg-surface-elevated border border-[var(--border)] shadow-sm"
       }`}
     >
       <div>
         {children}
         {badge && (
-          <span className="bg-[#40B9FF] text-white text-[10px] px-2 py-0.5 rounded-full uppercase font-semibold">
+          <span className="bg-[var(--primary)] text-white text-[10px] px-2 py-0.5 rounded-full uppercase font-semibold">
             {badge}
           </span>
         )}
@@ -31,11 +31,11 @@ export default function ModelSelectionCard({ children, selected, onClick, badge,
       <div className={`absolute top-4 ${isArabic ? 'left-4' : 'right-4'}`}>
         {selected ? (
           <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#4FC3FF" stroke="#4FC3FF" strokeWidth="2" />
+            <circle cx="12" cy="12" r="10" fill="var(--primary)" stroke="var(--primary)" strokeWidth="2" />
             <path d="M8 12l3 3 5-5" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ) : (
-          <Circle className="w-5 h-5 text-gray-800 fill-white" />
+          <Circle className="w-5 h-5 text-text-primary fill-white" />
         )}
       </div>
     </div>

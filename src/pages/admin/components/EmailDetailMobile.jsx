@@ -62,7 +62,7 @@ export default function EmailDetailMobile({ email, thread, loadingThread, replyT
             </div>
 
             {/* Root Message */}
-            <div className="bg-white border border-admin-border/40 rounded-xl p-4 shadow-sm">
+            <div className="bg-surface-elevated border border-admin-border/40 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <span className="px-3 py-1 text-xs font-bold bg-admin-brand/10 text-admin-brand rounded">
                   {email?.tag || 'Message'}
@@ -87,7 +87,7 @@ export default function EmailDetailMobile({ email, thread, loadingThread, replyT
                     : reply.senderEmail;
                   const isFromAdmin = reply.emailType === 'ADMIN_TO_USER';
                   return (
-                    <div key={reply._id} className={`border-l-4 ${isFromAdmin ? 'border-admin-brand bg-admin-brand-bg/50' : 'border-admin-border bg-white'} rounded-r-lg p-3`}>
+                    <div key={reply._id} className={`border-l-4 ${isFromAdmin ? 'border-admin-brand bg-admin-brand-bg/50' : 'border-admin-border bg-surface-elevated'} rounded-r-lg p-3`}>
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-admin-text-primary">{replyName}</span>
@@ -107,7 +107,7 @@ export default function EmailDetailMobile({ email, thread, loadingThread, replyT
             )}
 
             {/* Reply Area */}
-            <div className="bg-white border border-admin-border/40 rounded-xl overflow-hidden shadow-sm">
+            <div className="bg-surface-elevated border border-admin-border/40 rounded-xl overflow-hidden shadow-sm">
               <textarea
                 rows={6}
                 value={replyText}

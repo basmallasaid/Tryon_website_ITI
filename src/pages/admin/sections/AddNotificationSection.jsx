@@ -66,7 +66,7 @@ function TargetSection({ sendMode, setSendMode, emailSearch, setEmailSearch, tar
             />
           )}
           {showDropdown && emailSearch.trim() && !targetEmail && (
-            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-admin-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-surface-elevated border border-admin-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
               {filteredUsers.length > 0 ? (
                 filteredUsers.slice(0, 10).map((u) => {
                   const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email;
@@ -94,7 +94,7 @@ function TargetSection({ sendMode, setSendMode, emailSearch, setEmailSearch, tar
           )}
           {showDropdown && emailSearch.trim() && !targetEmail && (
             <div
-              className="absolute z-20 bottom-0 left-0 right-0 bg-white border border-admin-border rounded-b-lg px-4 py-2 cursor-pointer hover:bg-admin-brand-activeBg"
+              className="absolute z-20 bottom-0 left-0 right-0 bg-surface-elevated border border-admin-border rounded-b-lg px-4 py-2 cursor-pointer hover:bg-admin-brand-activeBg"
               onMouseDown={(e) => {
                 e.preventDefault();
                 setTargetEmail(emailSearch.trim());
@@ -127,7 +127,7 @@ function MobileTargetSection({ sendMode, setSendMode, emailSearch, setEmailSearc
         <button
           onClick={() => { setSendMode('broadcast'); setEmailSearch(''); setTargetEmail(''); }}
           className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${
-            sendMode === 'broadcast' ? 'bg-admin-brand text-white' : 'bg-white border border-admin-border text-admin-text-secondary'
+            sendMode === 'broadcast' ? 'bg-admin-brand text-white' : 'bg-surface-elevated border border-admin-border text-admin-text-secondary'
           }`}
         >
           <Users className="w-3.5 h-3.5" /> Broadcast
@@ -135,7 +135,7 @@ function MobileTargetSection({ sendMode, setSendMode, emailSearch, setEmailSearc
         <button
           onClick={() => setSendMode('individual')}
           className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-xs font-medium transition-colors ${
-            sendMode === 'individual' ? 'bg-admin-brand text-white' : 'bg-white border border-admin-border text-admin-text-secondary'
+            sendMode === 'individual' ? 'bg-admin-brand text-white' : 'bg-surface-elevated border border-admin-border text-admin-text-secondary'
           }`}
         >
           <User className="w-3.5 h-3.5" /> Individual
@@ -165,11 +165,11 @@ function MobileTargetSection({ sendMode, setSendMode, emailSearch, setEmailSearc
               onFocus={() => setShowDropdown(true)}
               onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
               placeholder="Search by name or email..."
-              className="w-full px-4 py-3 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
+              className="w-full px-4 py-3 bg-surface-elevated border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors"
             />
           )}
           {showDropdown && emailSearch.trim() && !targetEmail && (
-            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-white border border-admin-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+            <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-surface-elevated border border-admin-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
               {filteredUsers.length > 0 ? (
                 filteredUsers.slice(0, 8).map((u) => {
                   const name = [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') || u.email;
@@ -197,7 +197,7 @@ function MobileTargetSection({ sendMode, setSendMode, emailSearch, setEmailSearc
           )}
           {showDropdown && emailSearch.trim() && !targetEmail && (
             <div
-              className="absolute z-20 bottom-0 left-0 right-0 bg-white border border-admin-border rounded-b-lg px-4 py-2.5 cursor-pointer hover:bg-admin-brand-activeBg"
+              className="absolute z-20 bottom-0 left-0 right-0 bg-surface-elevated border border-admin-border rounded-b-lg px-4 py-2.5 cursor-pointer hover:bg-admin-brand-activeBg"
               onMouseDown={(e) => {
                 e.preventDefault();
                 setTargetEmail(emailSearch.trim());
@@ -377,7 +377,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
                     className={`flex-1 flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
                       selected
                         ? 'border-admin-brand bg-admin-brand/5'
-                        : 'border-admin-border/40 bg-white hover:border-admin-border'
+                        : 'border-admin-border/40 bg-surface-elevated hover:border-admin-border'
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -423,8 +423,8 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
       </div>
 
       {/* Mobile */}
-      <div className="lg:hidden min-h-screen bg-white pb-24">
-        <div className="sticky top-0 z-10 bg-white border-b border-admin-border/30">
+      <div className="lg:hidden min-h-screen bg-surface-elevated pb-24">
+        <div className="sticky top-0 z-10 bg-surface-elevated border-b border-admin-border/30">
           <div className="flex items-center justify-between px-4 py-4">
             <button onClick={onBack} className="p-1">
               <ArrowLeft className="w-5 h-5 text-admin-text-primary" />
@@ -488,7 +488,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
                     className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
                       selected
                         ? 'border-admin-brand bg-admin-brand/5'
-                        : 'border-admin-border/40 bg-white'
+                        : 'border-admin-border/40 bg-surface-elevated'
                     }`}
                   >
                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
@@ -518,7 +518,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
           <MobileTargetSection {...targetProps} />
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-admin-border/30">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-surface-elevated border-t border-admin-border/30">
           <button
             onClick={handleSend}
             disabled={submitting || !title.trim() || !message.trim() || (sendMode === 'individual' && !targetEmail.trim())}

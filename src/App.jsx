@@ -12,6 +12,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WardrobeProvider } from './context/WardrobeContext';
 import { FavoritesProvider } from './context/FavoritesContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Pages
 import Home from './pages/home/Home';
@@ -45,10 +46,10 @@ const LoadingFallback = () => (
       justifyContent: 'center',
       alignItems: 'center',
       minHeight: '100vh',
-      bgcolor: '#0A0E17',
+      bgcolor: 'var(--background)',
     }}
   >
-    <CircularProgress sx={{ color: '#00E5FF' }} />
+    <CircularProgress sx={{ color: 'var(--primary)' }} />
   </Box>
 );
 
@@ -150,13 +151,15 @@ function AppContent() {
 // Main App Component
 function App() {
   return (
-    <AuthProvider>
-      <WardrobeProvider>
-        <FavoritesProvider>
-          <AppContent />
-        </FavoritesProvider>
-      </WardrobeProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <WardrobeProvider>
+          <FavoritesProvider>
+            <AppContent />
+          </FavoritesProvider>
+        </WardrobeProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

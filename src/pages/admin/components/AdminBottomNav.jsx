@@ -37,7 +37,7 @@ export default function AdminBottomNav({ className = '', activePage, setActivePa
       <div className={`lg:hidden fixed inset-0 z-40 transition-opacity duration-300 ${showMore ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`} onClick={() => setShowMore(false)}>
         <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300`} />
         <div
-          className={`absolute top-0 right-0 bottom-0 w-[280px] bg-white shadow-xl flex flex-col transition-transform duration-300 ease-out ${showMore ? 'translate-x-0' : 'translate-x-full'}`}
+          className={`absolute top-0 right-0 bottom-0 w-[280px] bg-surface-elevated shadow-xl flex flex-col transition-transform duration-300 ease-out ${showMore ? 'translate-x-0' : 'translate-x-full'}`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}

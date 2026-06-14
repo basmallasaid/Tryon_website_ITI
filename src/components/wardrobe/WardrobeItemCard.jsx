@@ -18,16 +18,16 @@ const WardrobeItemCard = ({ item, onClick }) => {
   return (
     <div 
       onClick={() => onClick(item)}
-      className="group relative aspect-[4/5] bg-white rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer border border-gray-50"
+      className="group relative aspect-[4/5] bg-surface-elevated rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer border border-[var(--border)]"
     >
       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
       <button
         onClick={handleFavorite}
-        className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:scale-110 z-10 cursor-pointer"
+        className="absolute top-4 right-4 p-2 bg-surface-elevated/80 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:scale-110 z-10 cursor-pointer"
       >
         <Heart
           size={18}
-          className={favorited ? 'fill-accent-pink text-accent-pink' : 'text-gray-500'}
+          className={favorited ? 'fill-accent-pink text-accent-pink' : 'text-text-disabled'}
         />
       </button>
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />

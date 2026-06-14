@@ -48,8 +48,8 @@ export default function GoogleCallback() {
   }, [login, navigate, searchParams]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", bgcolor: "#0A0E17" }}>
-      <CircularProgress sx={{ color: "#00E5FF" }} />
+    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", bgcolor: "var(--background)" }}>
+      <CircularProgress sx={{ color: "var(--primary)" }} />
     </Box>
   );
 }

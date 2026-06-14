@@ -25,12 +25,12 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
           </h2>
         </div>
         <div
-          className="rounded-2xl bg-white p-6 sm:p-8"
+          className="rounded-2xl bg-surface-elevated p-6 sm:p-8"
           style={{ border: "1px solid var(--Border-Strong)" }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
-            <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-100">
-              <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200" />
+            <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-[var(--bg-secondary)]">
+              <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-[var(--bg-secondary)] via-[var(--bg-secondary)] to-[var(--bg-secondary)]" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
                   <div
@@ -54,19 +54,10 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
                 className="h-9 w-3/4 animate-pulse rounded-lg"
                 style={{ backgroundColor: "var(--Border-Strong)" }}
               />
-              <div className="space-y-2">
-                <div
-                  className="h-4 w-full animate-pulse rounded"
-                  style={{ backgroundColor: "#E5E7EB" }}
-                />
-                <div
-                  className="h-4 w-5/6 animate-pulse rounded"
-                  style={{ backgroundColor: "#E5E7EB" }}
-                />
-                <div
-                  className="h-4 w-4/6 animate-pulse rounded"
-                  style={{ backgroundColor: "#E5E7EB" }}
-                />
+                <div className="space-y-2">
+                  <div className="h-4 w-full animate-pulse rounded bg-[var(--bg-secondary)]" />
+                  <div className="h-4 w-5/6 animate-pulse rounded bg-[var(--bg-secondary)]" />
+                  <div className="h-4 w-4/6 animate-pulse rounded bg-[var(--bg-secondary)]" />
               </div>
             </div>
           </div>
@@ -97,11 +88,11 @@ const GeneratedDesign = ({ idea, imageUrl, loading }) => {
       </div>
 
       <div
-        className="rounded-2xl bg-white p-6 sm:p-8"
+        className="rounded-2xl bg-surface-elevated p-6 sm:p-8"
         style={{ border: "1px solid var(--Border-Strong)" }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
-          <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-gray-900 group">
+          <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-[#161616] group">
             <img
               src={imageUrl}
               alt={idea.title}

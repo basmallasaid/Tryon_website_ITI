@@ -148,7 +148,7 @@ const EditItemWardrobe = () => {
             text: t('wardrobe.deleteConfirm'),
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#40B9FF',
+            confirmButtonColor: 'var(--primary)',
             confirmButtonText: t('wardrobe.yesDelete'),
             cancelButtonText: t('wardrobe.cancel'),
         });
@@ -165,9 +165,9 @@ const EditItemWardrobe = () => {
         <button
             type="button"
             onClick={() => onClick(label)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 border ${isMatching(activeValue, label)
-                ? `border-[var(--color-primary)] bg-blue-50 text-[var(--color-primary)]`
-                : 'bg-white border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-gray-50'
+             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 border ${isMatching(activeValue, label)
+                ? `border-[var(--color-primary)] bg-primary-light text-[var(--color-primary)]`
+                : 'bg-surface-elevated border-[var(--border)] text-text-disabled hover:border-[var(--border)] hover:bg-[var(--bg-secondary)]'
             }`}
         >
             {(t('wardrobe.opt_' + label.toLowerCase()) || label).toUpperCase()}
@@ -175,16 +175,16 @@ const EditItemWardrobe = () => {
     );
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)]">
             <Loader2 className="w-10 h-10 text-[var(--color-primary)] animate-spin" />
         </div>
     );
 
     return (
-        <div className="min-h-screen bg-[#FDFDFF] p-4 md:p-8" dir={isArabic ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-surface-elevated p-4 md:p-8" dir={isArabic ? 'rtl' : 'ltr'}>
             <div className="max-w-5xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                    <button onClick={() => navigate('/wardrobe')} className="flex items-center gap-2 text-slate-500 font-bold hover:text-[#40B9FF] transition-colors">
+                    <button onClick={() => navigate('/wardrobe')} className="flex items-center gap-2 text-text-secondary font-bold hover:text-[var(--primary)] transition-colors">
                         <ArrowLeft size={20} className={isArabic ? 'rotate-180' : ''} />
                         <span className="text-sm uppercase tracking-wider">{t('wardrobe.backToWardrobe')}</span>
                     </button>
@@ -195,15 +195,15 @@ const EditItemWardrobe = () => {
                                 onClick={handleFavorite} 
                                 className={`p-2.5 rounded-xl transition-all shadow-sm ${
                                     favorited 
-                                    ? 'bg-rose-50 text-[var(--color-accent-pink)]' 
-                                    : 'bg-white text-gray-400 hover:text-[var(--color-accent-pink)] hover:bg-rose-50'
+                                    ? 'bg-[var(--accent-light)] text-[var(--color-accent-pink)]' 
+                                    : 'bg-surface-elevated text-text-disabled hover:text-[var(--color-accent-pink)] hover:bg-[var(--accent-light)]'
                                 }`}
                             >
                                 <Heart size={18} className={favorited ? 'fill-[var(--color-accent-pink)]' : ''} />
                             </button>
 
                             {/* زر الحذف */}
-                            <button onClick={handleDelete} className="p-2.5 text-[var(--color-accent-orange)] bg-orange-50 rounded-xl hover:bg-orange-100 transition-colors shadow-sm">
+                            <button onClick={handleDelete} className="p-2.5 text-[var(--color-accent-orange)] bg-accent-light rounded-xl hover:opacity-80 transition-colors shadow-sm">
                                 <Trash2 size={18} />
                             </button>
                         </div>
@@ -213,12 +213,12 @@ const EditItemWardrobe = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     {/* Left: Image Card */}
                     <div className="lg:col-span-4 lg:sticky lg:top-8">
-                        <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col items-center">
-                            <div className="w-full aspect-[3/4] rounded-[1.5rem] overflow-hidden bg-slate-50 shadow-inner">
+                        <div className="bg-surface-elevated p-4 rounded-[2rem] shadow-sm border border-[var(--border)] flex flex-col items-center">
+                            <div className="w-full aspect-[3/4] rounded-[1.5rem] overflow-hidden bg-[var(--bg-secondary)] shadow-inner">
                                 <img src={imageUrl} alt="Item" className="w-full h-full object-cover" />
                             </div>
                             <div className="mt-6 w-full px-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                                <label className="text-[10px] font-black text-text-disabled uppercase tracking-widest block mb-1">
                                     {t('wardrobe.itemName')}
                                 </label>
                                 <input
@@ -226,7 +226,7 @@ const EditItemWardrobe = () => {
                                     value={formData.name}
                                     onChange={(e) => handleUpdateField('name', e.target.value)}
                                     readOnly={!isNew}
-                                    className="w-full bg-slate-50/50 border-none rounded-xl p-3 text-slate-800 font-bold text-base outline-none"
+                                    className="w-full bg-[var(--bg-secondary)]/50 border-none rounded-xl p-3 text-text-primary font-bold text-base outline-none"
                                 />
                             </div>
                         </div>
@@ -234,12 +234,12 @@ const EditItemWardrobe = () => {
 
                     {/* Right: Options Card */}
                     <div className="lg:col-span-8">
-                        <form onSubmit={handleSubmit} className="bg-white rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-100 space-y-8">
+                        <form onSubmit={handleSubmit} className="bg-surface-elevated rounded-[2rem] p-6 md:p-8 shadow-sm border border-[var(--border)] space-y-8">
                             {/* ... (باقي أقسام الفورم كما هي في الكود السابق) ... */}
                             <section>
                                 <div className="flex items-center gap-2 mb-3">
                                     <User size={16} className="text-[var(--color-primary)]" />
-                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.intendedGender')}</h3>
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">{t('wardrobe.intendedGender')}</h3>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {['male', 'female', 'unisex'].map(g => (
@@ -252,7 +252,7 @@ const EditItemWardrobe = () => {
                                 <section>
                                     <div className="flex items-center gap-2 mb-3">
                                         <Shirt size={16} className="text-[var(--color-primary)]" />
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.category')}</h3>
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">{t('wardrobe.category')}</h3>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {getCategoriesByGender(formData.gender).filter(c => c !== 'All').map(c => (
@@ -263,7 +263,7 @@ const EditItemWardrobe = () => {
                                 <section>
                                     <div className="flex items-center gap-2 mb-3">
                                         <CloudSun size={16} className="text-[var(--color-primary)]" />
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.season')}</h3>
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">{t('wardrobe.season')}</h3>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {['summer', 'winter', 'spring', 'fall', 'all season'].map(s => (
@@ -277,7 +277,7 @@ const EditItemWardrobe = () => {
                                 <section>
                                     <div className="flex items-center gap-2 mb-3">
                                         <Sparkles size={16} className="text-[var(--color-primary)]" />
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.style')}</h3>
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">{t('wardrobe.style')}</h3>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {['casual', 'formal', 'streetwear', 'vintage', 'minimalist'].map(st => (
@@ -288,7 +288,7 @@ const EditItemWardrobe = () => {
                                 <section>
                                     <div className="flex items-center gap-2 mb-3">
                                         <Layers size={16} className="text-[var(--color-primary)]" />
-                                        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{t('wardrobe.pattern')}</h3>
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">{t('wardrobe.pattern')}</h3>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {['solid', 'striped', 'floral', 'checkered', 'graphic'].map(p => (
