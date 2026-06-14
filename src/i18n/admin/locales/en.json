@@ -261,6 +261,25 @@
     "topbar": {
       "filter": "Filter",
       "clearFilter": "Clear filter"
+    },
+    "automatedNotifications": {
+      "title": "Automated",
+      "description": "Configure automatic notifications sent to users when their AI operations complete.",
+      "tryOn": "Virtual Try-On",
+      "recycle": "Recycle",
+      "matching": "Matching",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "titleTemplate": "Notification Title",
+      "bodyTemplate": "Notification Body",
+      "channels": "Channels",
+      "app": "In-App",
+      "email": "Email",
+      "push": "Push",
+      "placeholders": "Use {{userName}} for user name, {{operation}} for operation type",
+      "save": "Save Changes",
+      "saved": "Saved successfully",
+      "loading": "Loading automated notifications..."
     }
   }
 }

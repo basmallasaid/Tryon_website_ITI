@@ -42,3 +42,6 @@ export const markEmailReadApi = (id, isRead = true) => api.patch(`/emails/admin/
 export const markAllEmailsReadApi = () => api.patch('/emails/admin/mark-all-read');
 export const getEmailUnreadCountApi = () => api.get('/emails/admin/unread-count');
 export const sendEmailToUserApi = (data) => api.post('/emails/admin/send-to-user', data);
+
+export const getAutomatedNotificationsApi = () => api.get('/automated-notifications');
+export const updateAutomatedNotificationApi = (operation, data) => api.put(`/automated-notifications/${operation}`, data);

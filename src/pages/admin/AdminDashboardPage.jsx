@@ -13,6 +13,7 @@ import UsersSection from './sections/UsersSection';
 import AddUserSection from './sections/AddUserSection';
 import ApiManagementSection from './sections/ApiManagementSection';
 import SettingsSection from './sections/SettingsSection';
+import AutomatedNotificationsSection from './sections/AutomatedNotificationsSection';
 import { getContactMessagesApi, getEmailUnreadCountApi } from '../../api/adminApi';
 import adminI18n from '../../i18n/admin/adminI18n';
 
@@ -28,6 +29,7 @@ export default function AdminDashboardPage() {
   const [showAddStore, setShowAddStore] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddNotification, setShowAddNotification] = useState(false);
+  const [showAutomatedNotifications, setShowAutomatedNotifications] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [editingStore, setEditingStore] = useState(null);
@@ -97,6 +99,13 @@ export default function AdminDashboardPage() {
     setShowAddNotification(false);
     setDeletionNotificationUser(null);
   };
+  const handleAutomatedNotifications = () => {
+    setActivePage('notifications');
+    setShowAutomatedNotifications(true);
+  };
+  const handleBackFromAutomated = () => {
+    setShowAutomatedNotifications(false);
+  };
   const handleAddUser = () => {
     setActivePage('users');
     setEditingUser(null);
@@ -124,6 +133,7 @@ export default function AdminDashboardPage() {
     setShowAddStore(false);
     setShowAddProduct(false);
     setShowAddNotification(false);
+    setShowAutomatedNotifications(false);
     setShowAddUser(false);
     setEditingProduct(null);
     setEditingStore(null);
@@ -142,7 +152,7 @@ export default function AdminDashboardPage() {
     stores: <StoresSection onAddStore={handleAddStore} onEditStore={handleEditStore} />,
     products: <ProductsSection onAddProduct={handleAddProduct} onEditProduct={handleEditProduct} />,
     notifications: (
-      <NotificationsSection onAddNotification={handleAddNotification} />
+      <NotificationsSection onAddNotification={handleAddNotification} onAutomatedNotifications={handleAutomatedNotifications} />
     ),
     emailCenter: <EmailCenterSection onReadChange={fetchCounts} />,
     users: <UsersSection onAddUser={handleAddUser} roleFilter={userRoleFilter} onResetFilter={() => setUserRoleFilter('All')} onSendDeletionNotification={handleSendDeletionNotification} onEditUser={handleEditUser} />,
@@ -257,6 +267,8 @@ export default function AdminDashboardPage() {
         prefillChannels={['app', 'email', 'website']}
       />
     );
+  } else if (showAutomatedNotifications) {
+    currentSection = <AutomatedNotificationsSection onBack={handleBackFromAutomated} />;
   } else if (showAddUser) {
     currentSection = <AddUserSection onBack={handleBackFromAddUser} editingUser={editingUser} />;
   } else {

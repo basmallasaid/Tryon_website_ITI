@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2, Zap } from 'lucide-react';
 import { getAllNotificationsApi, deleteNotificationApi } from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
 
@@ -86,7 +86,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
   );
 }
 
-export default function NotificationsSection({ onAddNotification }) {
+export default function NotificationsSection({ onAddNotification, onAutomatedNotifications }) {
   const { t } = adminI18n;
   const typeConfig = getTypeConfig(t);
   const [notifications, setNotifications] = useState([]);
@@ -148,9 +148,14 @@ export default function NotificationsSection({ onAddNotification }) {
       <div className="hidden md:block bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
         <div className="px-6 py-4 border-b border-admin-border/40 flex items-center justify-between">
           <h2 className="text-sm font-bold text-admin-text-primary">{t('admin.notifications.allNotifications')}</h2>
-          <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
-            <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={onAutomatedNotifications} className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-primary hover:bg-admin-brand-activeBg transition-colors">
+              <Zap className="w-4 h-4" /> {t('admin.automatedNotifications.title')}
+            </button>
+            <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
+              <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
+            </button>
+          </div>
         </div>
         <table className="w-full">
           <thead>
@@ -225,7 +230,10 @@ export default function NotificationsSection({ onAddNotification }) {
 
       {/* Mobile Cards */}
       <div className="md:hidden">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 mb-4">
+          <button onClick={onAutomatedNotifications} className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-primary">
+            <Zap className="w-4 h-4" /> {t('admin.automatedNotifications.title')}
+          </button>
           <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand text-white rounded-xl text-xs font-medium">
             <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
           </button>
