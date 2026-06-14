@@ -22,7 +22,6 @@ import { useTheme } from "../context/ThemeContext";
 import ProfilePopup from "../pages/profile/ProfilePopup";
 import NotificationWindow from "./NotificationWindow";
 import { getNotifications } from "../api/notificationApi";
-import PwaInstallButton from "./PwaInstallButton";
 
 const Navbar = ({ onOpenAuth }) => {
   const { t, i18n } = useTranslation();
@@ -297,8 +296,6 @@ const Navbar = ({ onOpenAuth }) => {
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
-
-        <PwaInstallButton />
 
         <div className="h-8 w-px bg-[var(--border)] mx-1" />
 
@@ -686,9 +683,7 @@ const Navbar = ({ onOpenAuth }) => {
             </button>
           </div>
 
-          <div className="mb-4">
-            <PwaInstallButton />
-          </div>
+
 
           {user ? (
             <div className="space-y-3">
