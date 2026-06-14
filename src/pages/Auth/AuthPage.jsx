@@ -74,7 +74,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
 
     useEffect(() => {
         const handleMessage = (event) => {
-            if (event.origin !== window.origin) return;
+            if (event.origin !== window.origin && event.origin !== import.meta.env.VITE_API_URL) return;
             if (event.data?.type === "GOOGLE_AUTH_SUCCESS") {
                 googleAuthSuccess.current = true;
                 const userData = event.data.payload;
