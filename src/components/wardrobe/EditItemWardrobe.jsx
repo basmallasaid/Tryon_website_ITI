@@ -195,15 +195,15 @@ const EditItemWardrobe = () => {
                                 onClick={handleFavorite} 
                                 className={`p-2.5 rounded-xl transition-all shadow-sm ${
                                     favorited 
-                                    ? 'bg-[var(--accent-light)] text-[var(--color-accent-pink)]' 
-                                    : 'bg-surface-elevated text-text-disabled hover:text-[var(--color-accent-pink)] hover:bg-[var(--accent-light)]'
+                                    ? 'text-[var(--color-accent-pink)]' 
+                                    : 'bg-surface-elevated text-text-disabled hover:text-[var(--color-accent-pink)]'
                                 }`}
                             >
                                 <Heart size={18} className={favorited ? 'fill-[var(--color-accent-pink)]' : ''} />
                             </button>
 
                             {/* زر الحذف */}
-                            <button onClick={handleDelete} className="p-2.5 text-[var(--color-accent-orange)] bg-accent-light rounded-xl hover:opacity-80 transition-colors shadow-sm">
+                            <button onClick={handleDelete} className="p-2.5 text-[var(--color-accent-orange)] rounded-xl hover:opacity-80 transition-colors shadow-sm">
                                 <Trash2 size={18} />
                             </button>
                         </div>

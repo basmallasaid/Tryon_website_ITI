@@ -200,7 +200,7 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange, isMobile }) => 
                           e.stopPropagation();
                           handleDelete(notif._id);
                         }}
-                        className="p-1 rounded-md hover:bg-[var(--accent-light)] text-text-disabled hover:text-accent-pink transition-colors cursor-pointer"
+                        className="p-1 rounded-md text-text-disabled hover:text-accent-orange transition-colors cursor-pointer"
                       >
                         <Trash2 size={14} />
                       </button>

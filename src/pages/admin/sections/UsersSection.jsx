@@ -101,7 +101,7 @@ function DeleteConfirmDialog({
           {notified ? (
             <button
               onClick={onDelete}
-              className="px-4 py-2 bg-admin-danger text-white rounded-lg text-sm font-medium hover:bg-admin-danger/90 transition-colors"
+              className="px-4 py-2 bg-accent-orange text-white rounded-lg text-sm font-medium hover:opacity-90 transition-colors"
             >
               {t('admin.users.deleteUser')}
             </button>
@@ -358,7 +358,7 @@ export default function UsersSection({
           {selectedIds.size > 0 && (
             <button
               onClick={handleDeleteClick}
-              className="flex items-center gap-2 px-4 py-2 bg-admin-danger text-white rounded-lg text-xs font-medium hover:bg-admin-danger/90 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-accent-orange text-white rounded-lg text-xs font-medium hover:opacity-90 transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
               {t('admin.users.selectDelete', { count: selectedIds.size })}
@@ -491,7 +491,7 @@ export default function UsersSection({
         {selectedIds.size > 0 && (
           <button
             onClick={handleDeleteClick}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-admin-danger text-white rounded-xl text-xs font-medium"
+            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-accent-orange text-white rounded-xl text-xs font-medium"
           >
             <Trash2 className="w-3.5 h-3.5" />
             {t('admin.users.selectDelete', { count: selectedIds.size })}

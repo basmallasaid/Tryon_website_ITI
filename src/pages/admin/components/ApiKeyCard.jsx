@@ -36,7 +36,7 @@ export default function ApiKeyCard({ name, icon: Icon, iconBg, iconColor, status
           </button>
           <button
             onClick={onDelete}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-accent-orange"
             title="Delete key"
           >
             <Trash2 className="w-4 h-4" />

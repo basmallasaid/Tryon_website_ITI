@@ -345,7 +345,7 @@ export default function EditProfilePage() {
                                 onClick={handleImageRemove}
                                 className="absolute top-1 ltr:right-1 rtl:left-1 bg-surface-elevated p-1.5 rounded-full border-2 border-[var(--border)] shadow-sm hover:scale-110 transition-transform cursor-pointer"
                             >
-                                <Trash2 className="text-error-text w-4 h-4" />
+                                <Trash2 className="text-accent-orange w-4 h-4" />
                             </button>
                         )}
                     </div>

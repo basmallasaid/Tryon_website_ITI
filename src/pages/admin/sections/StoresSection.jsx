@@ -217,7 +217,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
                   <Pencil className="w-3.5 h-3.5" /> {t('admin.stores.selectEdit')}
                 </button>
               )}
-              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-admin-danger/10 text-admin-danger rounded-lg text-xs font-medium hover:bg-admin-danger/20 transition-colors">
+              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-accent-orange/10 text-accent-orange rounded-lg text-xs font-medium hover:bg-accent-orange/20 transition-colors">
                 <Trash2 className="w-3.5 h-3.5" /> {t('admin.stores.selectDelete', { count: selectedIds.size })}
               </button>
             </div>
@@ -457,7 +457,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
                   <Pencil className="w-3.5 h-3.5" /> {t('admin.stores.selectEdit')}
                 </button>
               )}
-              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-admin-danger/10 text-admin-danger rounded-xl text-xs font-medium">
+              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-accent-orange/10 text-accent-orange rounded-xl text-xs font-medium">
                 <Trash2 className="w-3.5 h-3.5" /> {t('admin.stores.selectDelete', { count: selectedIds.size })}
               </button>
             </div>
