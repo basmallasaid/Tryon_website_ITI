@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Shirt, Grid3x3, Sparkles, LogIn, X, Circle, Package, Heart } from "lucide-react";
+import { Shirt, Grid3x3, Sparkles, LogIn, X, Circle, Package, Heart, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -515,10 +515,21 @@ export default function Matching() {
                 ) : (
                   wardrobeMatches.map((match, index) => {
                     const imgUrl = getMatchImage(match);
+                    const wardrobeId = match.item?._id || match.item?.id;
+                    const isFav = wardrobeId ? isFavorite(wardrobeId) : false;
+                    const handleFav = (e) => {
+                      e.stopPropagation();
+                      if (!wardrobeId) return;
+                      if (isFav) {
+                        removeItem(wardrobeId);
+                      } else {
+                        addItem(wardrobeId, "WARDROBE");
+                      }
+                    };
                     return (
                       <div
                         key={match.item?.id || `wm-${index}`}
-                        className="shrink-0 transition-all"
+                        className="shrink-0 transition-all group"
                         style={{
                           width: 130,
                           height: 150,
@@ -531,6 +542,15 @@ export default function Matching() {
                           <div className={`absolute top-1 ${isArabic ? "left-1" : "right-1"} z-10 bg-lime-500 text-white text-[9px] font-bold px-[6px] py-[2px] rounded-full`}>
                             {match.score}%
                           </div>
+                          <button
+                            onClick={handleFav}
+                            className={`absolute top-1 z-30 p-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:scale-110 transition-all cursor-pointer ${isArabic ? "right-1" : "left-1"}`}
+                          >
+                            <Heart
+                              size={12}
+                              className={isFav ? "fill-accent-pink text-accent-pink" : "text-gray-500"}
+                            />
+                          </button>
                           {imgUrl ? (
                             <img
                               src={imgUrl}
@@ -540,6 +560,18 @@ export default function Matching() {
                           ) : (
                             <Shirt className="w-[40%] h-auto text-gray-300" />
                           )}
+                          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] rounded-[9px] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 pointer-events-none">
+                            <div
+                              className="pointer-events-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const itemId = match.item?._id || match.item?.id;
+                                if (itemId) navigate("/wardrobe/edit/" + itemId);
+                              }}
+                            >
+                              <ArrowRight size={22} className={`text-white ${isArabic ? "rotate-180" : ""}`} />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
@@ -573,10 +605,11 @@ export default function Matching() {
                         addItem(productId, "PRODUCT");
                       }
                     };
+                    const product = allProducts.find((p) => p._id === productId || p.id === productId);
                     return (
                       <div
                         key={match.item?.id || `sm-${index}`}
-                        className="shrink-0 transition-all"
+                        className="shrink-0 transition-all group"
                         style={{
                           width: 130,
                           height: 150,
@@ -591,7 +624,7 @@ export default function Matching() {
                           </div>
                           <button
                             onClick={handleFav}
-                            className="absolute top-1 left-1 z-10 p-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:scale-110 transition-all cursor-pointer"
+                            className={`absolute top-1 z-30 p-1 rounded-full bg-white/80 backdrop-blur-sm shadow-sm hover:scale-110 transition-all cursor-pointer ${isArabic ? "right-1" : "left-1"}`}
                           >
                             <Heart
                               size={12}
@@ -607,6 +640,17 @@ export default function Matching() {
                           ) : (
                             <Shirt className="w-[40%] h-auto text-gray-300" />
                           )}
+                          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] rounded-[9px] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 pointer-events-none">
+                            <div
+                              className="pointer-events-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (product?.purchase_url) window.open(product.purchase_url, '_blank');
+                              }}
+                            >
+                              <ArrowRight size={22} className={`text-white ${isArabic ? "rotate-180" : ""}`} />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );

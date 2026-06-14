@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { getUserApi, updateProfileApi, deleteUserAccountApi, updateUserImageApi, deleteUserImageApi } from '../../api/userApi';
+import { getUserApi, updateProfileApi, deleteUserAccountApi, updateUserImageApi, deleteUserImageApi, getSettingsApi } from '../../api/userApi';
 import { getAvatarByIdApi } from '../../api/avatarApi';
 import { Camera, UserPlus, Lock, SquarePen, AlertTriangle, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
@@ -24,6 +24,7 @@ export default function EditProfilePage() {
     const [uploadingImage, setUploadingImage] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState(null);
     const [avatarLoading, setAvatarLoading] = useState(false);
+    const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
     const userId = user?.id || user?._id;
 
@@ -85,6 +86,20 @@ export default function EditProfilePage() {
 
         return () => { cancelled = true; };
     }, [user]);
+
+    useEffect(() => {
+        if (!user?.email) {
+            setSubscriptionStatus(null);
+            return;
+        }
+        getSettingsApi({ email: user.email })
+            .then((res) => {
+                setSubscriptionStatus(res.data.subscriptionStatus);
+            })
+            .catch(() => {
+                setSubscriptionStatus(null);
+            });
+    }, [user?.email]);
 
     const handleImageChange = async (event) => {
         const file = event.target.files?.[0];
@@ -354,7 +369,7 @@ export default function EditProfilePage() {
                             <p className="text-gray-500 text-sm font-semibold mb-4">{t("profile.yourAvatar")}</p>
                             <div className="flex gap-3">
                                 <button
-                                    onClick={() => navigate('/avatar')}
+                                    onClick={() => navigate(subscriptionStatus === 'active' ? '/avatar' : '/pricing')}
                                     className="bg-[var(--color-brand-secondary)] text-white px-8 py-2 rounded-lg text-sm font-bold shadow-sm hover:opacity-90"
                                 >
                                     {t("profile.editAvatar")}

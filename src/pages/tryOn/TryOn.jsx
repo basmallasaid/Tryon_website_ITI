@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, Shirt, Grid3x3, X, LogIn, Plus } from "lucide-react";
+import { Sparkles, Shirt, Grid3x3, X, LogIn, Plus, Check, Lock } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -10,6 +10,8 @@ import ModelSelectionCard from "../../components/tryOn/ModelSelectionCard";
 import WardrobeItem from "../../components/tryOn/WardrobeItem";
 import { useAuth } from "../../context/AuthContext";
 import { useWardrobe } from "../../context/WardrobeContext";
+import Swal from "sweetalert2";
+import { showToast } from "../../utils/toast";
 import { getAvatarByIdApi } from "../../api/avatarApi";
 import { virtualTryOnApi, virtualTryOnOutfitApi } from "../../api/tryOnApi";
 import { addToLatestTryOnApi } from "../../api/userApi";
@@ -28,6 +30,16 @@ const base64ToFile = (base64, filename) => {
   for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
   return new File([arr], `${filename}.${ext}`, { type: mime });
 };
+
+const CATEGORY_DISABLE_RULES = {
+  top: ["top", "dress"],
+  bottom: ["bottom", "dress"],
+  dress: ["dress", "top", "bottom"],
+};
+
+const GALLERY_CATEGORIES = ["top", "bottom", "dress"];
+
+const gradientBorder = `url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3cdefs%3e%3clinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='0%25'%3e%3cstop offset='0%25' stop-color='%23FF8A3D'/%3e%3cstop offset='50%25' stop-color='%2340B9FF'/%3e%3cstop offset='100%25' stop-color='%238ED321'/%3e%3c%2flinearGradient%3e%3c%2fdefs%3e%3crect width='100%25' height='100%25' fill='none' rx='16' ry='16' stroke='url(%23g)' stroke-width='3' stroke-linecap='round'/%3e%3c%2fsvg%3e")`;
 
 export default function TryOn() {
   const { user } = useAuth();
@@ -97,6 +109,34 @@ export default function TryOn() {
     });
   };
 
+  const handleGalleryCategoryChange = (index, category) => {
+    setGalleryFiles((prev) => {
+      const current = prev[index];
+      if (!current) return prev;
+
+      if (current.category === category) {
+        const next = [...prev];
+        next[index] = { ...next[index], category: null };
+        return next;
+      }
+
+      for (let i = 0; i < prev.length; i++) {
+        if (i === index) continue;
+        const other = prev[i];
+        if (!other.category) continue;
+        const disables = CATEGORY_DISABLE_RULES[other.category];
+        if (disables && disables.includes(category)) {
+          showToast("error", `Cannot combine "${category}" with "${other.category}"`);
+          return prev;
+        }
+      }
+
+      const next = [...prev];
+      next[index] = { ...next[index], category };
+      return next;
+    });
+  };
+
   useEffect(() => {
     return () => {
       if (userPhoto) URL.revokeObjectURL(userPhoto);
@@ -157,9 +197,57 @@ export default function TryOn() {
   ];
 
   const currentStep = generating || generatedImageUrl ? 3 : selectedModel ? 2 : 1;
-  const isReady = selectedModel && selectedItems.length > 0;
+  const hasGalleryReady = activeTab === "gallery" && galleryFiles.length > 0 && galleryFiles.every((f) => f.category);
+  const isReady = selectedModel && (selectedItems.length > 0 || hasGalleryReady);
 
   const MAX_SELECTION = 2;
+
+  const disabledItemIds = useMemo(() => {
+    const disabled = new Set();
+
+    for (const selectedId of selectedItems) {
+      const item = wardrobeItems.find((i) => i._id === selectedId);
+      if (!item) continue;
+      const cat = (item.category || "").toLowerCase();
+      const disables = CATEGORY_DISABLE_RULES[cat];
+      if (!disables) continue;
+
+      wardrobeItems.forEach((i) => {
+        if (!selectedItems.includes(i._id)) {
+          const icat = (i.category || "").toLowerCase();
+          if (disables.includes(icat)) {
+            disabled.add(i._id);
+          }
+        }
+      });
+    }
+
+    if (selectedItems.length >= MAX_SELECTION) {
+      wardrobeItems.forEach((i) => {
+        if (!selectedItems.includes(i._id)) {
+          disabled.add(i._id);
+        }
+      });
+    }
+
+    return disabled;
+  }, [selectedItems, wardrobeItems]);
+
+  const galleryDisabledCategories = useMemo(() => {
+    const disabled = new Set();
+    const assignedCats = galleryFiles
+      .filter((f) => f.category)
+      .map((f) => f.category);
+
+    for (const cat of assignedCats) {
+      const disables = CATEGORY_DISABLE_RULES[cat];
+      if (disables) {
+        disables.forEach((d) => disabled.add(d));
+      }
+    }
+
+    return disabled;
+  }, [galleryFiles]);
 
   const toggleItem = (id) => {
     setSelectedItems((prev) =>
@@ -213,6 +301,19 @@ export default function TryOn() {
 
   const handleGenerate = async () => {
     if (!isReady) return;
+
+    if (activeTab === "gallery" && galleryFiles.length > 0) {
+      const missingCategory = galleryFiles.some((f) => !f.category);
+      if (missingCategory) {
+        Swal.fire({
+          icon: "warning",
+          title: "Category Required",
+          text: "Please assign a category to each uploaded image before generating.",
+          confirmButtonColor: "#3b82f6",
+        });
+        return;
+      }
+    }
 
     const details = {
       model: selectedModel,
@@ -292,6 +393,26 @@ export default function TryOn() {
         const res = await virtualTryOnOutfitApi(formData);
         console.log("✅ [TryOn] Response:", res.data);
         resultUrl = res.data?.imageUrl;
+      } else if (activeTab === "gallery" && galleryFiles.length > 0) {
+        if (galleryFiles.length === 1) {
+          const file = galleryFiles[0].file;
+          formData.append("garmentImage", file, file.name);
+          logDetails.garmentImage = `File: ${file.name} (${file.size} bytes, ${file.type})`;
+          console.log("🚀 [TryOn] Sending request to POST /api/virtual-tryon (gallery)", logDetails);
+          const res = await virtualTryOnApi(formData);
+          console.log("✅ [TryOn] Response:", res.data);
+          resultUrl = res.data?.imageUrl;
+        } else if (galleryFiles.length === 2) {
+          const [first, second] = galleryFiles;
+          formData.append("topImage", first.file, first.file.name);
+          formData.append("bottomImage", second.file, second.file.name);
+          logDetails.topImage = `File: ${first.file.name} (${first.file.size} bytes, ${first.file.type})`;
+          logDetails.bottomImage = `File: ${second.file.name} (${second.file.size} bytes, ${second.file.type})`;
+          console.log("🚀 [TryOn] Sending request to POST /api/virtual-tryon/outfit (gallery)", logDetails);
+          const res = await virtualTryOnOutfitApi(formData);
+          console.log("✅ [TryOn] Response:", res.data);
+          resultUrl = res.data?.imageUrl;
+        }
       }
       }
 
@@ -530,16 +651,20 @@ export default function TryOn() {
                 </div>
               ) : (
                 <div className="flex gap-[15px] flex-wrap justify-center sm:justify-start">
-                  {wardrobeItems.map((item) => (
-                    <WardrobeItem
-                      key={item._id}
-                      src={imgSrc(item.image)}
-                      alt={item.name || t("tryOn.clothingItem")}
-                      selected={selectedItems.includes(item._id)}
-                      disabled={!selectedItems.includes(item._id) && selectedItems.length >= MAX_SELECTION}
-                      onClick={() => toggleItem(item._id)}
-                    />
-                  ))}
+                  {wardrobeItems.map((item) => {
+                    const isSelected = selectedItems.includes(item._id);
+                    const isDisabled = !isSelected && disabledItemIds.has(item._id);
+                    return (
+                      <WardrobeItem
+                        key={item._id}
+                        src={imgSrc(item.image)}
+                        alt={item.name || t("tryOn.clothingItem")}
+                        selected={isSelected}
+                        disabled={isDisabled}
+                        onClick={() => toggleItem(item._id)}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </>
@@ -551,14 +676,70 @@ export default function TryOn() {
                 </div>
               )}
               {galleryFiles.length > 0 && (
-                <div className="flex flex-wrap gap-4 sm:gap-6 justify-center sm:justify-start">
+                <div className="flex flex-wrap gap-6 sm:gap-8 justify-center sm:justify-start">
                   {galleryFiles.map((img, i) => (
-                    <UploadedImageCard
+                    <div
                       key={img.preview}
-                      image={img}
-                      index={i}
-                      onRemove={handleRemoveGalleryImage}
-                    />
+                      className={`relative transition-all duration-300 ease-in-out transform-gpu ${
+                        img.category ? "scale-[1.02]" : "scale-100"
+                      }`}
+                    >
+                      <div
+                        className={`rounded-2xl transition-all duration-300 ease-in-out ${
+                          img.category
+                            ? "shadow-lg shadow-blue-100/50"
+                            : "shadow-sm"
+                        }`}
+                        style={img.category ? {
+                          background: gradientBorder,
+                          padding: "3px",
+                        } : {}}
+                      >
+                        <UploadedImageCard
+                          image={img}
+                          index={i}
+                          onRemove={handleRemoveGalleryImage}
+                        />
+                      </div>
+
+                      {img.category && (
+                        <div className="absolute -top-1.5 -right-1.5 w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center shadow-md z-10">
+                          <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                        </div>
+                      )}
+
+                      <div className="mt-3 w-44 sm:w-52">
+                        <p className="text-xs font-semibold mb-2" style={{ color: "var(--Primary-Text-color)" }}>
+                          What type is this item?
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {GALLERY_CATEGORIES.map((cat) => {
+                            const isSelected = img.category === cat;
+                            const isDisabled = galleryDisabledCategories.has(cat) && !isSelected;
+                            return (
+                              <button
+                                key={cat}
+                                type="button"
+                                disabled={isDisabled && !isSelected}
+                                onClick={() => handleGalleryCategoryChange(i, cat)}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-200 ease-in-out ${
+                                  isSelected
+                                    ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-200 scale-105"
+                                    : isDisabled
+                                      ? "bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed opacity-50"
+                                      : "bg-white text-gray-600 border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 hover:shadow-sm cursor-pointer active:scale-95"
+                                }`}
+                              >
+                                {isDisabled && (
+                                  <Lock className="w-2.5 h-2.5 inline mr-1 -mt-0.5" />
+                                )}
+                                {cat}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}

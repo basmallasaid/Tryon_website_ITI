@@ -83,6 +83,7 @@ const ProfilePopup = ({ user, logout, isArabic, isDarkMode, toggleDarkMode, chan
       className={`absolute top-full mt-4 w-[300px] bg-white rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-gray-100 p-6 z-[100] animate-in fade-in zoom-in duration-200 ${
         isArabic ? 'left-0' : 'right-0'
       }`}
+      style={{ maxWidth: 'calc(100vw - 2rem)' }}
     >
       {/* User Email Header */}
       <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-2xl mb-6">

@@ -15,7 +15,7 @@ import {
   SquarePen,
 } from "lucide-react";
 import Button from "./Button";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import ProfilePopup from "../pages/profile/ProfilePopup";
@@ -26,6 +26,7 @@ const Navbar = ({ onOpenAuth }) => {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobileFeaturesOpen, setIsMobileFeaturesOpen] = useState(false);
@@ -330,32 +331,44 @@ const Navbar = ({ onOpenAuth }) => {
       </div>
 
       {/* Mobile Menu Button */}
-      <div className="min-[1100px]:hidden flex items-center gap-3">
+      <div className="min-[1100px]:hidden flex items-center gap-1">
         {user && (
-          <div className="relative">
+          <>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsNotifOpen(!isNotifOpen);
+              onClick={() => {
                 setIsMobileOpen(false);
+                navigate("/editprofile");
               }}
-              className="p-2 text-gray-500 cursor-pointer relative"
+              className="p-2 rounded-lg bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200 hover:text-brand-secondary transition-all active:scale-90"
+              aria-label="Profile"
             >
-              <Bell size={22} />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-rose-500 text-white text-[10px] font-bold rounded-full border-2 border-white px-1">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
+              <User size={22} />
             </button>
-            {isNotifOpen && (
-              <NotificationWindow
-                isArabic={isArabic}
-                onClose={() => setIsNotifOpen(false)}
-                onUnreadChange={setUnreadCount}
-              />
-            )}
-          </div>
+            <div className="relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsNotifOpen(!isNotifOpen);
+                  setIsMobileOpen(false);
+                }}
+                className="p-2 text-gray-500 cursor-pointer relative"
+              >
+                <Bell size={22} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-rose-500 text-white text-[10px] font-bold rounded-full border-2 border-white px-1">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </button>
+              {isNotifOpen && (
+                <NotificationWindow
+                  isArabic={isArabic}
+                  onClose={() => setIsNotifOpen(false)}
+                  onUnreadChange={setUnreadCount}
+                />
+              )}
+            </div>
+          </>
         )}
         <button
           onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -424,7 +437,7 @@ const Navbar = ({ onOpenAuth }) => {
               />
             </button>
             {isMobileFeaturesOpen && (
-              <div className="ml-4 mt-1 space-y-1 border-l-2 border-gray-100 pl-2">
+              <div className={`mt-1 space-y-1 border-gray-100 ${isArabic ? "mr-4 border-r-2 pr-2" : "ml-4 border-l-2 pl-2"}`}>
                 {featureItems.map((item) => (
                   <Link
                     key={item.path}
@@ -469,6 +482,22 @@ const Navbar = ({ onOpenAuth }) => {
           >
             {t("nav.favorites")}
           </Link>
+          {user && (
+            <Link
+              to="/editprofile"
+              onClick={() => setIsMobileOpen(false)}
+              className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
+                location.pathname === "/editprofile"
+                  ? "bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20"
+                  : "text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <User size={18} />
+                {t("profile.editProfile")}
+              </div>
+            </Link>
+          )}
         </div>
 
         <div className="absolute bottom-0 w-full p-6 border-t border-gray-100 bg-gray-50/50">
@@ -490,7 +519,13 @@ const Navbar = ({ onOpenAuth }) => {
 
           {user ? (
             <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100">
+              <div
+                onClick={() => {
+                  setIsMobileOpen(false);
+                  navigate("/editprofile");
+                }}
+                className="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors"
+              >
                 <div className="w-10 h-10 rounded-full bg-brand-secondary flex items-center justify-center text-white font-bold">
                   {getUserFullName(user).charAt(0)}
                 </div>
