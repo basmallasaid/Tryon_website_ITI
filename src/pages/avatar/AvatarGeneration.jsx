@@ -7,23 +7,24 @@ import { getSettingsApi } from '../../api/userApi';
 import { useAuth } from '../../context/AuthContext';
 import { getAuth } from '../../utils/tokenUtils';
 import Button from '../../components/Button';
+import { showToast } from '../../utils/toast';
 
 const skinTones = [
-  { id: 'very-light', color: '#F6DFC8', label: 'Very Light' },
-  { id: 'light', color: '#E5C39B', label: 'Light' },
-  { id: 'medium', color: '#D2A46A', label: 'Medium' },
-  { id: 'tan', color: '#B88349', label: 'Tan' },
-  { id: 'brown', color: '#8E5A2A', label: 'Brown' },
-  { id: 'dark', color: '#4D2C12', label: 'Dark' },
+  { id: 'very-light', color: '#F6DFC8' },
+  { id: 'light', color: '#E5C39B' },
+  { id: 'medium', color: '#D2A46A' },
+  { id: 'tan', color: '#B88349' },
+  { id: 'brown', color: '#8E5A2A' },
+  { id: 'dark', color: '#4D2C12' },
 ];
 
 const hairColors = [
-  { id: 'black', color: '#000000', label: 'Black' },
-  { id: 'dark-brown', color: '#3A2414', label: 'Dark Brown' },
-  { id: 'brown', color: '#6B4423', label: 'Brown' },
-  { id: 'light-brown', color: '#A26B3D', label: 'Light Brown' },
-  { id: 'blonde', color: '#E6C27A', label: 'Blonde' },
-  { id: 'red', color: '#A53A2A', label: 'Red' },
+  { id: 'black', color: '#000000' },
+  { id: 'dark-brown', color: '#3A2414' },
+  { id: 'brown', color: '#6B4423' },
+  { id: 'light-brown', color: '#A26B3D' },
+  { id: 'blonde', color: '#E6C27A' },
+  { id: 'red', color: '#A53A2A' },
 ];
 
 const GENDER_OPTIONS = ['male', 'female'];
@@ -72,13 +73,14 @@ const inputBaseClass =
   'w-full h-12 rounded-lg border border-border-strong bg-surface-elevated px-4 text-sm font-semibold text-text-primary outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-placeholder appearance-none';
 
 export default function AvatarGeneration() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, login } = useAuth();
   const navigate = useNavigate();
+  const toastPosition = i18n.language === 'ar' ? 'top-start' : 'top-end';
   const [form, setForm] = useState(INITIAL_FORM);
   const [processing, setProcessing] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
-  const [apiError, setApiError] = useState('');
+
   const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [subscriptionLoading, setSubscriptionLoading] = useState(true);
@@ -138,12 +140,10 @@ export default function AvatarGeneration() {
   }, [generatedImageUrl]);
 
   const handleChange = field => e => {
-    setApiError('');
     setForm(prev => ({ ...prev, [field]: e.target.value }));
   };
 
   const handleSelect = field => value => {
-    setApiError('');
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
@@ -158,7 +158,7 @@ export default function AvatarGeneration() {
     ];
     const missing = required.find(f => !form[f]);
     if (missing) {
-      setApiError('Please fill in all fields.');
+      showToast('error', t('avatar.fillAllFields'), toastPosition);
       return;
     }
 
@@ -168,7 +168,6 @@ export default function AvatarGeneration() {
       return;
     }
 
-    setApiError('');
     setProcessing(true);
     setGeneratedImageUrl(null);
 
@@ -180,18 +179,14 @@ export default function AvatarGeneration() {
         setGeneratedImageUrl(imageUrl);
         login({ ...user, generatedAvatar: imageUrl });
       } else {
-        setApiError(t('avatar.noImageReturned'));
+        showToast('error', t('avatar.generationError'), toastPosition);
       }
     } catch (err) {
       if (err.response?.status === 401) {
         navigate('/', { replace: true, state: { openAuth: 'login' } });
         return;
       }
-      setApiError(
-        err.response?.data?.error ||
-          err.message ||
-          t('avatar.generationFailed'),
-      );
+      showToast('error', t('avatar.generationError'), toastPosition);
     } finally {
       setProcessing(false);
     }
@@ -361,7 +356,7 @@ export default function AvatarGeneration() {
                                 : 'var(--color-text-disabled)',
                           }}
                         >
-                          {s.label}
+                          {t('avatar.skinTones.' + s.id)}
                         </span>
                       </button>
                     ))}
@@ -410,7 +405,7 @@ export default function AvatarGeneration() {
                                 : 'var(--color-text-disabled)',
                           }}
                         >
-                          {h.label}
+                          {t('avatar.hairColors.' + h.id)}
                         </span>
                       </button>
                     ))}
@@ -503,12 +498,6 @@ export default function AvatarGeneration() {
             </div>
           </div>
         </section>
-
-        {apiError && (
-          <div className="mt-6 max-w-6xl mx-auto rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {apiError}
-          </div>
-        )}
       </div>
     </div>
   );

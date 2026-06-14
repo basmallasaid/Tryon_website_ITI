@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -24,6 +24,9 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
     const handleForgot = () => setView("forgot");
     const handleBackToLogin = () => setView("login");
 
+    const toastPosition = isArabic ? 'top-start' : 'top-end';
+    const googleAuthSuccess = useRef(false);
+
     const handleGoogleLogin = () => {
         if (window.googleAuthPopup && !window.googleAuthPopup.closed) {
             window.googleAuthPopup.focus();
@@ -38,24 +41,58 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             "google-auth",
             `width=${width},height=${height},left=${left},top=${top}`
         );
+        if (window.googleAuthPopup) {
+            window.googleAuthPopup.focus();
+        }
+        if (!window.googleAuthPopup) {
+            showToast('error', t("auth.googlePopupBlocked"), toastPosition);
+            return;
+        }
+
+        googleAuthSuccess.current = false;
+        const checkPopup = setInterval(() => {
+            if (window.googleAuthPopup?.closed) {
+                clearInterval(checkPopup);
+                window.googleAuthPopup = null;
+                if (!googleAuthSuccess.current) {
+                    onClose?.();
+                    showToast('error', t("auth.googleLoginFailed"), toastPosition);
+                }
+            }
+        }, 500);
+    };
+
+    const getGoogleErrorMessage = (error) => {
+        if (!error) return t("auth.googleLoginFailed");
+        const lower = error.toLowerCase();
+        if (lower.includes("duplicate") || lower.includes("e11000") || lower.includes("already exists")) {
+            return t("auth.googleEmailExists");
+        }
+        return t("auth.googleTryDifferentEmail");
     };
 
     useEffect(() => {
         const handleMessage = (event) => {
             if (event.origin !== window.origin) return;
-            if (event.data?.type !== "GOOGLE_AUTH_SUCCESS") return;
-            const userData = event.data.payload;
-            console.log("Google OAuth login successful", userData);
-            login(userData);
-            if (userData.role === "admin") {
-                navigate("/admin", { replace: true });
-            } else {
+            if (event.data?.type === "GOOGLE_AUTH_SUCCESS") {
+                googleAuthSuccess.current = true;
+                const userData = event.data.payload;
+                console.log("Google OAuth login successful", userData);
+                login(userData);
+                if (userData.role === "admin") {
+                    navigate("/admin", { replace: true });
+                } else {
+                    onClose?.();
+                }
+            } else if (event.data?.type === "GOOGLE_AUTH_ERROR") {
+                googleAuthSuccess.current = true;
                 onClose?.();
+                showToast('error', getGoogleErrorMessage(event.data.payload), toastPosition);
             }
         };
         window.addEventListener("message", handleMessage);
         return () => window.removeEventListener("message", handleMessage);
-    }, [login, onClose, navigate]);
+    }, [login, onClose, navigate, t, toastPosition]);
 
     const handleLogin = async (e) => {
         e.preventDefault();

@@ -49,6 +49,7 @@ export default function TryOn() {
 
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
+  const toastPosition = isArabic ? 'top-start' : 'top-end';
 
   const storeProduct = useMemo(
     () => location.state?.productImage
@@ -68,7 +69,6 @@ export default function TryOn() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
-  const [generateError, setGenerateError] = useState(null);
   const [userPhoto, setUserPhoto] = useState(null);
   const [userPhotoFile, setUserPhotoFile] = useState(null);
   const [productImageFile, setProductImageFile] = useState(null);
@@ -126,7 +126,7 @@ export default function TryOn() {
         if (!other.category) continue;
         const disables = CATEGORY_DISABLE_RULES[other.category];
         if (disables && disables.includes(category)) {
-          showToast("error", `Cannot combine "${category}" with "${other.category}"`);
+          showToast("error", t('tryOn.categoryConflict', { cat1: category, cat2: other.category }), toastPosition);
           return prev;
         }
       }
@@ -260,12 +260,12 @@ export default function TryOn() {
   };
 
   useEffect(() => {
-    if ((generatedImageUrl || generateError) && resultRef.current) {
+    if (generatedImageUrl && resultRef.current) {
       setTimeout(() => {
         resultRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 300);
     }
-  }, [generatedImageUrl, generateError]);
+  }, [generatedImageUrl]);
 
   const handleReset = () => {
     if (userPhoto) URL.revokeObjectURL(userPhoto);
@@ -274,7 +274,6 @@ export default function TryOn() {
     setSelectedModel(null);
     setSelectedItems([]);
     setGeneratedImageUrl(null);
-    setGenerateError(null);
     setUserPhoto(null);
     setUserPhotoFile(null);
     setGalleryFiles([]);
@@ -294,6 +293,7 @@ export default function TryOn() {
       setSaveMsg("saved");
     } catch (err) {
       setSaveMsg("error");
+      showToast('error', t('tryOn.generationError'), toastPosition);
     } finally {
       setSaving(false);
     }
@@ -307,8 +307,8 @@ export default function TryOn() {
       if (missingCategory) {
         Swal.fire({
           icon: "warning",
-          title: "Category Required",
-          text: "Please assign a category to each uploaded image before generating.",
+          title: t("tryOn.categoryRequired"),
+          text: t("tryOn.categoryRequiredText"),
           confirmButtonColor: "#3b82f6",
         });
         return;
@@ -327,7 +327,6 @@ export default function TryOn() {
 
     setGenerating(true);
     setGeneratedImageUrl(null);
-    setGenerateError(null);
 
     try {
       const formData = new FormData();
@@ -420,9 +419,7 @@ export default function TryOn() {
     } catch (err) {
       const errorPayload = err.response?.data || err.message || err;
       console.error("❌ [TryOn] Error — model:", selectedModel, "items:", selectedItems, "|", errorPayload);
-      setGenerateError(
-        err.response?.data?.error || err.message || t("tryOn.generationFailed")
-      );
+      showToast('error', t('tryOn.generationError'), toastPosition);
     } finally {
       setGenerating(false);
     }
@@ -811,23 +808,12 @@ export default function TryOn() {
         </section>
 
         {/* Result */}
-        {(generating || generatedImageUrl || generateError) && (
+        {(generating || generatedImageUrl) && (
           <section ref={resultRef} className="mt-12 sm:mt-16">
             {generating ? (
               <div className="rounded-2xl shadow-xl bg-gray-100 flex flex-col items-center justify-center py-20">
                 <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 mb-4" />
                 <p className="text-gray-500 font-medium">{t("tryOn.generatingTryOn")}</p>
-              </div>
-            ) : generateError ? (
-              <div className="rounded-2xl shadow-xl bg-red-50 border border-red-200 p-8 text-center">
-                <p className="text-red-600 font-medium mb-2">{t("tryOn.somethingWentWrong")}</p>
-                <p className="text-sm text-red-500">{generateError}</p>
-                <button
-                  onClick={handleReset}
-                  className="mt-6 inline-flex items-center gap-2 px-8 py-3 rounded-xl font-bold text-white bg-lime-500 hover:bg-lime-600 transition-all shadow-lg"
-                >
-                  {t("tryOn.tryAgain")}
-                </button>
               </div>
             ) : (
               <>

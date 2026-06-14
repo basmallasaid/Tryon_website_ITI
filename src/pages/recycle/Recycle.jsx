@@ -16,6 +16,7 @@ import {
   analyzeRecycleApi,
   generateRecycleIdeaApi,
 } from "../../api/recycleApi";
+import { showToast } from "../../utils/toast";
 
 const MAX_SELECTION = 2;
 
@@ -56,10 +57,11 @@ const buildPreviews = async (files) => {
 };
 
 export default function Recycle() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
   const navigate = useNavigate();
+  const toastPosition = i18n.language === 'ar' ? 'top-start' : 'top-end';
 
   const [wardrobeSelectedIds, setWardrobeSelectedIds] = useState([]);
   const [galleryFiles, setGalleryFiles] = useState([]);
@@ -72,7 +74,6 @@ export default function Recycle() {
   const [generating, setGenerating] = useState(false);
   const [generatedIdea, setGeneratedIdea] = useState(null);
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
-  const [apiError, setApiError] = useState("");
 
   const ideasRef = useRef(null);
   const generateRef = useRef(null);
@@ -146,7 +147,6 @@ export default function Recycle() {
   };
 
   const handleGalleryFilesSelected = async (files) => {
-    setApiError("");
     const allowed = remainingSlots > 0 ? files.slice(0, remainingSlots) : [];
     if (allowed.length === 0) return;
     const previews = await buildPreviews(allowed);
@@ -154,7 +154,6 @@ export default function Recycle() {
   };
 
   const handleRemoveGalleryImage = (index) => {
-    setApiError("");
     setGalleryFiles((prev) => {
       const img = prev[index];
       if (img?.preview?.startsWith("blob:")) URL.revokeObjectURL(img.preview);
@@ -169,7 +168,6 @@ export default function Recycle() {
 
   const handleRecycle = async () => {
     if (!isReady) return;
-    setApiError("");
     setAnalyzing(true);
     setIdeas([]);
     setSessionId(null);
@@ -197,11 +195,7 @@ export default function Recycle() {
       setSessionId(data.session_id);
       setIdeas(data.ideas || []);
     } catch (err) {
-      setApiError(
-        err.response?.data?.error ||
-        err.message ||
-        t("recycle.analysisFailed")
-      );
+      showToast('error', t('recycle.analysisFailed'), toastPosition);
     } finally {
       setAnalyzing(false);
     }
@@ -213,7 +207,6 @@ export default function Recycle() {
 
   const handleGenerate = async () => {
     if (!sessionId || !selectedIdeaId) return;
-    setApiError("");
     setGenerating(true);
     setGeneratedImageUrl(null);
     setGeneratedIdea(selectedIdea);
@@ -228,14 +221,10 @@ export default function Recycle() {
       if (data.image_url) {
         setGeneratedImageUrl(data.image_url);
       } else {
-        setApiError(t("recycle.noImageReturned"));
+        showToast('error', t('recycle.generationError'), toastPosition);
       }
     } catch (err) {
-      setApiError(
-        err.response?.data?.error ||
-        err.message ||
-        t("recycle.generationFailed")
-      );
+      showToast('error', t('recycle.generationFailed'), toastPosition);
     } finally {
       setGenerating(false);
     }
@@ -253,7 +242,6 @@ export default function Recycle() {
     setSelectedIdeaId(null);
     setGeneratedIdea(null);
     setGeneratedImageUrl(null);
-    setApiError("");
   };
 
   return (
@@ -411,15 +399,6 @@ export default function Recycle() {
             </div>
           )}
         </section>
-
-        {/* API Error */}
-        {apiError && (
-          <section className="mt-6 max-w-6xl mx-auto">
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-              {apiError}
-            </div>
-          </section>
-        )}
 
         {/* Selected Items Status */}
         {!ideas.length && (

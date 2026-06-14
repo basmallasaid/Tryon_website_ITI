@@ -263,7 +263,11 @@
     "resetSuccess": "Password reset successfully! Please login with your new password.",
     "failedToSendReset": "Failed to send reset link",
     "verificationFailed": "Verification failed",
-    "failedToReset": "Failed to reset password"
+    "failedToReset": "Failed to reset password",
+    "googleLoginFailed": "Google login failed. Please try again.",
+    "googlePopupBlocked": "Popup was blocked. Please allow popups for this site.",
+    "googleEmailExists": "This email is already registered. Please login or use a different email.",
+    "googleTryDifferentEmail": "Error while logging in. Try with a different email."
   },
   "stores": {
     "title": "Stores",
@@ -336,6 +340,7 @@
     "analysisFailed": "Failed to analyze images. Please try again.",
     "noImageReturned": "No image was returned from the server.",
     "generationFailed": "Image generation failed. Please try again.",
+    "generationError": "Error executing this action. Please try again.",
     "unsupportedFileType": "Unsupported file type. Accepted: {{types}}",
     "fileTooLarge": "\"{{name}}\" exceeds the 10MB size limit.",
     "selectItemsStep": "Select Items",
@@ -431,7 +436,11 @@
     "save": "Save",
     "productPreselected": "This product is pre-selected for try-on",
     "selectModelAndGenerate": "Select your model above and generate",
-    "tryOnResult": "Try-on result"
+    "tryOnResult": "Try-on result",
+    "generationError": "Error executing this action. Please try again.",
+    "categoryConflict": "Cannot combine \"{{cat1}}\" with \"{{cat2}}\".",
+    "categoryRequired": "Category Required",
+    "categoryRequiredText": "Please assign a category to each uploaded image before generating."
   },
   "matching": {
     "title": "Matching",
@@ -465,7 +474,8 @@
     "noWardrobeMatches": "No wardrobe matches found",
     "storeMatches": "Matching Items From Store",
     "noStoreMatches": "No store matches found",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "generationError": "Error executing this action. Please try again."
   },
   "wardrobe": {
     "health": "Wardrobe Health",
@@ -582,8 +592,24 @@
     "weight": "Weight",
     "height": "Height",
     "skinTone": "Skin Tone",
+    "skinTones": {
+      "very-light": "Very Light",
+      "light": "Light",
+      "medium": "Medium",
+      "tan": "Tan",
+      "brown": "Brown",
+      "dark": "Dark"
+    },
     "faceShape": "Face Shape",
     "hairColor": "Hair Color",
+    "hairColors": {
+      "black": "Black",
+      "dark-brown": "Dark Brown",
+      "brown": "Brown",
+      "light-brown": "Light Brown",
+      "blonde": "Blonde",
+      "red": "Red"
+    },
     "eyeColor": "Eye Color",
     "beardStyle": "Beard Style",
     "facialExpression": "Facial Expression",
@@ -596,6 +622,8 @@
     "generatingAvatar": "Generating your avatar...",
     "generationFailed": "Avatar generation failed. Please try again.",
     "noImageReturned": "No image was returned from the server.",
+    "fillAllFields": "Please fill in all required fields.",
+    "generationError": "Error executing this action. Please try again.",
     "useInTryOn": "Use in Try-On",
     "upgrade": "Upgrade to Generate More"
   },

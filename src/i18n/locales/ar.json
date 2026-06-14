@@ -263,7 +263,11 @@
     "resetSuccess": "تم إعادة تعيين كلمة المرور بنجاح! يرجى تسجيل الدخول بكلمة المرور الجديدة.",
     "failedToSendReset": "فشل في إرسال رابط الإعادة",
     "verificationFailed": "فشل التحقق",
-    "failedToReset": "فشل في إعادة تعيين كلمة المرور"
+    "failedToReset": "فشل في إعادة تعيين كلمة المرور",
+    "googleLoginFailed": "فشل تسجيل الدخول عبر Google. حاول مرة أخرى.",
+    "googlePopupBlocked": "تم حظر النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة لهذا الموقع.",
+    "googleEmailExists": "هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.",
+    "googleTryDifferentEmail": "خطأ أثناء تسجيل الدخول. حاول باستخدام بريد إلكتروني آخر."
   },
   "stores": {
     "title": "المتاجر",
@@ -338,6 +342,7 @@
     "generationFailed": "فشل توليد الصورة. يرجى المحاولة مرة أخرى.",
     "unsupportedFileType": "نوع ملف غير مدعوم. المقبول: {{types}}",
     "fileTooLarge": "\"{{name}}\" يتجاوز الحد الأقصى للحجم (10 ميغابايت).",
+    "generationError": "خطأ في تنفيذ هذا الإجراء. حاول مرة أخرى.",
     "selectItemsStep": "اختيار العناصر",
     "chooseItemsStep": "اختر 1-2 قطعة ملابس",
     "getIdeasStep": "الحصول على أفكار",
@@ -431,7 +436,11 @@
     "save": "حفظ",
     "productPreselected": "هذا المنتج محدد مسبقاً للتجربة",
     "selectModelAndGenerate": "اختر النموذج أعلاه وابدأ التوليد",
-    "tryOnResult": "نتيجة تجربة الارتداء"
+    "tryOnResult": "نتيجة تجربة الارتداء",
+    "generationError": "خطأ في تنفيذ هذا الإجراء. حاول مرة أخرى.",
+    "categoryConflict": "لا يمكن الجمع بين \"{{cat1}}\" و \"{{cat2}}\".",
+    "categoryRequired": "الفئة مطلوبة",
+    "categoryRequiredText": "يرجى تعيين فئة لكل صورة مرفوعة قبل التوليد."
   },
   "matching": {
     "title": "المطابقة",
@@ -465,7 +474,8 @@
     "noWardrobeMatches": "لم يتم العثور على تطابقات في الخزانة",
     "storeMatches": "عناصر متطابقة من المتجر",
     "noStoreMatches": "لم يتم العثور على تطابقات من المتجر",
-    "tryAgain": "حاول مرة أخرى"
+    "tryAgain": "حاول مرة أخرى",
+    "generationError": "خطأ في تنفيذ هذا الإجراء. حاول مرة أخرى."
   },
   "wardrobe": {
     "health": "صحة الخزانة",
@@ -582,8 +592,24 @@
     "weight": "الوزن",
     "height": "الطول",
     "skinTone": "لون البشرة",
+    "skinTones": {
+      "very-light": "فاتح جداً",
+      "light": "فاتح",
+      "medium": "متوسط",
+      "tan": "قمحي",
+      "brown": "بني",
+      "dark": "داكن"
+    },
     "faceShape": "شكل الوجه",
     "hairColor": "لون الشعر",
+    "hairColors": {
+      "black": "أسود",
+      "dark-brown": "بني غامق",
+      "brown": "بني",
+      "light-brown": "بني فاتح",
+      "blonde": "أشقر",
+      "red": "أحمر"
+    },
     "eyeColor": "لون العينين",
     "beardStyle": "نمط اللحية",
     "facialExpression": "التعبير الوجهي",
@@ -596,6 +622,8 @@
     "generatingAvatar": "جارٍ توليد صورتك الرمزية...",
     "generationFailed": "فشل توليد الصورة الرمزية. حاول مرة أخرى.",
     "noImageReturned": "لم يتم إرجاع صورة من الخادم.",
+    "fillAllFields": "يرجى ملء جميع الحقول المطلوبة.",
+    "generationError": "خطأ في تنفيذ هذا الإجراء. حاول مرة أخرى.",
     "useInTryOn": "استخدم في التجربة",
     "upgrade": "ترقية لتوليد المزيد"
   },

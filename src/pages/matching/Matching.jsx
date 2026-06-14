@@ -15,6 +15,7 @@ import {
   getMatchesByAnalysis,
 } from "../../api/matchingApi";
 import { getAllProducts } from "../../api/userApi";
+import { showToast } from "../../utils/toast";
 
 const imgSrc = (image) => {
   if (!image) return null;
@@ -41,6 +42,7 @@ const base64ToFile = (base64, filename) => {
 export default function Matching() {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
+  const toastPosition = isArabic ? 'top-start' : 'top-end';
   const { user } = useAuth();
   const { items: wardrobeItems, loading: wardrobeLoading } = useWardrobe();
   const { isFavorite, addItem, removeItem } = useFavorites();
@@ -149,6 +151,7 @@ export default function Matching() {
         console.log("Sources:", list.map((m) => m.item?.source));
         setWardrobeMatches(list.filter((m) => m.item?.source === "wardrobe"));
         setStoreMatches(list.filter((m) => m.item?.source === "store"));
+        setShowResults(true);
       };
 
       if (itemSource === "wardrobe" && selectedItemId) {
@@ -166,13 +169,15 @@ export default function Matching() {
           const matchRes = await getMatchesByAnalysis(analysisId);
           console.log("Gallery match response:", matchRes);
           processMatches(matchRes);
+        } else {
+          setShowResults(true);
         }
       }
     } catch (err) {
       console.error("Match error:", err);
+      showToast('error', t('matching.generationError'), toastPosition);
     } finally {
       setIsLoading(false);
-      setShowResults(true);
     }
 
     setTimeout(() => {

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { showToast } from "../../../utils/toast";
 
 const ACCEPTED_EXTENSIONS = [
   ".jpg",
@@ -40,26 +41,27 @@ const UploadArea = ({
   disabled = false,
   maxFiles = 2,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const toastPosition = i18n.language === 'ar' ? 'top-start' : 'top-end';
   const inputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [error, setError] = useState("");
 
   const handleFiles = (fileList) => {
-    setError("");
     if (!fileList || fileList.length === 0) return;
 
     const files = Array.from(fileList).slice(0, maxFiles);
 
     for (const file of files) {
       if (!isAcceptedFile(file)) {
-        setError(
-          t("recycle.unsupportedFileType", { types: ACCEPTED_EXTENSIONS.join(", ") })
+        showToast(
+          'error',
+          t("recycle.unsupportedFileType", { types: ACCEPTED_EXTENSIONS.join(", ") }),
+          toastPosition
         );
         return;
       }
       if (file.size > MAX_FILE_SIZE) {
-        setError(t("recycle.fileTooLarge", { name: file.name }));
+        showToast('error', t("recycle.fileTooLarge", { name: file.name }), toastPosition);
         return;
       }
     }
@@ -168,12 +170,6 @@ const UploadArea = ({
           disabled={disabled}
         />
       </div>
-
-      {error && (
-        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600">
-          {error}
-        </div>
-      )}
     </div>
   );
 };
