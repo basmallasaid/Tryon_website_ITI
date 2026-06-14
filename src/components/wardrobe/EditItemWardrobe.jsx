@@ -29,7 +29,7 @@ const EditItemWardrobe = () => {
 
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
-        name: '', category: '', season: '', style: '', color: '', pattern: '', gender: '',
+        name: '', category: '', season: [], style: '', color: '', pattern: '', gender: '',
     });
     const [imageUrl, setImageUrl] = useState('');
     const [saving, setSaving] = useState(false);
@@ -50,7 +50,7 @@ const EditItemWardrobe = () => {
                     setFormData({
                         name: item.name || '',
                         category: item.category || '',
-                        season: Array.isArray(item.season) ? item.season[0] : item.season || '',
+                        season: Array.isArray(item.season) ? item.season : item.season ? [item.season] : [],
                         style: item.style || '',
                         color: item.color || '',
                         pattern: item.pattern || '',
@@ -69,7 +69,7 @@ const EditItemWardrobe = () => {
                 setFormData({
                     name: garment.specificType || garment.name || '',
                     category: garment.category || '',
-                    season: Array.isArray(garment.season) ? garment.season[0] : garment.season || '',
+                    season: Array.isArray(garment.season) ? garment.season : garment.season ? [garment.season] : [],
                     style: garment.style || '',
                     color: garment.colors?.[0]?.color || garment.color || '',
                     pattern: garment.pattern || '',
@@ -85,7 +85,7 @@ const EditItemWardrobe = () => {
             setFormData({
                 name: garment.specificType || garment.name || '',
                 category: garment.category || '',
-                season: Array.isArray(garment.season) ? garment.season[0] : garment.season || '',
+                season: Array.isArray(garment.season) ? garment.season : garment.season ? [garment.season] : [],
                 style: garment.style || '',
                 color: garment.colors?.[0]?.color || garment.color || '',
                 pattern: garment.pattern || '',
@@ -103,6 +103,17 @@ const EditItemWardrobe = () => {
     const handleUpdateField = (field, value) => {
         if (!isNew) return;
         setFormData(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleToggleSeason = (season) => {
+        if (!isNew) return;
+        setFormData(prev => {
+            const current = prev.season || [];
+            const updated = current.includes(season)
+                ? current.filter(s => s !== season)
+                : [...current, season];
+            return { ...prev, season: updated };
+        });
     };
 
     const handleFavorite = (e) => {
@@ -128,7 +139,7 @@ const EditItemWardrobe = () => {
                         specificType: formData.name,
                         category: formData.category,
                         style: formData.style,
-                        season: [formData.season],
+                        season: formData.season,
                         colors: original?.colors || [{ color: formData.color, percentage: 100 }],
                         pattern: formData.pattern,
                         gender: formData.gender,
@@ -166,7 +177,7 @@ const EditItemWardrobe = () => {
             type="button"
             onClick={() => onClick(label)}
              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 border ${isMatching(activeValue, label)
-                ? `border-[var(--color-primary)] bg-primary-light text-[var(--color-primary)]`
+                ? `border-[var(--color-primary)] text-[var(--color-primary)]`
                 : 'bg-surface-elevated border-[var(--border)] text-text-disabled hover:border-[var(--border)] hover:bg-[var(--bg-secondary)]'
             }`}
         >
@@ -266,8 +277,19 @@ const EditItemWardrobe = () => {
                                         <h3 className="text-xs font-black uppercase tracking-widest text-text-primary">{t('wardrobe.season')}</h3>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
-                                        {['summer', 'winter', 'spring', 'fall', 'all season'].map(s => (
-                                            <SelectionChip key={s} label={s} activeValue={formData.season} onClick={(val) => handleUpdateField('season', val)} />
+                                        {['summer', 'winter', 'spring', 'fall'].map(s => (
+                                            <button
+                                                key={s}
+                                                type="button"
+                                                onClick={() => handleToggleSeason(s)}
+                                                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 border ${
+                                                    formData.season.includes(s)
+                                                        ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
+                                                        : 'bg-surface-elevated border-[var(--border)] text-text-disabled hover:border-[var(--border)] hover:bg-[var(--bg-secondary)]'
+                                                }`}
+                                            >
+                                                {(t('wardrobe.opt_' + s.toLowerCase()) || s).toUpperCase()}
+                                            </button>
                                         ))}
                                     </div>
                                 </section>
