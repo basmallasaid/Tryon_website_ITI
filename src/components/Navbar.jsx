@@ -334,16 +334,31 @@ const Navbar = ({ onOpenAuth }) => {
       <div className="min-[1100px]:hidden flex items-center gap-1">
         {user && (
           <>
-            <button
-              onClick={() => {
-                setIsMobileOpen(false);
-                navigate("/editprofile");
-              }}
-              className="p-2 rounded-lg bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200 hover:text-brand-secondary transition-all active:scale-90"
-              aria-label="Profile"
-            >
-              <User size={22} />
-            </button>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  setIsNotifOpen(false);
+                }}
+                className="p-2 rounded-lg bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200 hover:text-brand-secondary transition-all active:scale-90"
+                aria-label="Profile"
+              >
+                <User size={22} />
+              </button>
+              {isProfileOpen && (
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ProfilePopup
+                    user={user}
+                    logout={logout}
+                    isArabic={isArabic}
+                    isDarkMode={isDarkMode}
+                    toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+                    changeLanguage={changeLanguage}
+                    onClose={() => setIsProfileOpen(false)}
+                  />
+                </div>
+              )}
+            </div>
             <div className="relative">
               <button
                 onClick={(e) => {
