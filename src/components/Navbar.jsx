@@ -22,6 +22,7 @@ import { useTheme } from '../context/ThemeContext';
 import ProfilePopup from '../pages/profile/ProfilePopup';
 import NotificationWindow from './NotificationWindow';
 import { getNotifications } from '../api/notificationApi';
+import PwaInstallButton from './PwaInstallButton';
 
 const Navbar = ({ onOpenAuth }) => {
   const { t, i18n } = useTranslation();
@@ -41,6 +42,7 @@ const Navbar = ({ onOpenAuth }) => {
   const profileRef = useRef(null);
   const mobileProfileBtnRef = useRef(null);
   const mobilePopupRef = useRef(null);
+  const langRef = useRef(null);
 
   const getUserFullName = currentUser => {
     if (!currentUser) return '';
@@ -74,12 +76,16 @@ const Navbar = ({ onOpenAuth }) => {
       if (!isClickInsideDesktop && !isClickInsideMobileBtn && !isClickInsidePopup) {
         setIsProfileOpen(false);
       }
+
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setIsLangOpen(false);
+      }
     };
-    if (isProfileOpen) {
+    if (isProfileOpen || isLangOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isProfileOpen]);
+  }, [isProfileOpen, isLangOpen]);
 
   const changeLanguage = lng => {
     i18n.changeLanguage(lng);
@@ -283,13 +289,15 @@ const Navbar = ({ onOpenAuth }) => {
           </button>
         </div>
 
+        <PwaInstallButton />
+
         <div className="h-8 w-px bg-[var(--border)] mx-1" />
 
         {/* Language Selector */}
-        <div className="relative">
+        <div className="relative" ref={langRef}>
           <button
             onClick={() => setIsLangOpen(!isLangOpen)}
-            className="flex items-center gap-1.5 h-10 border border-[var(--border)] rounded-lg px-3 bg-surface-elevated hover:bg-[var(--bg-secondary)] transition-all cursor-pointer text-sm font-bold text-text-secondary"
+            className={`flex items-center gap-1.5 h-10 border border-[var(--border)] rounded-lg px-3 bg-surface-elevated hover:bg-[var(--bg-secondary)] transition-all cursor-pointer text-sm font-bold ${isDarkMode ? 'text-white' : 'text-black'}`}
           >
             <Globe className="w-4 h-4" />
             <span>{isArabic ? 'AR' : 'EN'}</span>
@@ -306,7 +314,7 @@ const Navbar = ({ onOpenAuth }) => {
                 <button
                   key={lang}
                   onClick={() => changeLanguage(lang)}
-                  className="flex items-center justify-between w-full px-4 py-2.5 hover:bg-[var(--bg-secondary)] text-sm font-medium transition-colors cursor-pointer"
+                  className={`flex items-center justify-between w-full px-4 py-2.5 hover:bg-[var(--bg-secondary)] text-sm font-medium transition-colors cursor-pointer ${isDarkMode ? 'text-white' : 'text-black'}`}
                 >
                   <span>{lang === 'en' ? 'English' : 'العربية'}</span>
                   {((lang === 'ar' && isArabic) ||
@@ -660,6 +668,10 @@ const Navbar = ({ onOpenAuth }) => {
             >
               <Globe size={18} /> {isArabic ? 'العربية' : 'EN'}
             </button>
+          </div>
+
+          <div className="mb-4">
+            <PwaInstallButton />
           </div>
 
           {user ? (
