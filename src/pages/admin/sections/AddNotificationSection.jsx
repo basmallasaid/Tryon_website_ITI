@@ -48,7 +48,7 @@ function TargetSection({ sendMode, setSendMode, emailSearch, setEmailSearch, tar
               </span>
               <button
                 onClick={() => { setTargetEmail(''); setEmailSearch(''); }}
-                className="text-admin-text-muted hover:text-admin-danger text-xs"
+                className="text-admin-text-muted hover:text-accent-orange text-xs"
               >
                 ✕
               </button>
@@ -151,7 +151,7 @@ function MobileTargetSection({ sendMode, setSendMode, emailSearch, setEmailSearc
               </span>
               <button
                 onClick={() => { setTargetEmail(''); setEmailSearch(''); }}
-                className="text-admin-text-muted hover:text-admin-danger text-xs"
+                className="text-admin-text-muted hover:text-accent-orange text-xs"
               >
                 ✕
               </button>

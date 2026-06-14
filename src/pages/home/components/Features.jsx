@@ -14,7 +14,7 @@ const Features = () => {
     },
     {
       icon: tryonIcon,
-      bg: 'var(--accent-light)',
+      bg: 'var(--accent-orange-light)',
       title: t('features.tryOnTitle'),
       desc: t('features.tryOnDesc'),
     },

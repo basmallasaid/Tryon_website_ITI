@@ -1,11 +1,11 @@
-import heroImg from "../../../assets/hero-img.svg";
+import heroImg from "../../../assets/herosec.png";
 import Button from "../../../components/Button";
 import { useTranslation } from "react-i18next";
 
 const Hero = () => {
   const { t } = useTranslation();
   return (
-    <section className="w-full bg-bg-secondary px-20 py-20 max-[1200px]:px-14 max-[1000px]:p-8 flex items-center justify-center gap-[26px] max-[1000px]:flex-col">
+    <section className="w-full bg-bg-secondary px-20 py-20 max-[1200px]:px-14 max-[1000px]:p-8 flex items-center justify-center gap-[40px] max-[1000px]:flex-col">
       <div className="w-[414px] max-[1000px]:w-full flex flex-col gap-6">
         <h1 className="font-bold text-[64px] max-[1000px]:text-4xl max-[600px]:text-3xl leading-[69px] max-[1000px]:leading-tight">
           <span className="text-text-primary">{t("hero.yourPersonal")}</span>{" "}

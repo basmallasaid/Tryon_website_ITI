@@ -215,7 +215,7 @@ const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose, isMobil
           <Link
             to="/admin"
             onClick={onClose}
-            className="w-full bg-[var(--primary-light)] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[var(--accent-light)] hover:scale-[1.02]"
+            className="w-full bg-[var(--primary-light)] group rounded-2xl p-4 flex items-center justify-between transition-all hover:scale-[1.02]"
           >
             <div className="flex items-center gap-3">
               <div className="bg-surface-elevated p-2 rounded-xl shadow-sm text-[var(--primary)]">
@@ -235,7 +235,7 @@ const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose, isMobil
         <Link
           to="/pricing"
           onClick={onClose}
-          className="w-full bg-[var(--primary-light)] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[var(--accent-light)] hover:scale-[1.02]"
+          className="w-full bg-[var(--primary-light)] group rounded-2xl p-4 flex items-center justify-between transition-all hover:scale-[1.02]"
         >
           <div className="flex items-center gap-3">
             <div className="bg-surface-elevated p-2 rounded-xl shadow-sm text-[var(--primary)]">
@@ -255,7 +255,7 @@ const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose, isMobil
         <Link
           to="/favorites"
           onClick={onClose}
-          className="w-full bg-[var(--primary-light)] group rounded-2xl p-4 flex items-center justify-between transition-all hover:bg-[var(--accent-light)] hover:scale-[1.02]"
+          className="w-full bg-[var(--primary-light)] group rounded-2xl p-4 flex items-center justify-between transition-all hover:scale-[1.02]"
         >
           <div className="flex items-center gap-3">
             <div className="bg-surface-elevated p-2 rounded-xl shadow-sm text-[var(--primary)]">

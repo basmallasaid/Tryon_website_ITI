@@ -308,7 +308,7 @@ export default function PricingPage() {
               </p>
             </div>
             <div className="flex justify-center w-full">
-              <div className="relative w-[900px] max-w-full rounded-[32px] overflow-hidden">
+              <div className="relative w-[900px] max-w-full rounded-[32px] overflow-hidden shadow-[0_0_20px_4px_rgba(255,138,61,0.1),0_0_40px_8px_rgba(64,185,255,0.08),0_0_60px_12px_rgba(142,211,33,0.06)]">
                 <span
                   className="absolute inset-0 p-[4px] rounded-[32px] pointer-events-none"
                   style={{
@@ -415,7 +415,7 @@ export default function PricingPage() {
             </div>
 
             <div className="w-[798px] h-[94px] flex items-center justify-center max-[1100px]:w-full max-[1100px]:px-4">
-              <div className="relative flex items-center bg-bg-secondary rounded-full w-full h-full">
+              <div className="relative flex items-center bg-[#EDEDED] rounded-full w-full h-full">
                 <span
                   className="absolute rounded-full border border-[var(--border)] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
                   style={{
@@ -487,7 +487,7 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <div className="relative w-[449px] max-[1100px]:w-full rounded-[32px] overflow-hidden shrink-0">
+              <div className="relative w-[449px] max-[1100px]:w-full rounded-[32px] overflow-hidden shrink-0 shadow-[0_0_20px_4px_rgba(255,138,61,0.1),0_0_40px_8px_rgba(64,185,255,0.08),0_0_60px_12px_rgba(142,211,33,0.06)]">
                 <span
                   className="absolute inset-0 p-[4px] rounded-[32px] pointer-events-none"
                   style={{
@@ -501,7 +501,7 @@ export default function PricingPage() {
                   }}
                 />
 
-                <div className="relative z-10 w-full h-full flex flex-col gap-8 py-8 max-[1100px]:py-6 px-10 bg-surface-elevated">
+                <div className="relative z-10 w-full h-full flex flex-col gap-8 py-8 max-[1100px]:py-6 px-10">
                   <div className="w-[116px] rounded-full py-1 px-3 bg-accent-orange flex items-center justify-center">
                     <span className="font-medium text-sm leading-[117%] text-surface-elevated">
                       {t("pricing.popular")}

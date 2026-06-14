@@ -118,7 +118,7 @@ const ItemDetailsModal = ({ item, onClose, onDelete }) => {
             {onDelete && (
               <button
                 onClick={() => onDelete(item._id)}
-                className="p-3 md:p-4 bg-accent-light text-[var(--color-accent-orange)] rounded-xl md:rounded-2xl hover:opacity-80 transition-all hover:scale-105 active:scale-95"
+                className="p-3 md:p-4 text-[var(--color-accent-orange)] rounded-xl md:rounded-2xl hover:opacity-80 transition-all hover:scale-105 active:scale-95"
                 title={t('wardrobe.delete')}
               >
                 <Trash2 size={18} className="md:w-[22px] md:h-[22px]" />

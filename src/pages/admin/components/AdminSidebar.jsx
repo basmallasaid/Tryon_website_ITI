@@ -100,7 +100,7 @@ export default function AdminSidebar({ className = '', activePage, setActivePage
         </button>
         <button
           onClick={handleLogout}
-          className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg hover:text-admin-danger transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg hover:text-accent-orange transition-colors cursor-pointer"
           style={{ letterSpacing: '0.24px' }}
         >
           <LogOut className="w-[18px] h-[18px]" />

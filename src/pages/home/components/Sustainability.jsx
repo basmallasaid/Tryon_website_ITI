@@ -1,4 +1,4 @@
-import bin from '../../../assets/bin.svg';
+import bin from '../../../assets/v.jpeg';
 import recycleIcon from '../../../assets/recycle-icon.svg';
 import ticketIcon from '../../../assets/ticket-icon.svg';
 import { useTranslation } from 'react-i18next';

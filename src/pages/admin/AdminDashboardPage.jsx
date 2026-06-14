@@ -222,7 +222,7 @@ export default function AdminDashboardPage() {
                       setUserRoleFilter('All');
                       setShowFilterDropdown(false);
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-admin-danger hover:bg-admin-danger/10 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs text-accent-orange hover:bg-accent-orange/10 transition-colors"
                   >
                     <X className="w-3 h-3" />
                     {t('admin.topbar.clearFilter')}
