@@ -142,7 +142,7 @@ export default function PricingPage() {
   const isPostPayment = useRef(false);
   const retryIntervalRef = useRef(null);
 
-  const fetchSubscription = () => {
+  const fetchSubscription = (retries = 0, delay = 1000) => {
     if (!user) {
       setLoading(false);
       return;
@@ -166,8 +166,14 @@ export default function PricingPage() {
             clearInterval(retryIntervalRef.current);
             retryIntervalRef.current = null;
           }
-        } else if (!isPostPayment.current) {
+          isPostPayment.current = false;
+        } else if (isPostPayment.current && retries > 0) {
+          retryIntervalRef.current = setTimeout(() => {
+            fetchSubscription(retries - 1, delay);
+          }, delay);
+        } else {
           setSubscription(null);
+          isPostPayment.current = false;
         }
       })
       .catch(() => {})
@@ -177,6 +183,7 @@ export default function PricingPage() {
   useEffect(() => {
     if (searchParams.get("success") === "true") {
       if (user) {
+        isPostPayment.current = true;
         setSearchParams({}, { replace: true });
         setShowSuccessPopup(true);
         syncSubscriptionApi({ userId: user.id })
@@ -202,6 +209,7 @@ export default function PricingPage() {
   useEffect(() => {
     if (justSubscribed && user) {
       setJustSubscribed(false);
+      isPostPayment.current = true;
       setSearchParams({}, { replace: true });
       syncSubscriptionApi({ userId: user.id })
         .then(() => fetchSubscription(3, 1000))

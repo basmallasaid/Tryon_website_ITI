@@ -20,13 +20,13 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
     const [forgotEmail, setForgotEmail] = useState("");
     const { login } = useAuth();
 
-    const toggleAuth = () => setView(view === "login" ? "register" : "login");
+  const toggleAuth = () => setView(view === 'login' ? 'register' : 'login');
 
-    const handleForgot = () => setView("forgot");
-    const handleBackToLogin = () => setView("login");
+  const handleForgot = () => setView('forgot');
+  const handleBackToLogin = () => setView('login');
 
-    const toastPosition = isArabic ? 'top-start' : 'top-end';
-    const googleAuthSuccess = useRef(false);
+  const toastPosition = isArabic ? 'top-start' : 'top-end';
+  const googleAuthSuccess = useRef(false);
 
     const handleGoogleLogin = () => {
         if (window.googleAuthPopup && !window.googleAuthPopup.closed) {
