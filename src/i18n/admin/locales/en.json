@@ -256,7 +256,8 @@
       "emailCenter": "Email Center",
       "users": "Users",
       "apiManagement": "API Management",
-      "settings": "Settings"
+      "settings": "Settings",
+      "viewSite": "View Site"
     },
     "topbar": {
       "filter": "Filter",

@@ -20,7 +20,7 @@ import {
   updateUserSettingsNotificationsApi,
 } from '../../api/userApi';
 
-const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose }) => {
+const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose, isMobile }) => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -95,8 +95,12 @@ const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose }) => {
 
   return (
     <div
-      className={`absolute top-full mt-4 w-[300px] bg-surface-elevated rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[var(--border)] p-6 z-[100] animate-in fade-in zoom-in duration-200 ${
-        isArabic ? 'left-0' : 'right-0'
+      className={`${
+        isMobile
+          ? "relative w-full min-[641px]:w-[300px] max-h-[calc(100vh-120px)] overflow-y-auto"
+          : "absolute top-full mt-4 w-[300px]"
+      } bg-surface-elevated rounded-[24px] shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-[var(--border)] p-6 z-[100] animate-in fade-in zoom-in duration-200 ${
+        !isMobile ? (isArabic ? 'left-0' : 'right-0') : ''
       }`}
       style={{ maxWidth: 'calc(100vw - 2rem)' }}
     >

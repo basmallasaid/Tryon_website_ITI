@@ -7,7 +7,7 @@ import {
   clearAllNotifications,
 } from "../api/notificationApi";
 
-const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
+const NotificationWindow = ({ isArabic, onClose, onUnreadChange, isMobile }) => {
   const [notifications, setNotifications] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -110,8 +110,12 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
     <div
       ref={windowRef}
       onMouseDown={(e) => e.stopPropagation()}
-      className={`absolute top-full mt-4 w-[380px] max-h-[520px] bg-surface-elevated rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-[var(--border)] z-[100] animate-fadeInScale flex flex-col overflow-hidden ${
-        isArabic ? "left-0" : "right-0"
+      className={`${
+        isMobile
+          ? "relative w-full min-[641px]:w-[380px] max-h-[70vh] min-[641px]:max-h-[520px]"
+          : "absolute top-full mt-4 w-[380px] max-w-[calc(100vw-2rem)] max-h-[520px]"
+      } bg-surface-elevated rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-[var(--border)] z-[100] animate-fadeInScale flex flex-col overflow-hidden ${
+        !isMobile ? (isArabic ? "left-0" : "right-0 max-[480px]:-right-2") : ""
       }`}
     >
       {/* Header */}

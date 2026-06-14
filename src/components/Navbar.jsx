@@ -39,6 +39,8 @@ const Navbar = ({ onOpenAuth }) => {
 
   const isArabic = i18n.language === 'ar';
   const profileRef = useRef(null);
+  const mobileProfileBtnRef = useRef(null);
+  const mobilePopupRef = useRef(null);
 
   const getUserFullName = currentUser => {
     if (!currentUser) return '';
@@ -66,7 +68,10 @@ const Navbar = ({ onOpenAuth }) => {
 
   useEffect(() => {
     const handleClickOutside = e => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
+      const isClickInsideDesktop = profileRef.current && profileRef.current.contains(e.target);
+      const isClickInsideMobileBtn = mobileProfileBtnRef.current && mobileProfileBtnRef.current.contains(e.target);
+      const isClickInsidePopup = mobilePopupRef.current && mobilePopupRef.current.contains(e.target);
+      if (!isClickInsideDesktop && !isClickInsideMobileBtn && !isClickInsidePopup) {
         setIsProfileOpen(false);
       }
     };
@@ -116,19 +121,47 @@ const Navbar = ({ onOpenAuth }) => {
     return () => clearInterval(interval);
   }, [user]);
 
+  // Close all menus on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+    setIsProfileOpen(false);
+    setIsNotifOpen(false);
+    setIsLangOpen(false);
+    setIsMobileFeaturesOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileOpen]);
+
+  // Helper to close everything cleanly
+  const closeAllPopups = () => {
+    setIsProfileOpen(false);
+    setIsNotifOpen(false);
+    setIsLangOpen(false);
+  };
+
   return (
     <nav
-      className={`flex items-center justify-between bg-[var(--header-footer-bg)] px-20 max-[1300px]:px-14 max-[1150px]:px-10 max-[1100px]:px-8 py-6 relative z-50 ${isArabic ? 'rtl' : 'ltr'}`}
+      className={`flex items-center justify-between bg-[var(--header-footer-bg)] px-20 max-[1300px]:px-14 max-[1150px]:px-10 max-[1100px]:px-8 max-[768px]:px-5 max-[480px]:px-4 py-6 max-[768px]:py-4 relative z-50 ${isArabic ? 'rtl' : 'ltr'}`}
     >
       {/* Logo */}
       <Link
         to="/"
-        className="flex items-center cursor-pointer transition-transform hover:scale-105"
+        className="flex items-center cursor-pointer transition-transform hover:scale-105 shrink-0"
       >
         <img
           src={isDarkMode ? '/logo-dark.svg' : '/logo-light.svg'}
           alt="Logo"
-          className="w-[139px] h-10"
+          className="w-[139px] h-10 max-[480px]:w-[110px] max-[480px]:h-8"
         />
       </Link>
 
@@ -317,6 +350,7 @@ const Navbar = ({ onOpenAuth }) => {
                   isArabic={isArabic}
                   changeLanguage={changeLanguage}
                   onClose={() => setIsProfileOpen(false)}
+                  isMobile={false}
                 />
               )}
             </div>
@@ -340,106 +374,178 @@ const Navbar = ({ onOpenAuth }) => {
         </div>
       </div>
 
-      {/* Mobile Menu Button */}
-      <div className="min-[1100px]:hidden flex items-center gap-1">
-        {user && (
+      {/* ╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë */}
+      {/*  MOBILE / TABLET SECTION (below 1100px)        */}
+      {/* ╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë */}
+
+      {/* Mobile Top Bar Actions */}
+      <div className="min-[1100px]:hidden flex items-center gap-1 max-[480px]:gap-0.5">
+        {user ? (
           <>
-            <div className="relative">
+            {/* Mobile Profile Button */}
+            <div className="relative" ref={!isMobileOpen ? mobileProfileBtnRef : undefined}>
               <button
                 onClick={() => {
                   setIsProfileOpen(!isProfileOpen);
                   setIsNotifOpen(false);
+                  setIsMobileOpen(false);
                 }}
-                className="p-2 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 hover:text-brand-secondary transition-all active:scale-90  dark:text-text-disabled"
+                className="p-2 rounded-lg text-text-secondary cursor-pointer hover:bg-[var(--bg-secondary)] hover:text-brand-secondary transition-all active:scale-90"
                 aria-label="Profile"
               >
-                <User size={22} />
+                <User size={22} className="max-[380px]:w-5 max-[380px]:h-5" />
               </button>
-              {isProfileOpen && (
-                <div onClick={e => e.stopPropagation()}>
-                  <ProfilePopup
-                    user={user}
-                    logout={logout}
-                    isArabic={isArabic}
-                    isDarkMode={isDarkMode}
-                    toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-                    changeLanguage={changeLanguage}
-                    onClose={() => setIsProfileOpen(false)}
-                  />
-                </div>
-              )}
             </div>
+
+            {/* Mobile Notification Button */}
             <div className="relative">
               <button
                 onClick={e => {
                   e.stopPropagation();
                   setIsNotifOpen(!isNotifOpen);
+                  setIsProfileOpen(false);
                   setIsMobileOpen(false);
                 }}
-                className="p-2 text-gray-500 cursor-pointer relative"
+                className="p-2 text-text-secondary cursor-pointer relative hover:text-brand-secondary transition-all"
+                aria-label="Notifications"
               >
-                <Bell size={22} />
+                <Bell size={22} className="max-[380px]:w-5 max-[380px]:h-5" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-accent-pink text-white text-[10px] font-bold rounded-full border-2 border-surface-elevated px-1">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
               </button>
-              {isNotifOpen && (
-                <NotificationWindow
-                  isArabic={isArabic}
-                  onClose={() => setIsNotifOpen(false)}
-                  onUnreadChange={setUnreadCount}
-                />
-              )}
             </div>
           </>
+        ) : (
+          /* Mobile Logged-out User Icon */
+          <button
+            onClick={() => onOpenAuth?.('login')}
+            className="p-2 rounded-lg text-text-secondary cursor-pointer hover:bg-[var(--bg-secondary)] hover:text-brand-secondary transition-all active:scale-90"
+            aria-label="Login"
+          >
+            <User size={22} className="max-[380px]:w-5 max-[380px]:h-5" />
+          </button>
         )}
+
+        {/* Hamburger / Close */}
         <button
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          onClick={() => {
+            setIsMobileOpen(!isMobileOpen);
+            setIsProfileOpen(false);
+            setIsNotifOpen(false);
+          }}
           className="p-2 rounded-lg bg-[var(--bg-secondary)] text-text-primary transition-all active:scale-90 cursor-pointer"
+          aria-label={isMobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={isMobileOpen}
         >
-          {isMobileOpen ? <X size={26} /> : <Menu size={26} />}
+          {isMobileOpen ? (
+            <X size={24} className="max-[380px]:w-5 max-[380px]:h-5" />
+          ) : (
+            <Menu size={24} className="max-[380px]:w-5 max-[380px]:h-5" />
+          )}
         </button>
       </div>
 
-      {/* Mobile Menu Drawer */}
-      {isMobileOpen && (
-        <div
-          className="fixed inset-0 bg-overlay backdrop-blur-sm z-40 min-[1100px]:hidden"
-          onClick={() => setIsMobileOpen(false)}
-        />
+      {/* ╬ô├╢├ç╬ô├╢├ç Mobile Profile Popup (renders as fixed overlay on small screens) ╬ô├╢├ç╬ô├╢├ç */}
+      {isProfileOpen && !isMobileOpen && (
+        <div className="absolute inset-0 pointer-events-none min-[1100px]:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/20 z-[90] pointer-events-auto"
+            onClick={() => setIsProfileOpen(false)}
+          />
+          {/* Popup container ╬ô├ç├╢ centered on mobile */}
+          <div
+            ref={mobilePopupRef}
+            className={`fixed z-[100] pointer-events-auto max-[640px]:inset-x-4 max-[640px]:top-20 min-[641px]:absolute min-[641px]:top-full min-[641px]:mt-2 ${isArabic ? 'min-[641px]:left-0' : 'min-[641px]:right-4'}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <ProfilePopup
+              user={user}
+              logout={logout}
+              isArabic={isArabic}
+              isDarkMode={isDarkMode}
+              toggleDarkMode={toggleTheme}
+              changeLanguage={changeLanguage}
+              onClose={() => setIsProfileOpen(false)}
+              isMobile={true}
+            />
+          </div>
+        </div>
       )}
 
+      {/* ╬ô├╢├ç╬ô├╢├ç Mobile Notification Window (renders as fixed overlay on small screens) ╬ô├╢├ç╬ô├╢├ç */}
+      {isNotifOpen && (
+        <div className="absolute inset-0 pointer-events-none min-[1100px]:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/20 z-[90] pointer-events-auto"
+            onClick={() => setIsNotifOpen(false)}
+          />
+          {/* Notification container */}
+          <div
+            className={`fixed z-[100] pointer-events-auto max-[640px]:inset-x-3 max-[640px]:top-16 min-[641px]:absolute min-[641px]:top-full min-[641px]:mt-2 ${isArabic ? 'min-[641px]:left-0' : 'min-[641px]:right-4'}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <NotificationWindow
+              isArabic={isArabic}
+              onClose={() => setIsNotifOpen(false)}
+              onUnreadChange={setUnreadCount}
+              isMobile={true}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ╬ô├╢├ç╬ô├╢├ç Mobile Drawer Overlay ╬ô├╢├ç╬ô├╢├ç */}
       <div
-        className={`fixed top-0 ${isArabic ? 'left-0' : 'right-0'} h-full w-72 bg-surface-elevated shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1100px]:hidden ${
+        className={`fixed inset-0 bg-overlay backdrop-blur-sm z-40 min-[1100px]:hidden transition-opacity duration-300 ${
+          isMobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsMobileOpen(false)}
+        aria-hidden={!isMobileOpen}
+      />
+
+      {/* ╬ô├╢├ç╬ô├╢├ç Mobile Drawer Panel ╬ô├╢├ç╬ô├╢├ç */}
+      <div
+        className={`fixed top-0 ${isArabic ? 'left-0' : 'right-0'} h-full w-[280px] max-w-[85vw] bg-surface-elevated shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1100px]:hidden flex flex-col ${
           isMobileOpen
             ? 'translate-x-0'
             : isArabic
               ? '-translate-x-full'
               : 'translate-x-full'
         }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
       >
-        <div className="flex items-center justify-between px-6 py-6 border-b border-[var(--border)]">
-          <img
-            src={isDarkMode ? '/logo-dark.svg' : '/logo-light.svg'}
-            alt="Logo"
-            className="h-8 w-auto"
-          />
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between px-5 py-5 border-b border-[var(--border)] shrink-0">
+          <Link to="/" onClick={() => setIsMobileOpen(false)}>
+            <img
+              src={isDarkMode ? '/logo-dark.svg' : '/logo-light.svg'}
+              alt="Logo"
+              className="h-7 w-auto"
+            />
+          </Link>
           <button
             onClick={() => setIsMobileOpen(false)}
             className="p-2 rounded-full bg-[var(--bg-secondary)] text-text-secondary transition-all hover:bg-[var(--surface)] cursor-pointer"
+            aria-label="Close menu"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        <div className="flex flex-col px-4 py-6 space-y-1">
+        {/* Drawer Navigation Links (Scrollable) */}
+        <div className="flex flex-col px-3 py-4 space-y-0.5 flex-1 overflow-y-auto overscroll-contain">
           {/* Home */}
           <Link
             to="/"
             onClick={() => setIsMobileOpen(false)}
-            className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
+            className={`px-4 py-3 rounded-xl text-[15px] font-bold transition-all ${
               location.pathname === '/'
                 ? 'bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20'
                 : 'text-text-secondary hover:bg-[var(--bg-secondary)]'
@@ -452,7 +558,7 @@ const Navbar = ({ onOpenAuth }) => {
           <div>
             <button
               onClick={() => setIsMobileFeaturesOpen(!isMobileFeaturesOpen)}
-              className={`flex items-center justify-between w-full px-4 py-3 rounded-xl text-base font-bold transition-all ${
+              className={`flex items-center justify-between w-full px-4 py-3 rounded-xl text-[15px] font-bold transition-all ${
                 isFeaturesActive
                   ? 'bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20'
                   : 'text-text-secondary hover:bg-[var(--bg-secondary)]'
@@ -465,16 +571,20 @@ const Navbar = ({ onOpenAuth }) => {
                 }`}
               />
             </button>
-            {isMobileFeaturesOpen && (
+            <div
+              className={`overflow-hidden transition-all duration-200 ${
+                isMobileFeaturesOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+              }`}
+            >
               <div
-                className={`mt-1 space-y-1 border-[var(--border)] ${isArabic ? 'mr-4 border-r-2 pr-2' : 'ml-4 border-l-2 pl-2'}`}
+                className={`mt-1 space-y-0.5 border-[var(--border)] ${isArabic ? 'mr-4 border-r-2 pr-1' : 'ml-4 border-l-2 pl-1'}`}
               >
                 {featureItems.map(item => (
                   <Link
                     key={item.path}
                     to={item.path}
                     onClick={() => setIsMobileOpen(false)}
-                    className={`block px-4 py-3 rounded-xl text-sm font-bold transition-all ${
+                    className={`block px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
                       item.path === location.pathname
                         ? 'bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20'
                         : 'text-text-secondary hover:bg-[var(--bg-secondary)]'
@@ -484,7 +594,7 @@ const Navbar = ({ onOpenAuth }) => {
                   </Link>
                 ))}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Remaining Links */}
@@ -493,7 +603,7 @@ const Navbar = ({ onOpenAuth }) => {
               key={link.name}
               to={link.path || '#'}
               onClick={() => setIsMobileOpen(false)}
-              className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-[15px] font-bold transition-all ${
                 link.path === location.pathname
                   ? 'bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20'
                   : 'text-text-secondary hover:bg-[var(--bg-secondary)]'
@@ -502,10 +612,12 @@ const Navbar = ({ onOpenAuth }) => {
               {link.name}
             </Link>
           ))}
+
+          {/* Favorites Link */}
           <Link
             to="/favorites"
             onClick={() => setIsMobileOpen(false)}
-            className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
+            className={`px-4 py-3 rounded-xl text-[15px] font-bold transition-all ${
               location.pathname === '/favorites'
                 ? 'bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20'
                 : 'text-text-secondary hover:bg-[var(--bg-secondary)]'
@@ -513,14 +625,16 @@ const Navbar = ({ onOpenAuth }) => {
           >
             {t('nav.favorites')}
           </Link>
+
+          {/* Edit Profile Link (auth only) */}
           {user && (
             <Link
               to="/editprofile"
               onClick={() => setIsMobileOpen(false)}
-              className={`px-4 py-3 rounded-xl text-base font-bold transition-all ${
+              className={`px-4 py-3 rounded-xl text-[15px] font-bold transition-all ${
                 location.pathname === '/editprofile'
                   ? 'bg-brand-secondary text-white shadow-lg shadow-brand-secondary/20'
-                  : 'text-gray-600 hover:bg-gray-50'
+                  : 'text-text-secondary hover:bg-[var(--bg-secondary)]'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -566,22 +680,28 @@ const Navbar = ({ onOpenAuth }) => {
               </div>
               <button
                 onClick={logout}
-                className="w-full py-3.5 bg-[var(--accent-light)] text-accent-pink rounded-xl font-bold flex items-center justify-center gap-2 active:brightness-90 transition-colors cursor-pointer"
+                className="w-full py-3 bg-[var(--accent-light)] text-accent-pink rounded-xl font-bold flex items-center justify-center gap-2 active:brightness-90 transition-colors cursor-pointer"
               >
                 <LogOut size={18} /> {t('nav.logout')}
               </button>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <button
-                onClick={() => onOpenAuth?.('login')}
-                className="w-full py-3 border-2 border-brand-secondary text-brand-secondary rounded-xl font-bold"
+                onClick={() => {
+                  setIsMobileOpen(false);
+                  onOpenAuth?.('login');
+                }}
+                className="w-full py-3 border-2 border-brand-secondary text-brand-secondary rounded-xl font-bold hover:bg-brand-secondary/5 transition-colors cursor-pointer"
               >
                 {t('nav.login')}
               </button>
               <button
-                onClick={() => onOpenAuth?.('signup')}
-                className="w-full py-3 bg-gradient-to-r from-brand-secondary to-[#AAE338] text-white rounded-xl font-bold shadow-lg shadow-brand-secondary/20"
+                onClick={() => {
+                  setIsMobileOpen(false);
+                  onOpenAuth?.('signup');
+                }}
+                className="w-full py-3 bg-gradient-to-r from-brand-secondary to-[#AAE338] text-white rounded-xl font-bold shadow-lg shadow-brand-secondary/20 active:scale-[0.98] transition-transform cursor-pointer"
               >
                 {t('nav.signup')}
               </button>

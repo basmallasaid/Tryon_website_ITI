@@ -30,6 +30,39 @@ const pricingKeys = {
   },
 };
 
+function SuccessPopup({ open, onClose, t }) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay px-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-[500px] rounded-lg border border-border-strong p-8 gap-6 bg-surface-elevated animate-fadeInScale flex flex-col items-center text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-16 h-16 rounded-full bg-success-bg flex items-center justify-center">
+          <CircleCheck className="w-8 h-8 text-success-text" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h3 className="font-roboto font-bold text-[24px] leading-[38.4px] text-text-primary">
+            {t("pricing.successTitle")}
+          </h3>
+          <p className="font-roboto text-[16px] leading-[24px] text-text-secondary">
+            {t("pricing.successDesc")}
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full h-12 rounded-lg bg-gradient-to-r from-primary via-[#69C9AC] to-[#AAE338] font-semibold text-base text-white cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+        >
+          {t("pricing.successButton")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function CancelModal({ open, onClose, onConfirm, cancelling, endDate }) {
   const { t } = useTranslation();
   if (!open) return null;
@@ -145,7 +178,7 @@ export default function PricingPage() {
     if (searchParams.get("success") === "true") {
       if (user) {
         setSearchParams({}, { replace: true });
-        showToast("success", t("pricing.subscriptionSuccess"));
+        setShowSuccessPopup(true);
         syncSubscriptionApi({ userId: user.id })
           .then(() => fetchSubscription(3, 1000))
           .catch(() => fetchSubscription(3, 1000));
@@ -583,6 +616,11 @@ export default function PricingPage() {
           onConfirm={handleCancel}
           cancelling={cancelling}
           endDate={subscription?.endDate}
+        />
+        <SuccessPopup
+          open={showSuccessPopup}
+          onClose={() => { setShowSuccessPopup(false); setSuccessPopupShown(true); }}
+          t={t}
         />
       </div>
     </section>

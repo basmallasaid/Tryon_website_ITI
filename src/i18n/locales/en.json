@@ -147,7 +147,10 @@
     "confirmCancellation": "Confirm Cancellation",
     "subscriptionSuccess": "Subscription activated successfully!",
     "loginPromptTitle": "Subscription Requires Login",
-    "loginPromptDesc": "Create an account or log in to subscribe to a plan and unlock premium features."
+    "loginPromptDesc": "Create an account or log in to subscribe to a plan and unlock premium features.",
+    "successTitle": "Subscription Activated!",
+    "successDesc": "Your Pro Stylist plan is now active. Enjoy unlimited lookbooks, hyper-realistic try-on, and personalized style coaching.",
+    "successButton": "Go to My Subscription"
   },
   "questions": {
     "title": "Styling Questions?",

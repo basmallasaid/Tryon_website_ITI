@@ -5,7 +5,7 @@
 // import './App.css'
 import { lazy, Suspense, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router';
 
 // Contexts
@@ -77,7 +77,8 @@ function LogoutWatcher() {
 
 function UserGuard() {
   const auth = JSON.parse(localStorage.getItem('auth') || 'null');
-  if (auth?.role === 'admin') return <Navigate to="/admin" replace />;
+  const location = useLocation();
+  if (auth?.role === 'admin' && location.pathname !== '/') return <Navigate to="/admin" replace />;
   return (
     <>
       <LogoutWatcher />
@@ -93,54 +94,54 @@ function AuthGuard() {
 }
 
 // Router Configuration
-function AppContent() {
-  const router = createBrowserRouter([
-    {
-      path: '/',
-      element: <UserGuard />,
-      children: [
-        {
-          element: <Layout />, 
-          children: [
-            { index: true, element: <Home /> },
-            { path: 'login', element: <Navigate to="/" replace state={{ openAuth: 'login' }} /> },
-            { path: 'about-tryon', element: <AboutTryon /> },
-            { path: 'about-recycle', element: <AboutRecycle /> },
-            { path: 'about', element: <About /> },
-            { path: 'contact-us', element: <ContactUs /> },
-            { path: 'auth/callback', element: <GoogleCallback /> },
-            {
-              element: <AuthGuard />,
-              children: [
-                { path: 'tryOn', element: <TryOn /> },
-                { path: 'pricing', element: <PricingPage /> },
-                { path: 'stores', element: <StoresPage /> },
-                { path: 'avatar', element: <AvatarGeneration /> },
-                { path: 'matching', element: <Matching /> },
-                { path: 'recycle', element: <Recycle /> },
-                { path: 'editprofile', element: <EditProfilePage /> },
-                { path: 'favorites', element: <Fav /> },
-                { path: 'wardrobe', element: <WardrobePage /> },
-                { path: 'wardrobe/edit/:id', element: <EditItemWardrobe /> },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      path: '/admin',
-      element: <AdminGuard />,
-      children: [
-        { index: true, element: <AdminDashboardPage /> },
-      ],
-    },
-    {
-      path: '*',
-      element: <NotFound />,
-    },
-  ]);
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <UserGuard />,
+    children: [
+      {
+        element: <Layout />, 
+        children: [
+          { index: true, element: <Home /> },
+          { path: 'login', element: <Navigate to="/" replace state={{ openAuth: 'login' }} /> },
+          { path: 'about-tryon', element: <AboutTryon /> },
+          { path: 'about-recycle', element: <AboutRecycle /> },
+          { path: 'about', element: <About /> },
+          { path: 'contact-us', element: <ContactUs /> },
+          { path: 'auth/callback', element: <GoogleCallback /> },
+          {
+            element: <AuthGuard />,
+            children: [
+              { path: 'tryOn', element: <TryOn /> },
+              { path: 'pricing', element: <PricingPage /> },
+              { path: 'stores', element: <StoresPage /> },
+              { path: 'avatar', element: <AvatarGeneration /> },
+              { path: 'matching', element: <Matching /> },
+              { path: 'recycle', element: <Recycle /> },
+              { path: 'editprofile', element: <EditProfilePage /> },
+              { path: 'favorites', element: <Fav /> },
+              { path: 'wardrobe', element: <WardrobePage /> },
+              { path: 'wardrobe/edit/:id', element: <EditItemWardrobe /> },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <AdminGuard />,
+    children: [
+      { index: true, element: <AdminDashboardPage /> },
+    ],
+  },
+  {
+    path: '*',
+    element: <NotFound />,
+  },
+]);
 
+function AppContent() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <RouterProvider router={router} />

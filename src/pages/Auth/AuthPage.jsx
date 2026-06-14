@@ -11,6 +11,7 @@ import OtpVerification from "./OtpVerification";
 import ResetPassword from "./ResetPassword";
 import SlidingOverlay from "../../components/SlidingOverlay";
 import { showToast } from "../../utils/toast";
+
 export default function AuthPage({ initialIsLogin = true, inModal = false, onClose }) {
     const { t, i18n } = useTranslation();
     const isArabic = i18n.language === "ar";
@@ -202,23 +203,54 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
         }
     };
 
+    // ─── Mobile-only single-panel renderer (no animation, natural height) ─────
+    const mobilePanel = () => {
+        const commonProps = { inModal };
+        switch (view) {
+            case "login":
+                return <Login isVisible onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} toggleAuth={toggleAuth} {...commonProps} mobile />;
+            case "register":
+                return <Register isVisible onRegister={handleRegister} toggleAuth={toggleAuth} onGoogleLogin={handleGoogleLogin} {...commonProps} mobile />;
+            case "forgot":
+                return <ForgotPassword isVisible onForgot={handleForgotSubmit} onBackToLogin={handleBackToLogin} {...commonProps} mobile />;
+            case "otp":
+                return <OtpVerification isVisible email={forgotEmail} onVerify={handleOtpVerify} onBackToLogin={handleBackToLogin} {...commonProps} mobile />;
+            case "reset":
+                return <ResetPassword isVisible onReset={handleResetPassword} onBackToLogin={handleBackToLogin} {...commonProps} mobile />;
+            default:
+                return null;
+        }
+    };
+
     return (
-        <div className={`flex ${inModal ? '' : 'min-h-screen'} items-center justify-center ${inModal ? '' : 'bg-surface-elevated p-4'} font-sans`}>
-            <div dir={isArabic ? 'rtl' : 'ltr'} className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full ${inModal ? '' : 'max-w-6xl'} overflow-hidden rounded-[40px] bg-surface-elevated shadow-2xl`}>
-                
-                <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
-                
-                <Register isVisible={view === "register"} onRegister={handleRegister} toggleAuth={toggleAuth} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
-                
-                <ForgotPassword isVisible={view === "forgot"} onForgot={handleForgotSubmit} onBackToLogin={handleBackToLogin} inModal={inModal} />
-                
-                <OtpVerification isVisible={view === "otp"} email={forgotEmail} onVerify={handleOtpVerify} onBackToLogin={handleBackToLogin} inModal={inModal} />
-                
-                <ResetPassword isVisible={view === "reset"} onReset={handleResetPassword} onBackToLogin={handleBackToLogin} inModal={inModal} />
-                
-                <SlidingOverlay view={view} onToggle={toggleAuth} onForgot={handleForgot} inModal={inModal} />
-                
+        <div dir={isArabic ? 'rtl' : 'ltr'} className={`font-sans ${inModal ? '' : 'min-h-screen flex items-center justify-center bg-surface-elevated p-4'}`}>
+
+            {/* ── MOBILE LAYOUT (< md): single panel, natural height, scrollable ── */}
+            <div className={`md:hidden w-full ${inModal ? '' : 'max-w-md mx-auto'}`}>
+                <div className="bg-surface-elevated rounded-3xl shadow-xl overflow-hidden">
+                    {mobilePanel()}
+                </div>
             </div>
+
+            {/* ── DESKTOP LAYOUT (≥ md): original sliding-panel animation ── */}
+            <div className={`hidden md:block w-full ${inModal ? '' : 'max-w-6xl'}`}>
+                <div className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full overflow-hidden rounded-[40px] bg-surface-elevated shadow-2xl`}>
+
+                    <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
+
+                    <Register isVisible={view === "register"} onRegister={handleRegister} toggleAuth={toggleAuth} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
+
+                    <ForgotPassword isVisible={view === "forgot"} onForgot={handleForgotSubmit} onBackToLogin={handleBackToLogin} inModal={inModal} />
+
+                    <OtpVerification isVisible={view === "otp"} email={forgotEmail} onVerify={handleOtpVerify} onBackToLogin={handleBackToLogin} inModal={inModal} />
+
+                    <ResetPassword isVisible={view === "reset"} onReset={handleResetPassword} onBackToLogin={handleBackToLogin} inModal={inModal} />
+
+                    <SlidingOverlay view={view} onToggle={toggleAuth} onForgot={handleForgot} inModal={inModal} />
+
+                </div>
+            </div>
+
         </div>
     );
 }
