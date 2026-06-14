@@ -3,16 +3,76 @@ import LinkedinIcon from '../../../icons/LinkedinIcon';
 import { useTranslation } from 'react-i18next';
 
 const teamMembers = [
-  { id: 1, name: 'Basmala Said', linkedin: 'https://www.linkedin.com/in/basmala-said/', initials: 'BS', avatarBg: 'from-[#40B9FF] to-[#69C9AC]' },
-  { id: 2, name: 'Mayar Ahmed Abdallah', linkedin: 'https://www.linkedin.com/in/mayar-ahmed-39934925a/', initials: 'MAA', avatarBg: 'from-[#8ED321] to-[#AAE338]' },
-  { id: 3, name: 'Mostafa Salah', linkedin: 'https://www.linkedin.com/in/mostafa-salah-tayea/', initials: 'MS', avatarBg: 'from-[#FF8A3D] to-[#FF6B8A]' },
-  { id: 4, name: 'Menna Walid', linkedin: 'https://www.linkedin.com/in/menna-walid-fadel/', initials: 'MW', avatarBg: 'from-[#40B9FF] to-[#006492]' },
-  { id: 5, name: 'Ahmed Mohamed Ayoub', linkedin: 'https://www.linkedin.com/in/ahmed-azaz-33306823a/', initials: 'AMA', avatarBg: 'from-[#426900] to-[#8ED321]' },
-  { id: 6, name: 'Nouran Sherif', linkedin: 'https://www.linkedin.com/in/nouran-sherif-46bab929a/', initials: 'NS', avatarBg: 'from-[#9A4600] to-[#FF8A3D]' },
-  { id: 7, name: 'Kariman Ayman', linkedin: 'https://www.linkedin.com/in/kariman-ayman-1a6788200/', initials: 'KA', avatarBg: 'from-[#40B9FF] to-[#69C9AC]' },
-  { id: 8, name: 'Enjy Ahmed Fawzy', linkedin: '#', initials: 'EAF', avatarBg: 'from-[#8ED321] to-[#AAE338]' },
-  { id: 9, name: 'Samira Abdullah Mohamed', linkedin: '#', initials: 'SAM', avatarBg: 'from-[#FF8A3D] to-[#FF6B8A]' },
-  { id: 10, name: 'Hassan Abd elmoniem Ahmed', linkedin: 'https://www.linkedin.com/in/hassan-abd-el-moniem-5b6511115/', initials: 'HAA', avatarBg: 'from-[#426900] to-[#8ED321]' },
+  {
+    id: 1,
+    name: 'Basmala Said',
+    linkedin: 'https://www.linkedin.com/in/basmala-said/',
+    initials: 'BS',
+    avatarBg: 'from-[#40B9FF] to-[#69C9AC]',
+  },
+  {
+    id: 2,
+    name: 'Mayar Ahmed Abdallah',
+    linkedin: 'https://www.linkedin.com/in/mayar-ahmed-39934925a/',
+    initials: 'MAA',
+    avatarBg: 'from-[#8ED321] to-[#AAE338]',
+  },
+  {
+    id: 3,
+    name: 'Mostafa Salah',
+    linkedin: 'https://www.linkedin.com/in/mostafa-salah-tayea/',
+    initials: 'MS',
+    avatarBg: 'from-[#FF8A3D] to-[#FF6B8A]',
+  },
+  {
+    id: 4,
+    name: 'Menna Walid',
+    linkedin: 'https://www.linkedin.com/in/menna-walid-fadel/',
+    initials: 'MW',
+    avatarBg: 'from-[#40B9FF] to-[#006492]',
+  },
+  {
+    id: 5,
+    name: 'Ahmed Mohamed Ayoub',
+    linkedin: 'https://www.linkedin.com/in/ahmed-azaz-33306823a/',
+    initials: 'AMA',
+    avatarBg: 'from-[#426900] to-[#8ED321]',
+  },
+  {
+    id: 6,
+    name: 'Nouran Sherif',
+    linkedin: 'https://www.linkedin.com/in/nouran-sherif-46bab929a/',
+    initials: 'NS',
+    avatarBg: 'from-[#9A4600] to-[#FF8A3D]',
+  },
+  {
+    id: 7,
+    name: 'Kariman Ayman',
+    linkedin: 'https://www.linkedin.com/in/kariman-ayman-1a6788200/',
+    initials: 'KA',
+    avatarBg: 'from-[#40B9FF] to-[#69C9AC]',
+  },
+  {
+    id: 8,
+    name: 'Enjy Ahmed Fawzy',
+    linkedin: 'https://www.linkedin.com/in/injy-elbarwy/',
+    initials: 'EAF',
+    avatarBg: 'from-[#8ED321] to-[#AAE338]',
+  },
+  {
+    id: 9,
+    name: 'Samira Abdullah Mohamed',
+    linkedin: 'https://www.linkedin.com/in/samira-abdullah/',
+    initials: 'SAM',
+    avatarBg: 'from-[#FF8A3D] to-[#FF6B8A]',
+  },
+  {
+    id: 10,
+    name: 'Hassan Abd elmoniem Ahmed',
+    linkedin: 'https://www.linkedin.com/in/hassan-abd-el-moniem-5b6511115/',
+    initials: 'HAA',
+    avatarBg: 'from-[#426900] to-[#8ED321]',
+  },
 ];
 
 export default function TeamSection() {
@@ -32,10 +92,7 @@ export default function TeamSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teamMembers.map(member => (
-            <div
-              key={member.id}
-              className="group relative"
-            >
+            <div key={member.id} className="group relative">
               <span
                 className="absolute inset-0 p-[2px] rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
                 style={{
