@@ -83,3 +83,30 @@ export async function translateProducts(products) {
   console.log("[Translation] Done");
   return translated;
 }
+
+export async function translateOutfitItems(items) {
+  if (!items || !items.length) return items;
+
+  const translated = await Promise.all(
+    items.map(async (item) => {
+      const [name_ar, style_ar] = await Promise.all([
+        translateToArabic(item.name || ""),
+        translateToArabic(item.style || item.category || ""),
+      ]);
+      return { ...item, name_ar, style_ar };
+    })
+  );
+
+  return translated;
+}
+
+export async function translateOutfit(outfit) {
+  if (!outfit) return outfit;
+
+  const translatedItems = await translateOutfitItems(outfit.items || []);
+
+  return {
+    ...outfit,
+    items: translatedItems,
+  };
+}

@@ -746,7 +746,13 @@
     "top": "علوي",
     "bottom": "سفلي",
     "savedOutfit": "إطلالة محفوظة",
-    "matched": "مطابق"
+    "matched": "مطابق",
+    "outfitDetails": "تفاصيل الإطلالة",
+    "previousRecommendation": "التوصية السابقة",
+    "outfitItems": "عناصر الإطلالة",
+    "todayChoice": "اختيار اليوم",
+    "weatherDescription": "مثالية لطقس اليوم الدافئ وقطع خزانة ملابسك. مزيج متوازن من الراحة والأسلوب.",
+    "noOutfitsForWeek": "لا توجد إطلالات هذا الأسبوع بعد"
   },
   "fav": {
     "title": "المفضلة",
