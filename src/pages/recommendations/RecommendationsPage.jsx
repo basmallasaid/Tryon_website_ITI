@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ChevronRight, ChevronLeft, Heart, Star, Sun, Cloud, CloudRain, CloudSnow, Wind } from "lucide-react";
+import { Sparkles, ChevronLeft, ChevronRight, Sun, Cloud, CloudRain, CloudSnow, Wind } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useWardrobe } from "../../context/WardrobeContext";
 import { getAllRecommendations, requestRecommendations } from "../../api/recommendationsApi";
@@ -198,15 +198,10 @@ export default function RecommendationsPage() {
   const todayEntry = weeklyOutfits.find((d) => d.isToday);
   const todayOutfit = todaysOutfit || todayEntry?.entry?.outfits?.[0] || history[0]?.outfits?.[0] || null;
   const aiAnalysis = todayOutfit?.breakdown;
-
   const currentItems = todayOutfit?.items || [];
 
   const historyCards = useMemo(() => {
-    return history.filter((h) => {
-      const hKey = toLocalDateKey(new Date(h.created_at));
-      const todayKey = toLocalDateKey(new Date());
-      return hKey !== todayKey;
-    });
+    return history.filter((h) => toLocalDateKey(new Date(h.created_at)) !== toLocalDateKey(new Date()));
   }, [history]);
 
   const scrollHistory = (direction) => {
@@ -219,15 +214,13 @@ export default function RecommendationsPage() {
     }
   };
 
-  // --- عرض حالة التحميل ---
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F5F6F7]">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-[#8ED321]" />
+      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-[var(--border)] border-t-brand-secondary" />
       </div>
     );
   }
-
 
   if (wardrobeItems.length === 0) {
     return (
@@ -240,154 +233,151 @@ export default function RecommendationsPage() {
     );
   }
 
-  // --- 2. حالة الـ Dashboard (إذا وجدت داتا) ---
   return (
-    <div className="min-h-screen bg-[#F5F6F7] text-[#1E1E24]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+    <div className="min-h-screen bg-[var(--background)] text-text-secondary pb-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 space-y-12">
         
-        {/* Greeting & Weather */}
-        <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#0D1117]">
-              {getGreeting(t)}, {userName || t("recommendation.guest")}! 👋
+        {/* --- HEADER --- */}
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+          <div className="space-y-2">
+            <h1 className="text-4xl lg:text-5xl font-black font-roboto text-text-primary tracking-tight">
+              {getGreeting(t)}, <span className="text-brand-secondary">{userName || t("recommendation.guest")}!</span> 👋
             </h1>
-            <p className="text-gray-500 font-medium mt-1">{t("recommendation.subtitle")}</p>
+            <p className="text-text-disabled font-medium text-lg">{t("recommendation.subtitle")}</p>
           </div>
           {weather && (
-            <div className="flex items-center gap-6 bg-white border border-slate-100 rounded-[1.5rem] px-6 py-4 shadow-sm min-w-[320px]">
-              <div className="flex items-center gap-3 border-r border-slate-50 pr-6">
+            <div className="bg-surface-elevated border border-[var(--border)] rounded-[2rem] px-8 py-5 shadow-sm flex items-center gap-8 min-w-[340px]">
+              <div className="flex items-center gap-4 border-r border-[var(--border)] pr-8">
                 <WeatherIcon condition={weather.condition} />
                 <div>
-                  <span className="text-2xl font-bold block leading-none">{weather.temp ?? "25"}°C</span>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{weather.condition || "Clear Sky"}</span>
+                  <span className="text-3xl font-black block leading-none text-text-primary">{weather.temp ?? "25"}°C</span>
+                  <span className="text-[10px] font-bold text-text-disabled uppercase tracking-widest mt-1 block">{weather.condition || "Clear Sky"}</span>
                 </div>
               </div>
-              <div className="flex gap-5">
-                <div className="text-center">
+              <div className="flex gap-6">
+                <div className="text-center space-y-1">
                   <CloudRain className="w-4 h-4 text-blue-300 mx-auto" />
-                  <span className="text-[10px] font-bold mt-1 block">24°C</span>
+                  <span className="text-xs font-bold text-text-primary block">24°C</span>
                 </div>
-                <div className="text-center">
+                <div className="text-center space-y-1">
                   <Cloud className="w-4 h-4 text-slate-300 mx-auto" />
-                  <span className="text-[10px] font-bold mt-1 block">{weather.humidity}%</span>
+                  <span className="text-xs font-bold text-text-primary block">{weather.humidity}%</span>
                 </div>
-                <div className="text-center">
+                <div className="text-center space-y-1">
                   <Wind className="w-4 h-4 text-teal-300 mx-auto" />
-                  <span className="text-[10px] font-bold mt-1 block">{weather.wind_speed}</span>
+                  <span className="text-xs font-bold text-text-primary block">{weather.wind_speed}</span>
                 </div>
               </div>
             </div>
           )}
-        </section>
+        </header>
 
-        {/* Today's Recommendation Banner */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-xl font-bold text-[#0D1117]">{t("recommendation.todaysRecommendation")}</h2>
-            <button className="flex items-center gap-1 text-sm font-bold text-slate-500 hover:text-black">
-              {t("recommendation.viewDetails")} <ChevronRight className="w-4 h-4" />
-            </button>
+        {/* --- MAIN HERO SECTION: Bento Layout --- */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-black font-roboto text-text-primary tracking-tight">
+              {t("recommendation.todaysRecommendation")}
+            </h2>
           </div>
 
-          <div className="relative h-[450px] rounded-[2.5rem] overflow-hidden shadow-sm bg-white">
-            {todayOutfit?.compositeImage ? (
-              <img src={imgSrc(todayOutfit.compositeImage)} alt="Outfit" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-slate-50"><Sparkles className="w-12 h-12 text-slate-200" /></div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-10">
-              <h3 className="text-white text-4xl font-bold mb-3">{t("recommendation.todaysLook")}</h3>
-              <p className="text-white/80 max-w-md text-sm leading-relaxed">
-                Perfect for today's warm weather and your light wardrobe pieces. A balanced mix of comfort and professionalism.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Why We Chose This */}
-        {todayOutfit && (
-          <section className="mb-12">
-            <h2 className="text-xl font-bold text-[#0D1117] mb-6">{t("recommendation.whyWeChoseThis")}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {currentItems.slice(0, 2).map((item, idx) => (
-                <div key={idx} className="bg-white rounded-[2rem] p-6 border border-slate-50 shadow-sm">
-                  <div className="aspect-[4/3] bg-[#F3F4F6] rounded-2xl mb-5 flex items-center justify-center p-6 overflow-hidden">
-                    <img src={imgSrc(item.image)} alt={item.name} className="max-h-full object-contain mix-blend-multiply transition-transform hover:scale-110" />
-                  </div>
-                  <h4 className="font-bold text-sm mb-3">{item.name || "Clothing Item"}</h4>
-                  <span className="text-[10px] font-bold text-[#8ED321] border border-[#8ED321] px-3 py-1 rounded-full uppercase">
-                    {item.style || "Smart Casual"}
-                  </span>
-                </div>
-              ))}
-
-              <div className="bg-[#8ED321] rounded-[2rem] p-10 text-white flex flex-col justify-center relative overflow-hidden">
-                <Sparkles className="absolute -top-4 -right-4 w-24 h-24 text-white/10 rotate-12" />
-                <div className="flex items-center gap-3 mb-5">
-                  <Sparkles className="w-6 h-6 fill-white" />
-                  <h3 className="text-2xl font-bold italic tracking-tight">{t("recommendation.aiAnalysis")}</h3>
-                </div>
-                <p className="text-sm font-medium leading-relaxed opacity-95 relative z-10">
-                  {aiAnalysis ? Object.values(aiAnalysis).filter(v => typeof v === 'string').join(". ") : t("recommendation.defaultAnalysis")}
-                </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left: Main Big Image */}
+            <div className="lg:col-span-8 relative h-[500px] lg:h-[600px] rounded-[3rem] overflow-hidden shadow-xl bg-surface-elevated group">
+              {todayOutfit?.compositeImage ? (
+                <img src={imgSrc(todayOutfit.compositeImage)} alt="Main Outfit" className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-105" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-[var(--bg-secondary)]"><Sparkles className="w-16 h-16 text-text-disabled" /></div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent p-10 flex flex-col justify-end">
+                <span className="bg-brand-secondary text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest w-fit mb-4">Today's Choice</span>
+                <h3 className="text-white text-4xl lg:text-5xl font-black mb-3">{t("recommendation.todaysLook")}</h3>
+                <p className="text-white/80 max-w-xl font-medium leading-relaxed">Perfect for today's warm weather and your light wardrobe pieces. A balanced mix of comfort and professionalism.</p>
               </div>
             </div>
-          </section>
-        )}
 
-        {/* History Gallery */}
-        <section className="mb-12">
+            {/* Right: Items + AI Analysis */}
+            <div className="lg:col-span-4 flex flex-col gap-6">
+              <div className="flex flex-col gap-4">
+                {currentItems.slice(0, 2).map((item, idx) => (
+                  <div key={idx} className="bg-surface-elevated border border-[var(--border)] rounded-[2rem] p-4 shadow-sm hover:shadow-md transition-all flex items-center gap-4 group">
+                    <div className="w-24 h-24 bg-[var(--bg-secondary)] rounded-2xl overflow-hidden p-2 flex items-center justify-center shrink-0">
+                      <img src={imgSrc(item.image)} className="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform" alt={item.name} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-black text-sm text-text-primary truncate">{item.name || "Clothing"}</h4>
+                      <span className="text-[10px] font-black text-brand-secondary uppercase mt-1 block tracking-wider">{item.style || "Casual"}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* AI Analysis Card */}
+              {todaysOutfit && (
+                <div className="bg-brand-secondary rounded-[2rem] p-6 text-white flex flex-col justify-center relative overflow-hidden flex-1">
+                  <Sparkles className="absolute -top-6 -right-6 w-28 h-28 text-white/10 rotate-12" />
+                  <div className="flex items-center gap-3 mb-4">
+                    <Sparkles className="w-5 h-5 fill-white" />
+                    <h3 className="text-lg font-black tracking-tight">{t("recommendation.aiAnalysis")}</h3>
+                  </div>
+                  <p className="text-sm font-medium leading-relaxed opacity-95 relative z-10">
+                    {aiAnalysis ? Object.values(aiAnalysis).filter(v => typeof v === 'string').join(". ") : t("recommendation.defaultAnalysis")}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* --- HISTORY SECTION --- */}
+        <section>
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold text-[#0D1117]">{t("recommendation.historyTitle")}</h2>
+            <h2 className="text-2xl font-black font-roboto text-text-primary tracking-tight">{t("recommendation.historyTitle")}</h2>
             <div className="flex gap-2">
-              <button onClick={() => scrollHistory("left")} className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all"><ChevronLeft className="w-5 h-5" /></button>
-              <button onClick={() => scrollHistory("right")} className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all"><ChevronRight className="w-5 h-5" /></button>
+              <button onClick={() => scrollHistory("left")} className="w-10 h-10 flex items-center justify-center rounded-xl border border-[var(--border)] bg-surface-elevated hover:bg-brand-secondary hover:text-white transition-all"><ChevronLeft className="w-5 h-5" /></button>
+              <button onClick={() => scrollHistory("right")} className="w-10 h-10 flex items-center justify-center rounded-xl border border-[var(--border)] bg-surface-elevated hover:bg-brand-secondary hover:text-white transition-all"><ChevronRight className="w-5 h-5" /></button>
             </div>
           </div>
 
-          <div ref={historyScrollRef} className="flex gap-6 overflow-x-auto pb-6 no-scrollbar snap-x">
+          <div ref={historyScrollRef} className="flex gap-6 overflow-x-auto pb-8 no-scrollbar snap-x">
             {historyCards.map((entry) => (
-              <div key={entry._id} className="min-w-[280px] bg-white rounded-[2rem] overflow-hidden border border-slate-50 shadow-sm snap-start group">
-                <div className="h-[300px] bg-[#EDF6EA] relative flex items-center justify-center p-8 transition-colors group-hover:bg-[#E5EBE5]">
-                  <img src={imgSrc(entry.outfits?.[0]?.compositeImage)} alt="History" className="w-full h-full object-contain mix-blend-multiply" />
-                  <div className="absolute top-4 right-4 bg-[#8ED321] text-white text-[10px] font-bold px-2 py-1 rounded-lg">
+              <div key={entry._id} className="min-w-[300px] bg-surface-elevated rounded-[2.5rem] overflow-hidden border border-[var(--border)] shadow-sm snap-start group transition-transform hover:-translate-y-1">
+                <div className="h-[320px] bg-[var(--bg-secondary)] relative flex items-center justify-center p-8">
+                  <img src={imgSrc(entry.outfits?.[0]?.compositeImage)} alt="History" className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-500" />
+                  <div className="absolute top-5 right-5 bg-brand-secondary text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
                     {entry.outfits?.[0]?.score || "90"}% match
                   </div>
                 </div>
                 <div className="p-6">
-                  <h4 className="font-bold text-sm truncate">{entry.outfits?.[0]?.items?.[0]?.name || "Spring Outfit"}</h4>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Recommended: {formatDate(entry.created_at)}</p>
+                  <h4 className="font-black text-sm truncate text-text-primary">{entry.outfits?.[0]?.items?.[0]?.name || "Look"}</h4>
+                  <p className="text-[10px] text-text-disabled font-bold uppercase mt-1 tracking-widest">{formatDate(entry.created_at)}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Weekly Forecast */}
-        <section>
-          <h2 className="text-xl font-bold text-[#0D1117] mb-6">{t("recommendation.weeklyTitle")}</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+        {/* --- WEEKLY FORECAST --- */}
+        <section className="bg-text-primary rounded-[3rem] p-10 lg:p-12 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-brand-secondary/10 blur-[100px] rounded-full" />
+          <h2 className="text-2xl font-black mb-10 relative z-10">{t("recommendation.weeklyTitle")}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 relative z-10">
             {weeklyOutfits.map((day) => (
               <div
                 key={day.date}
-                className={`rounded-[1.5rem] p-4 text-center border transition-all ${
-                  day.isToday ? "bg-[#8ED321] border-[#8ED321] text-white shadow-lg" : "bg-white border-slate-100"
+                className={`rounded-[2rem] p-6 text-center border transition-all duration-500 ${
+                  day.isToday ? "bg-brand-secondary border-brand-secondary shadow-xl scale-105" : "bg-white/5 border-white/10"
                 }`}
               >
-                <div className="flex flex-col items-center gap-1">
-                  <span className={`text-xs font-bold uppercase tracking-widest ${day.isToday ? "text-white" : "text-slate-400"}`}>
-                    {getShortDay(day.dayName)}
-                  </span>
-                  <p className={`text-sm font-bold ${day.isToday ? "text-white" : "text-[#0D1117]"}`}>
-                    {formatDate(day.date)}
-                  </p>
-                  <div className="mt-3">
-                    {day.hasOutfit ? (
-                      <Sparkles className={`w-5 h-5 ${day.isToday ? "text-white" : "text-[#8ED321]"}`} />
-                    ) : (
-                      <Sun className="w-5 h-5 text-slate-100" />
-                    )}
-                  </div>
+                <span className={`text-[10px] font-black uppercase tracking-widest ${day.isToday ? "text-white" : "text-white/40"}`}>{getShortDay(day.dayName)}</span>
+                <p className={`text-sm font-bold mt-1 ${day.isToday ? "text-white" : "text-white/80"}`}>{formatDate(day.date)}</p>
+                <div className="mt-6 flex justify-center">
+                  {day.hasOutfit ? (
+                    <div className={`p-3 rounded-2xl ${day.isToday ? 'bg-white/20' : 'bg-brand-secondary/20'}`}>
+                      <Sparkles className={`w-6 h-6 ${day.isToday ? "text-white" : "text-brand-secondary"}`} />
+                    </div>
+                  ) : (
+                    <Sun className="w-6 h-6 text-white/10" />
+                  )}
                 </div>
               </div>
             ))}
