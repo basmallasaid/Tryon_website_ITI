@@ -350,7 +350,7 @@ const Navbar = ({ onOpenAuth }) => {
                   setIsProfileOpen(!isProfileOpen);
                   setIsNotifOpen(false);
                 }}
-                className="p-2 rounded-lg bg-gray-100 text-gray-700 cursor-pointer hover:bg-gray-200 hover:text-brand-secondary transition-all active:scale-90"
+                className="p-2 rounded-lg text-gray-700 cursor-pointer hover:bg-gray-200 hover:text-brand-secondary transition-all active:scale-90  dark:text-text-disabled"
                 aria-label="Profile"
               >
                 <User size={22} />
