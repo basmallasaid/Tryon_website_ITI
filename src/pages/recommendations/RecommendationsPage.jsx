@@ -197,7 +197,7 @@ export default function RecommendationsPage() {
 
   const weather = todaysWeather || weeklyOutfits.find((d) => d.isToday)?.entry?.weather || history[0]?.weather || null;
   const todayEntry = weeklyOutfits.find((d) => d.isToday);
-  const todayOutfit = todaysOutfit || todayEntry?.entry?.outfits?.[0] || history[0]?.outfits?.[0] || null;
+  const todayOutfit = todayEntry?.entry?.outfits?.[0] || todaysOutfit || history[0]?.outfits?.[0] || null;
   const currentItems = todayOutfit?.items || [];
 
   if (loading || wardrobeLoading) {
