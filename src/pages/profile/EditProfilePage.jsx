@@ -136,7 +136,7 @@ export default function EditProfilePage() {
             console.error('Failed to upload image:', error);
             URL.revokeObjectURL(previewUrl);
             setImagePreview(userImage || '');
-            showToast('error', error.response?.data?.message || t("profile.failedUploadImage"));
+            showToast('error', t("profile.failedUploadImage"));
         } finally {
             setUploadingImage(false);
             event.target.value = '';
@@ -165,7 +165,7 @@ export default function EditProfilePage() {
             showToast('success', t("profile.profileImageRemoved"));
         } catch (error) {
             console.error('Failed to remove image:', error);
-            showToast('error', error.response?.data?.message || t("profile.failedRemoveImage"));
+            showToast('error', t("profile.failedRemoveImage"));
         }
     };
 
@@ -202,7 +202,7 @@ export default function EditProfilePage() {
             navigate('/');
         } catch (error) {
             console.error('Failed to delete account:', error);
-            showToast('error', error.response?.data?.message || t("profile.failedDeleteAccount"));
+            showToast('error', t("profile.failedDeleteAccount"));
         } finally {
             setDeleting(false);
         }
@@ -264,7 +264,7 @@ export default function EditProfilePage() {
             showToast('success', t("profile.profileUpdated"));
         } catch (error) {
             console.error('Failed to save profile:', error);
-            showToast('error', error.response?.data?.message || t("profile.failedSaveProfile"));
+            showToast('error', t("profile.failedSaveProfile"));
         } finally {
             setSaving(false);
         }

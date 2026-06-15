@@ -229,7 +229,7 @@ export default function PricingPage() {
       });
       window.location.href = res.data.url;
     } catch (err) {
-      showToast("error", err.response?.data?.message || "Failed to start checkout.");
+      showToast("error", t("pricing.checkoutFailed") || "Failed to start checkout.");
     } finally {
       setSubscribing(false);
     }
@@ -245,7 +245,7 @@ export default function PricingPage() {
       localStorage.removeItem("selectedInterval");
       showToast("success", "Subscription cancelled.");
     } catch (err) {
-      showToast("error", err.response?.data?.message || "Cancellation failed.");
+      showToast("error", t("pricing.cancellationFailed") || "Cancellation failed.");
     } finally {
       setCancelling(false);
     }
