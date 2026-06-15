@@ -14,6 +14,9 @@ import { WardrobeProvider } from "./context/WardrobeContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
+// Hooks
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
+
 // Pages
 import Home from "./pages/home/Home";
 import GoogleCallback from "./pages/Auth/GoogleCallback";
@@ -89,9 +92,17 @@ function UserGuard() {
   );
 }
 
+// داخل App.js - ابحث عن AuthGuard وقم بتعديله بهذا الشكل:
 function AuthGuard() {
   const auth = JSON.parse(localStorage.getItem("auth") || "null");
-  if (!auth) return <Navigate to="/login" replace />;
+  const isOnline = useOnlineStatus();
+
+  // إذا كنا أوفلاين، لا توجه للوجن، اترك الـ Outlet يعمل والـ Layout سيقوم بإظهار صفحة الأوفلاين
+  if (!isOnline) return <Outlet />;
+
+  // التوجيه للوجن يحدث فقط إذا كنا "متأكدين" أننا أونلاين
+  if (!auth && isOnline) return <Navigate to="/login" replace />;
+  
   return <Outlet />;
 }
 

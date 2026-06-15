@@ -792,5 +792,12 @@
     "msg8": "Almost ready, your style is cooking...",
     "msg9": "Consulting with digital fashion experts...",
     "msg10": "Polishing every detail to perfection..."
+  },
+  "offline": {
+    "title": "No Internet Connection",
+    "subtitle": "This page is not available offline",
+    "description": "Please check your internet connection and try again. Some pages like Home and About are available offline.",
+    "retry": "Try Again",
+    "goHome": "Go Home"
   }
 }
