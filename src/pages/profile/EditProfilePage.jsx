@@ -71,7 +71,7 @@ export default function EditProfilePage() {
         let cancelled = false;
         setAvatarLoading(true);
 
-        getAvatarByIdApi(ids[0])
+        getAvatarByIdApi(ids[ids.length - 1])
             .then((res) => {
                 if (cancelled) return;
                 const url = res.data?.avatar?.image_url ?? null;

@@ -193,7 +193,7 @@ export default function TryOn() {
     }
     let cancelled = false;
     setAvatarLoading(true);
-    getAvatarByIdApi(ids[0])
+    getAvatarByIdApi(ids[ids.length - 1])
       .then(async res => {
         if (cancelled) return;
         const url = res.data?.avatar?.image_url ?? null;
