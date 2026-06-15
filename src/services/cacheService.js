@@ -8,213 +8,278 @@ import {
   dataHash,
 } from './indexedDB'
 
-// ─── Wardrobe Sync (user-scoped) ──────────────────────────────
+// ─── Wardrobe Sync ─────────────────────────────────────────────
 
 export async function syncWardrobeCache({ userId, fetchFn, onData, onCacheLoaded, force = false }) {
   if (!userId) { onData(null); return }
 
-  const meta = await getCacheMeta(userId, 'wardrobe')
-  let cachedItems = null
+  const apiPromise = navigator.onLine ? fetchFn().catch(() => null) : Promise.resolve(null)
 
-  if (meta && !force) {
-    cachedItems = await getWardrobeItems(userId)
+  if (!force) {
+    const [meta, cachedItems] = await Promise.all([
+      getCacheMeta(userId, 'wardrobe').catch(() => null),
+      getWardrobeItems(userId).catch(() => null),
+    ])
+
     if (cachedItems?.length) {
       onCacheLoaded?.(cachedItems)
       onData(cachedItems)
     }
-  }
 
-  if (!navigator.onLine) {
-    if (!cachedItems?.length) onData(null)
-    return
-  }
+    if (!navigator.onLine) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
 
-  try {
-    const res = await fetchFn()
+    const res = await apiPromise
+    if (!res) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
+
     const raw = Array.isArray(res.data) ? res.data : res.data?.items ?? res.data?.wardrobe ?? res.data?.products ?? []
     const freshHash = dataHash(raw)
 
     if (meta && freshHash === meta.dataHash) {
-      await saveCacheMeta(userId, 'wardrobe', { dataHash: freshHash })
-      if (!force) return
-      onData(raw)
+      saveCacheMeta(userId, 'wardrobe', { dataHash: freshHash }).catch(() => {})
       return
     }
 
-    await saveWardrobeItems(userId, raw)
-    await saveCacheMeta(userId, 'wardrobe', { dataHash: freshHash })
     onData(raw)
-  } catch {
-    if (!cachedItems?.length) onData(null)
-    else if (force) onData(cachedItems)
+    saveWardrobeItems(userId, raw).catch(() => {})
+    saveCacheMeta(userId, 'wardrobe', { dataHash: freshHash }).catch(() => {})
+  } else {
+    if (!navigator.onLine) return
+
+    const res = await apiPromise
+    if (!res) return
+
+    const raw = Array.isArray(res.data) ? res.data : res.data?.items ?? res.data?.wardrobe ?? res.data?.products ?? []
+    const freshHash = dataHash(raw)
+
+    onData(raw)
+    saveWardrobeItems(userId, raw).catch(() => {})
+    saveCacheMeta(userId, 'wardrobe', { dataHash: freshHash }).catch(() => {})
   }
 }
 
-// ─── Products Sync (public) ───────────────────────────────────
+// ─── Products Sync ─────────────────────────────────────────────
 
 export async function syncProductsCache({ fetchFn, onData, onCacheLoaded, force = false }) {
-  const meta = await getCacheMeta(null, 'products')
-  let cachedItems = null
+  const apiPromise = navigator.onLine ? fetchFn().catch(() => null) : Promise.resolve(null)
 
-  if (meta && !force) {
-    cachedItems = await getProducts()
+  if (!force) {
+    const [meta, cachedItems] = await Promise.all([
+      getCacheMeta(null, 'products').catch(() => null),
+      getProducts().catch(() => null),
+    ])
+
     if (cachedItems?.length) {
       onCacheLoaded?.(cachedItems)
       onData(cachedItems)
     }
-  }
 
-  if (!navigator.onLine) {
-    if (!cachedItems?.length) onData(null)
-    return
-  }
+    if (!navigator.onLine) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
 
-  try {
-    const res = await fetchFn()
+    const res = await apiPromise
+    if (!res) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
+
     const raw = Array.isArray(res.data) ? res.data : res.data?.products ?? []
     const freshHash = dataHash(raw)
 
     if (meta && freshHash === meta.dataHash) {
-      await saveCacheMeta(null, 'products', { dataHash: freshHash })
-      if (!force) return
-      onData(raw)
+      saveCacheMeta(null, 'products', { dataHash: freshHash }).catch(() => {})
       return
     }
 
-    await saveProducts(raw)
-    await saveCacheMeta(null, 'products', { dataHash: freshHash })
     onData(raw)
-  } catch {
-    if (!cachedItems?.length) onData(null)
-    else if (force) onData(cachedItems)
+    saveProducts(raw).catch(() => {})
+    saveCacheMeta(null, 'products', { dataHash: freshHash }).catch(() => {})
+  } else {
+    if (!navigator.onLine) return
+
+    const res = await apiPromise
+    if (!res) return
+
+    const raw = Array.isArray(res.data) ? res.data : res.data?.products ?? []
+    const freshHash = dataHash(raw)
+
+    onData(raw)
+    saveProducts(raw).catch(() => {})
+    saveCacheMeta(null, 'products', { dataHash: freshHash }).catch(() => {})
   }
 }
 
-// ─── Stores Sync (public) ─────────────────────────────────────
+// ─── Stores Sync ───────────────────────────────────────────────
 
 export async function syncStoresCache({ fetchFn, onData, onCacheLoaded, force = false }) {
-  const meta = await getCacheMeta(null, 'stores')
-  let cachedItems = null
+  const apiPromise = navigator.onLine ? fetchFn().catch(() => null) : Promise.resolve(null)
 
-  if (meta && !force) {
-    cachedItems = await getStores()
+  if (!force) {
+    const [meta, cachedItems] = await Promise.all([
+      getCacheMeta(null, 'stores').catch(() => null),
+      getStores().catch(() => null),
+    ])
+
     if (cachedItems?.length) {
       onCacheLoaded?.(cachedItems)
       onData(cachedItems)
     }
-  }
 
-  if (!navigator.onLine) {
-    if (!cachedItems?.length) onData(null)
-    return
-  }
+    if (!navigator.onLine) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
 
-  try {
-    const res = await fetchFn()
+    const res = await apiPromise
+    if (!res) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
+
     const raw = Array.isArray(res.data) ? res.data : res.data?.stores ?? []
     const freshHash = dataHash(raw)
 
     if (meta && freshHash === meta.dataHash) {
-      await saveCacheMeta(null, 'stores', { dataHash: freshHash })
-      if (!force) return
-      onData(raw)
+      saveCacheMeta(null, 'stores', { dataHash: freshHash }).catch(() => {})
       return
     }
 
-    await saveStores(raw)
-    await saveCacheMeta(null, 'stores', { dataHash: freshHash })
     onData(raw)
-  } catch {
-    if (!cachedItems?.length) onData(null)
-    else if (force) onData(cachedItems)
+    saveStores(raw).catch(() => {})
+    saveCacheMeta(null, 'stores', { dataHash: freshHash }).catch(() => {})
+  } else {
+    if (!navigator.onLine) return
+
+    const res = await apiPromise
+    if (!res) return
+
+    const raw = Array.isArray(res.data) ? res.data : res.data?.stores ?? []
+    const freshHash = dataHash(raw)
+
+    onData(raw)
+    saveStores(raw).catch(() => {})
+    saveCacheMeta(null, 'stores', { dataHash: freshHash }).catch(() => {})
   }
 }
 
-// ─── Recommendations Sync (user-scoped) ────────────────────────
+// ─── Recommendations Sync ──────────────────────────────────────
 
 export async function syncRecommendationsCache({ userId, fetchFn, onData, onCacheLoaded, force = false }) {
   if (!userId) { onData(null); return }
 
-  const meta = await getCacheMeta(userId, 'recommendations')
-  let cachedItems = null
+  const apiPromise = navigator.onLine ? fetchFn().catch(() => null) : Promise.resolve(null)
 
-  if (meta && !force) {
-    cachedItems = await getRecommendations(userId)
+  if (!force) {
+    const [meta, cachedItems] = await Promise.all([
+      getCacheMeta(userId, 'recommendations').catch(() => null),
+      getRecommendations(userId).catch(() => null),
+    ])
+
     if (cachedItems?.length) {
       onCacheLoaded?.(cachedItems)
       onData(cachedItems)
     }
-  }
 
-  if (!navigator.onLine) {
-    if (!cachedItems?.length) onData(null)
-    return
-  }
+    if (!navigator.onLine) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
 
-  try {
-    const res = await fetchFn()
+    const res = await apiPromise
+    if (!res) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
+
     const raw = Array.isArray(res) ? res : res?.history ?? []
     const freshHash = dataHash(raw)
 
     if (meta && freshHash === meta.dataHash) {
-      await saveCacheMeta(userId, 'recommendations', { dataHash: freshHash })
-      if (!force) return
-      onData(raw)
+      saveCacheMeta(userId, 'recommendations', { dataHash: freshHash }).catch(() => {})
       return
     }
 
-    await saveRecommendations(userId, raw)
-    await saveCacheMeta(userId, 'recommendations', { dataHash: freshHash })
     onData(raw)
-  } catch {
-    if (!cachedItems?.length) onData(null)
-    else if (force) onData(cachedItems)
+    saveRecommendations(userId, raw).catch(() => {})
+    saveCacheMeta(userId, 'recommendations', { dataHash: freshHash }).catch(() => {})
+  } else {
+    if (!navigator.onLine) return
+
+    const res = await apiPromise
+    if (!res) return
+
+    const raw = Array.isArray(res) ? res : res?.history ?? []
+    const freshHash = dataHash(raw)
+
+    onData(raw)
+    saveRecommendations(userId, raw).catch(() => {})
+    saveCacheMeta(userId, 'recommendations', { dataHash: freshHash }).catch(() => {})
   }
 }
 
-// ─── Favorites Sync (user-scoped) ─────────────────────────────
+// ─── Favorites Sync ────────────────────────────────────────────
 
 export async function syncFavoritesCache({ userId, fetchFn, onData, onCacheLoaded, force = false }) {
   if (!userId) { onData(null); return }
 
-  const meta = await getCacheMeta(userId, 'favorites')
-  let cachedItems = null
+  const apiPromise = navigator.onLine ? fetchFn().catch(() => null) : Promise.resolve(null)
 
-  if (meta && !force) {
-    cachedItems = await getFavorites(userId)
+  if (!force) {
+    const [meta, cachedItems] = await Promise.all([
+      getCacheMeta(userId, 'favorites').catch(() => null),
+      getFavorites(userId).catch(() => null),
+    ])
+
     if (cachedItems?.length) {
       onCacheLoaded?.(cachedItems)
       onData(cachedItems)
     }
-  }
 
-  if (!navigator.onLine) {
-    if (!cachedItems?.length) onData(null)
-    return
-  }
+    if (!navigator.onLine) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
 
-  try {
-    const res = await fetchFn()
+    const res = await apiPromise
+    if (!res) {
+      if (!cachedItems?.length) onData(null)
+      return
+    }
+
     const raw = Array.isArray(res) ? res : res?.favorites ?? res?.items ?? []
     const freshHash = dataHash(raw)
 
     if (meta && freshHash === meta.dataHash) {
-      await saveCacheMeta(userId, 'favorites', { dataHash: freshHash })
-      if (!force) return
-      onData(raw)
+      saveCacheMeta(userId, 'favorites', { dataHash: freshHash }).catch(() => {})
       return
     }
 
-    await saveFavorites(userId, raw)
-    await saveCacheMeta(userId, 'favorites', { dataHash: freshHash })
     onData(raw)
-  } catch {
-    if (!cachedItems?.length) onData(null)
-    else if (force) onData(cachedItems)
+    saveFavorites(userId, raw).catch(() => {})
+    saveCacheMeta(userId, 'favorites', { dataHash: freshHash }).catch(() => {})
+  } else {
+    if (!navigator.onLine) return
+
+    const res = await apiPromise
+    if (!res) return
+
+    const raw = Array.isArray(res) ? res : res?.favorites ?? res?.items ?? []
+    const freshHash = dataHash(raw)
+
+    onData(raw)
+    saveFavorites(userId, raw).catch(() => {})
+    saveCacheMeta(userId, 'favorites', { dataHash: freshHash }).catch(() => {})
   }
 }
 
-// ─── Invalidation ─────────────────────────────────────────────
+// ─── Invalidation ──────────────────────────────────────────────
 
 export async function invalidateCache(userId, cacheType) {
   await deleteCacheMeta(userId, cacheType)

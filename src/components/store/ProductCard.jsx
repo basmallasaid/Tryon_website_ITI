@@ -1,25 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Sparkles, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useFavorites } from '../../context/FavoritesContext';
 import MatchWardrobePopup from './MatchWardrobePopup'; 
-import { getProductMatchesApi } from '../../api/userApi';
-import { getProductMatches, saveProductMatches } from '../../services/indexedDB';
 
 const getProductId = (product) => product._id?.$oid || product._id || product.id;
 
-const ProductCard = ({ product, store, viewMode }) => {
+const ProductCard = ({ product, store, viewMode, hasMatches, matches }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const { isFavorite, addItem, removeItem } = useFavorites();
   const productId = getProductId(product);
   const favorited = isFavorite(productId);
   const [isMatchOpen, setIsMatchOpen] = useState(false);
-  const [matches, setMatches] = useState([]); 
-  const [loadingMatches, setLoadingMatches] = useState(false); 
   const [matchError, setMatchError] = useState(null);
-  const [hasMatches, setHasMatches] = useState(null);
   
   const isArabic = i18n.language === "ar";
   const displayName = isArabic && product.name_ar ? product.name_ar : product.name;
@@ -27,43 +22,6 @@ const ProductCard = ({ product, store, viewMode }) => {
   const imageUrl = product.images?.[0] ;
 
   const isList = viewMode === 'list';
-
-  useEffect(() => {
-    let cancelled = false;
-    const fetchMatches = async () => {
-      setLoadingMatches(true);
-
-      try {
-        const cached = await getProductMatches(productId);
-        if (cached && !cancelled) {
-          setHasMatches(cached.hasMatches);
-          setLoadingMatches(false);
-          if (cached.hasMatches && Date.now() - cached.updatedAt < 3600000) {
-            return;
-          }
-        }
-      } catch {
-        /* cache unavailable, proceed to API */
-      }
-
-      try {
-        const res = await getProductMatchesApi(productId);
-        if (!cancelled) {
-          const matchData = res.data.matches || [];
-          setMatches(matchData);
-          const hasAny = matchData.length > 0;
-          setHasMatches(hasAny);
-          saveProductMatches(productId, { hasMatches: hasAny }).catch(() => {});
-        }
-      } catch {
-        if (!cancelled) setHasMatches(false);
-      } finally {
-        if (!cancelled) setLoadingMatches(false);
-      }
-    };
-    fetchMatches();
-    return () => { cancelled = true; };
-  }, [productId]);
 
   const handleSeeMatch = () => {
     setIsMatchOpen(true);
@@ -93,7 +51,7 @@ const ProductCard = ({ product, store, viewMode }) => {
           isList ? 'w-48 md:w-64 h-full' : 'aspect-[4/5] w-full'
         }`}>
           <div className="absolute top-4 z-20 flex w-full px-4 items-start">
-              {hasMatches === true && (
+              {hasMatches === true && matches?.length > 0 && (
                 <span className="bg-[var(--color-brand-secondary)] text-white text-[10px] px-3 py-1.5 rounded-full shadow-sm font-bold uppercase tracking-wider">
                     {t("stores.matchWardrobe")}
                 </span>
@@ -122,7 +80,7 @@ const ProductCard = ({ product, store, viewMode }) => {
           </div>
 
           <div className="flex items-center gap-8">
-            {hasMatches === true && (
+            {hasMatches === true && matches?.length > 0 && (
               <button 
                 onClick={handleSeeMatch}
                 className="flex-1 bg-[var(--color-brand-secondary)] text-white py-3 rounded-[8px] text-[13px] font-black hover:bg-[var(--secondary)] transition-all shadow-md shadow-[var(--accent-light)]"
@@ -142,8 +100,8 @@ const ProductCard = ({ product, store, viewMode }) => {
         isOpen={isMatchOpen} 
         onClose={() => { setIsMatchOpen(false); setMatchError(null); }} 
         isArabic={isArabic}
-        matches={matches} 
-        loading={loadingMatches} 
+        matches={matches || []} 
+        loading={false} 
         error={matchError}
       />
     </>
