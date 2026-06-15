@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-caf3a6a6'], (function (workbox) { 'use strict';
+define(['./workbox-833106ff'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -81,26 +81,54 @@ define(['./workbox-caf3a6a6'], (function (workbox) { 'use strict';
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
     "url": "index.html",
-    "revision": "0.t4sjnjdm1io"
+    "revision": "0.c1gjtb3bg2g"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
     allowlist: [/^\/$/]
   }));
+  workbox.registerRoute(/^https?:\/\/.*\/api\/.*/i, new workbox.NetworkFirst({
+    "cacheName": "v1-api-cache",
+    "networkTimeoutSeconds": 10,
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 100,
+      maxAgeSeconds: 86400
+    }), new workbox.BackgroundSyncPlugin("api-sync-queue", {
+      maxRetentionTime: 1440
+    })]
+  }), 'GET');
   workbox.registerRoute(({
     request
   }) => request.destination === "image", new workbox.CacheFirst({
-    "cacheName": "images-cache",
+    "cacheName": "v1-images",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 100,
       maxAgeSeconds: 2592000
     })]
   }), 'GET');
-  workbox.registerRoute(/^https?:\/\/.*\/api\/.*/i, new workbox.NetworkFirst({
-    "cacheName": "api-cache",
+  workbox.registerRoute(({
+    request
+  }) => request.destination === "font", new workbox.CacheFirst({
+    "cacheName": "v1-fonts",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 20,
+      maxAgeSeconds: 31536000
+    })]
+  }), 'GET');
+  workbox.registerRoute(({
+    request
+  }) => request.destination === "script" || request.destination === "style", new workbox.StaleWhileRevalidate({
+    "cacheName": "v1-static",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 100,
-      maxAgeSeconds: 86400
+      maxAgeSeconds: 604800
+    })]
+  }), 'GET');
+  workbox.registerRoute(/\.(?:woff|woff2|eot|ttf|otf)$/i, new workbox.CacheFirst({
+    "cacheName": "v1-fonts",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 20,
+      maxAgeSeconds: 31536000
     })]
   }), 'GET');
 

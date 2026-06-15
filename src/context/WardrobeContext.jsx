@@ -1,38 +1,63 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import { getWardrobeApi } from "../api/wardrobeApi";
+import { syncWardrobeCache, invalidateCache } from "../services/cacheService";
 
 const WardrobeContext = createContext();
 
 export function WardrobeProvider({ children }) {
   const { user } = useAuth();
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const initialLoadDone = useRef(false);
 
-  const fetchWardrobe = useCallback(async () => {
+  const fetchWardrobe = useCallback(async (force = false) => {
     if (!user) {
       setItems([]);
+      setLoading(false);
       return;
     }
-    setLoading(true);
-    try {
-      const res = await getWardrobeApi();
-      const data = res.data;
-      setItems(Array.isArray(data) ? data : data?.items ?? data?.wardrobe ?? data?.products ?? []);
-    } catch (err) {
-      console.error("Failed to fetch wardrobe:", err);
-      setItems([]);
-    } finally {
-      setLoading(false);
+
+    const userId = user.id || user._id;
+
+    if (!initialLoadDone.current || force) {
+      setLoading(true);
     }
+
+    await syncWardrobeCache({
+      userId,
+      fetchFn: () => getWardrobeApi(),
+      onCacheLoaded: (cachedData) => {
+        if (!initialLoadDone.current) {
+          setItems(cachedData);
+          setLoading(false);
+          initialLoadDone.current = true;
+        }
+      },
+      onData: (freshData) => {
+        setItems(freshData || []);
+        setLoading(false);
+        initialLoadDone.current = true;
+      },
+      force,
+    });
   }, [user]);
 
   useEffect(() => {
+    initialLoadDone.current = false;
     fetchWardrobe();
   }, [fetchWardrobe]);
 
+  const clearCache = useCallback(async () => {
+    if (user) {
+      const userId = user.id || user._id;
+      await invalidateCache(userId, 'wardrobe');
+    }
+    initialLoadDone.current = false;
+  }, [user]);
+
   return (
-    <WardrobeContext.Provider value={{ items, loading, refetch: fetchWardrobe }}>
+    <WardrobeContext.Provider value={{ items, loading, refetch: () => fetchWardrobe(true), clearCache }}>
       {children}
     </WardrobeContext.Provider>
   );

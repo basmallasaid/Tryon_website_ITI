@@ -4,7 +4,8 @@ import { Heart, Sparkles, ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useFavorites } from '../../context/FavoritesContext';
 import MatchWardrobePopup from './MatchWardrobePopup'; 
-import { getProductMatchesApi } from '../../api/userApi'; 
+import { getProductMatchesApi } from '../../api/userApi';
+import { getProductMatches, saveProductMatches } from '../../services/indexedDB';
 
 const getProductId = (product) => product._id?.$oid || product._id || product.id;
 
@@ -31,12 +32,28 @@ const ProductCard = ({ product, store, viewMode }) => {
     let cancelled = false;
     const fetchMatches = async () => {
       setLoadingMatches(true);
+
+      try {
+        const cached = await getProductMatches(productId);
+        if (cached && !cancelled) {
+          setHasMatches(cached.hasMatches);
+          setLoadingMatches(false);
+          if (cached.hasMatches && Date.now() - cached.updatedAt < 3600000) {
+            return;
+          }
+        }
+      } catch {
+        /* cache unavailable, proceed to API */
+      }
+
       try {
         const res = await getProductMatchesApi(productId);
         if (!cancelled) {
           const matchData = res.data.matches || [];
           setMatches(matchData);
-          setHasMatches(matchData.length > 0);
+          const hasAny = matchData.length > 0;
+          setHasMatches(hasAny);
+          saveProductMatches(productId, { hasMatches: hasAny }).catch(() => {});
         }
       } catch {
         if (!cancelled) setHasMatches(false);

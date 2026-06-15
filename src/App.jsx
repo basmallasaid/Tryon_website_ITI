@@ -41,6 +41,7 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import Layout from "./pages/Layout";
 import EditItemWardrobe from "./components/wardrobe/EditItemWardrobe";
 import NotFound from "./pages/NotFound/NotFound";
+import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
 import { CircularProgress, Box } from "@mui/material";
 
 // Loading Component
@@ -161,6 +162,7 @@ function AppContent() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <RouterProvider router={router} />
+      <PWAUpdatePrompt />
     </Suspense>
   );
 }

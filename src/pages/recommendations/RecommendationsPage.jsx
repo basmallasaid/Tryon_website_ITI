@@ -227,7 +227,7 @@ export default function RecommendationsPage() {
             {/* Left: Main Big Image */}
             <div className="lg:col-span-8 relative h-[350px] sm:h-[450px] lg:h-[600px] rounded-[2rem] lg:rounded-[3rem] overflow-hidden shadow-xl bg-surface-elevated group">
               {todayCompositeImage ? (
-                <img src={imgSrc(todayCompositeImage)} alt="Main Outfit" className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-105" />
+                <img src={imgSrc(todayCompositeImage)} alt="Main Outfit" loading="lazy" className="w-full h-full object-contain transition-transform duration-1000 group-hover:scale-105" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-[var(--bg-secondary)]"><Sparkles className="w-12 h-12 sm:w-16 sm:h-16 text-text-disabled" /></div>
               )}
@@ -249,7 +249,7 @@ export default function RecommendationsPage() {
                   {currentItems.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-3 bg-[var(--bg-secondary)] rounded-2xl p-2.5 sm:p-3 border border-[var(--border)]">
                       <div className="w-12 h-12 sm:w-16 sm:h-16 bg-surface-elevated rounded-xl overflow-hidden p-1.5 flex items-center justify-center shrink-0">
-                        <img src={imgSrc(item.image)} className="w-full h-full object-contain" alt={getItemName(item, isArabic)} />
+                        <img src={imgSrc(item.image)} className="w-full h-full object-contain" alt={getItemName(item, isArabic)} loading="lazy" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-bold text-xs sm:text-sm text-text-primary truncate">{getItemName(item, isArabic) || t("recommendation.clothingItem")}</h4>

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import { getAllRecommendations } from "../api/recommendationsApi";
+import { getRecommendations, saveRecommendations } from "../services/indexedDB";
 import {
   getRecentRecommendationFromHistory,
   getCachedDailyOutfit,
@@ -25,11 +26,12 @@ export function RecommendationProvider({ children }) {
     isArabicRef.current = lang === "ar";
   }, []);
 
-  const fetchHistory = useCallback(async () => {
+  const fetchHistory = useCallback(async (userId) => {
     try {
       const data = await getAllRecommendations();
       const entries = data.history || [];
       setHistory(entries);
+      if (userId) saveRecommendations(userId, entries).catch(() => {});
       return entries;
     } catch {
       return [];
@@ -42,6 +44,7 @@ export function RecommendationProvider({ children }) {
       return;
     }
 
+    const userId = user?.id || user?._id;
     const doArabic = isArabicRef.current;
 
     const translateIfNeeded = async (outfit) => {
@@ -57,7 +60,23 @@ export function RecommendationProvider({ children }) {
       setLoading(true);
       setError(null);
 
-      const historyData = await fetchHistory();
+      if (userId) {
+        try {
+          const cachedRecs = await getRecommendations(userId);
+          if (cachedRecs?.length) {
+            const recentFromCached = getRecentRecommendationFromHistory(cachedRecs);
+            if (recentFromCached?.outfits?.[0]) {
+              const translated = await translateIfNeeded(recentFromCached.outfits[0]);
+              setTodaysOutfit(translated);
+              setTodaysWeather(recentFromCached.weather || recentFromCached.outfits[0]?.weather || null);
+              setHistory(cachedRecs);
+              setLoading(false);
+            }
+          }
+        } catch { /* IndexedDB unavailable, proceed */ }
+      }
+
+      const historyData = await fetchHistory(userId);
 
       const recentFromHistory = getRecentRecommendationFromHistory(historyData);
       if (recentFromHistory?.outfits?.[0]) {
@@ -84,7 +103,7 @@ export function RecommendationProvider({ children }) {
           setTodaysOutfit(translated);
           setTodaysWeather(result.weather || result.outfits[0]?.weather || null);
         }
-        await fetchHistory();
+        await fetchHistory(userId);
         fetchedRef.current = true;
       } catch {
         setError("Failed to fetch recommendation. Please try again.");
@@ -94,7 +113,7 @@ export function RecommendationProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [fetchHistory]);
+  }, [fetchHistory, user]);
 
   useEffect(() => {
     if (user) {

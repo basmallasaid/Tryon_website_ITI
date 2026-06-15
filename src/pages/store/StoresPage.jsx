@@ -8,6 +8,7 @@ import React, {
 import FilterSidebar from '../../components/store/FilterSidebar';
 import ProductCard from '../../components/store/ProductCard';
 import { getAllProducts, getAllStores } from '../../api/userApi';
+import { getProducts, saveProducts, getStores, saveStores, getCacheMeta, saveCacheMeta, dataHash } from '../../services/indexedDB';
 import {
   SlidersHorizontal,
   Search,
@@ -62,61 +63,92 @@ const StoresPage = () => {
     tryOnOnly: false,
   });
 
+  const applyData = useCallback((prodData, storeData) => {
+    setProducts(prodData);
+    setStores(storeData);
+
+    const categories = [
+      ...new Set(
+        prodData.map(p => p.category?.trim().toUpperCase()).filter(Boolean),
+      ),
+    ];
+    const brands = storeData.map(s => ({
+      id: normalizeId(s._id || s.id),
+      name: s.name?.trim().toUpperCase(),
+    }));
+    const colors = [
+      ...new Set(
+        prodData
+          .flatMap(p => p.color_tags || [])
+          .map(c => c?.trim().toUpperCase())
+          .filter(Boolean),
+      ),
+    ];
+    const seasons = [
+      ...new Set(
+        prodData
+          .flatMap(p => p.season_tags || [])
+          .map(s => s?.trim().toUpperCase())
+          .filter(Boolean),
+      ),
+    ];
+
+    const prices = prodData
+      .map(p => Number(p.price))
+      .filter(n => !isNaN(n));
+    const maxP = prices.length ? Math.max(...prices) : 2000;
+
+    setOptions({ categories, brands, colors, seasons });
+    setMaxPriceLimit(maxP);
+    setFilters(prev => ({ ...prev, maxPrice: maxP }));
+  }, []);
+
   useEffect(() => {
+    let cancelled = false;
     const fetchData = async () => {
       try {
         setLoading(true);
+
+        const [cachedProducts, cachedStores] = await Promise.all([
+          getProducts().catch(() => []),
+          getStores().catch(() => []),
+        ]);
+        if (cachedProducts.length && cachedStores.length && !cancelled) {
+          applyData(cachedProducts, cachedStores);
+          setLoading(false);
+        }
+
         const [prodRes, storeRes] = await Promise.all([
           getAllProducts(),
           getAllStores(),
         ]);
+        if (cancelled) return;
+
         const prodData = prodRes?.data ?? [];
         const storeData = storeRes?.data ?? [];
-        setProducts(prodData);
-        setStores(storeData);
 
-        const categories = [
-          ...new Set(
-            prodData.map(p => p.category?.trim().toUpperCase()).filter(Boolean),
-          ),
-        ];
-        const brands = storeData.map(s => ({
-          id: normalizeId(s._id || s.id),
-          name: s.name?.trim().toUpperCase(),
-        }));
-        const colors = [
-          ...new Set(
-            prodData
-              .flatMap(p => p.color_tags || [])
-              .map(c => c?.trim().toUpperCase())
-              .filter(Boolean),
-          ),
-        ];
-        const seasons = [
-          ...new Set(
-            prodData
-              .flatMap(p => p.season_tags || [])
-              .map(s => s?.trim().toUpperCase())
-              .filter(Boolean),
-          ),
-        ];
+        const prodHash = dataHash(prodData);
+        const meta = await getCacheMeta(null, 'products').catch(() => null);
+        if (meta && prodHash === meta.dataHash) {
+          await saveCacheMeta(null, 'products', { dataHash: prodHash }).catch(() => {});
+          if (cachedProducts.length > 0) return;
+        }
 
-        const prices = prodData
-          .map(p => Number(p.price))
-          .filter(n => !isNaN(n));
-        const maxP = prices.length ? Math.max(...prices) : 2000;
+        applyData(prodData, storeData);
 
-        setOptions({ categories, brands, colors, seasons });
-        setMaxPriceLimit(maxP);
-        setFilters(prev => ({ ...prev, maxPrice: maxP }));
+        saveProducts(prodData).catch(() => {});
+        saveStores(storeData).catch(() => {});
+        saveCacheMeta(null, 'products', { dataHash: prodHash }).catch(() => {});
+        saveCacheMeta(null, 'stores', { dataHash: dataHash(storeData) }).catch(() => {});
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
     fetchData();
-  }, []);
+    return () => { cancelled = true; };
+  }, [applyData]);
 
   const handleTranslate = useCallback(async () => {
     if (products.length === 0) return;

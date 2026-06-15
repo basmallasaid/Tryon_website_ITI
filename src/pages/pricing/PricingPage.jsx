@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Check, CircleCheck, Loader2, X, Lock } from "lucide-react";
@@ -10,7 +10,10 @@ import {
   syncSubscriptionApi,
 } from "../../api/paymentApi";
 import { getSettingsApi } from "../../api/userApi";
+import { getSubscription, saveSubscription } from "../../services/indexedDB";
 import AuthModal from "../../components/AuthModal";
+
+const SUBSCRIPTION_CACHE_TTL = 5 * 60 * 1000;
 
 const pricingKeys = {
   essential: {
@@ -142,7 +145,7 @@ export default function PricingPage() {
   const isPostPayment = useRef(false);
   const retryIntervalRef = useRef(null);
 
-  const fetchSubscription = (retries = 0, delay = 1000) => {
+  const fetchSubscription = useCallback((retries = 0, delay = 1000) => {
     if (!user) {
       setLoading(false);
       return;
@@ -153,17 +156,19 @@ export default function PricingPage() {
         if (res.data.subscriptionStatus === "active") {
           const storedInterval =
             localStorage.getItem("selectedInterval") || "month";
-          setSubscription({
+          const subData = {
             status: res.data.subscriptionStatus,
             subscriptionId: res.data.subscriptionId,
             endDate: res.data.subscriptionEndDate,
             interval: res.data.subscriptionInterval || storedInterval,
-          });
+          };
+          setSubscription(subData);
           setIsMonthly(
             (res.data.subscriptionInterval || storedInterval) === "month",
           );
+          saveSubscription(user.id || user._id, subData);
           if (retryIntervalRef.current) {
-            clearInterval(retryIntervalRef.current);
+            clearTimeout(retryIntervalRef.current);
             retryIntervalRef.current = null;
           }
           isPostPayment.current = false;
@@ -178,30 +183,45 @@ export default function PricingPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  };
+  }, [user]);
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
+      setSearchParams({}, { replace: true });
       if (user) {
         isPostPayment.current = true;
-        setSearchParams({}, { replace: true });
         setShowSuccessPopup(true);
-        syncSubscriptionApi({ userId: user.id })
+        const userId = user.id || user._id;
+        syncSubscriptionApi({ userId })
           .then(() => fetchSubscription(3, 1000))
           .catch(() => fetchSubscription(3, 1000));
       } else {
         setJustSubscribed(true);
       }
-    } else if (searchParams.get("canceled") === "true") {
+      return;
+    }
+    if (searchParams.get("canceled") === "true") {
       showToast("info", "Payment was cancelled.");
       setSearchParams({}, { replace: true });
-    } else if (user) {
-      fetchSubscription();
+      return;
     }
+    const userId = user?.id || user?._id;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    getSubscription(userId).then((cached) => {
+      if (cached && Date.now() - cached.updatedAt < SUBSCRIPTION_CACHE_TTL) {
+        setSubscription(cached.data);
+        setIsMonthly(cached.data.interval === "month");
+        setLoading(false);
+      }
+    });
+    fetchSubscription();
   }, []);
 
   useEffect(() => {
-    if (user && !searchParams.get("success") && !searchParams.get("canceled")) {
+    if (user && !searchParams.get("success") && !searchParams.get("canceled") && !isPostPayment.current) {
       fetchSubscription();
     }
   }, [user]);
@@ -211,11 +231,21 @@ export default function PricingPage() {
       setJustSubscribed(false);
       isPostPayment.current = true;
       setSearchParams({}, { replace: true });
-      syncSubscriptionApi({ userId: user.id })
+      const userId = user.id || user._id;
+      syncSubscriptionApi({ userId })
         .then(() => fetchSubscription(3, 1000))
         .catch(() => fetchSubscription(3, 1000));
     }
   }, [justSubscribed, user]);
+
+  useEffect(() => {
+    return () => {
+      if (retryIntervalRef.current) {
+        clearTimeout(retryIntervalRef.current);
+        retryIntervalRef.current = null;
+      }
+    };
+  }, []);
 
   const handleSubscribe = async () => {
     if (!user) return;

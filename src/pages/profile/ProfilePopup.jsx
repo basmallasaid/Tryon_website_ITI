@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import {
   Mail,
   Bell,
@@ -21,7 +21,7 @@ import {
   updateUserSettingsNotificationsApi,
 } from '../../api/userApi';
 
-const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose, isMobile }) => {
+const ProfilePopup = memo(({ user, logout, isArabic, changeLanguage, onClose, isMobile }) => {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const isDarkMode = theme === 'dark';
@@ -33,23 +33,17 @@ const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose, isMobil
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
   useEffect(() => {
+    const lang = isArabic ? 'ar' : 'en';
     if (user?.settings) {
       setSettings({
-        language: user.settings.language ?? (isArabic ? 'ar' : 'en'),
+        language: user.settings.language ?? lang,
         notifications_enabled: user.settings.notifications_enabled ?? true,
         has_mobile_app: user.settings.has_mobile_app ?? false,
       });
     } else {
-      setSettings(prev => ({ ...prev, language: isArabic ? 'ar' : 'en' }));
+      setSettings(prev => prev.language !== lang ? { ...prev, language: lang } : prev);
     }
   }, [user, isArabic]);
-
-  useEffect(() => {
-    setSettings(prev => ({
-      ...prev,
-      language: isArabic ? 'ar' : 'en',
-    }));
-  }, [isArabic]);
 
   const saveLanguage = async language => {
     const nextSettings = { ...settings, language };
@@ -293,6 +287,6 @@ const ProfilePopup = ({ user, logout, isArabic, changeLanguage, onClose, isMobil
       </div>
     </div>
   );
-};
+});
 
 export default ProfilePopup;
