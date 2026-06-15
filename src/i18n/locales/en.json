@@ -749,7 +749,13 @@
     "top": "Top",
     "bottom": "Bottom",
     "savedOutfit": "Saved outfit",
-    "matched": "Matched"
+    "matched": "Matched",
+    "outfitDetails": "Outfit Details",
+    "previousRecommendation": "Previous Recommendation",
+    "outfitItems": "Outfit Items",
+    "todayChoice": "Today's Choice",
+    "weatherDescription": "Perfect for today's warm weather and your wardrobe pieces. A balanced mix of comfort and style.",
+    "noOutfitsForWeek": "No outfits this week yet"
   },
   "fav": {
     "title": "Favorites",
