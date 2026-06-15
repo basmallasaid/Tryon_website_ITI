@@ -81,7 +81,7 @@ export default function Footer() {
               </h3>
               <ul className="space-y-4">
                 {contactInfo.map(item => (
-                  <li key={item.value}>
+                  <li key={item.href}>
                     <a
                       href={item.href}
                       className="flex items-center gap-3 text-text-disabled font-semibold hover:text-text-primary transition-colors"

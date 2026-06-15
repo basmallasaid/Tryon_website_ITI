@@ -46,7 +46,7 @@ const LoadingScreen = ({ visible }) => {
   return (
     <div
       dir={isArabic ? 'rtl' : 'ltr'}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--background)] animate-fadeInScale"
+      className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-[var(--background)] animate-fadeInScale"
     >
       <div ref={containerRef} className="w-72 h-72 md:w-96 md:h-96 mb-10" />
       <div className="flex items-center gap-2">
