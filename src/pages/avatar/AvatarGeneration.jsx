@@ -89,7 +89,7 @@ export default function AvatarGeneration() {
   useEffect(() => {
     const avatarIds = user?.avatars;
     if (!avatarIds || avatarIds.length === 0) return;
-    getAvatarByIdApi(avatarIds[0])
+    getAvatarByIdApi(avatarIds[avatarIds.length - 1])
       .then(res => {
         const avatar = res.data?.avatar;
         if (!avatar) return;
