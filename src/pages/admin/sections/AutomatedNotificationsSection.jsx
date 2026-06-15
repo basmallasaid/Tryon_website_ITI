@@ -103,7 +103,7 @@ export default function AutomatedNotificationsSection({ onBack }) {
         {OPERATIONS.map((op) => {
           const rule = rules[op] || {};
           return (
-            <div key={op} className="bg-white border border-admin-border/40 rounded-xl p-4 sm:p-6 shadow-sm">
+            <div key={op} className="bg-admin-surface border border-admin-border/40 rounded-xl p-4 sm:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{OP_ICONS[op]}</span>

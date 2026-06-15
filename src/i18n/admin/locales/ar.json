@@ -217,6 +217,8 @@
       "preferences": "التفضيلات",
       "systemLanguage": "لغة النظام",
       "systemLanguageDesc": "اختر لغتك المفضلة لواجهة لوحة التحكم.",
+      "darkMode": "الوضع الداكن",
+      "darkModeDesc": "التبديل بين المظهر الفاتح والداكن",
       "notifications": "الإشعارات",
       "pushNotifications": "إشعارات الدفع",
       "pushNotificationsDesc": "تلقى تنبيهات فورية لتغييرات المخزون وحالة الطلبات.",

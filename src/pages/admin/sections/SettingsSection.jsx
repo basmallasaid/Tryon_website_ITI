@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Mail, LogOut, Globe } from 'lucide-react';
+import { Mail, LogOut, Globe, Moon, Sun } from 'lucide-react';
 import SlidersIcon from '../../../icons/SlidersIcon';
 import NotificationBellIcon from '../../../icons/NotificationBellIcon';
 import SendIcon from '../../../icons/SendIcon';
 import MegaphoneWaveIcon from '../../../icons/MegaphoneWaveIcon';
 import adminI18n from '../../../i18n/admin/adminI18n';
+import { useAuth } from '../../../context/AuthContext';
+import { useAdminDarkMode } from '../context/AdminDarkModeContext';
 
 const SETTINGS_KEY = 'admin_settings';
 
@@ -47,7 +48,8 @@ function Toggle({ checked, onChange }) {
 
 export default function PlatformSettingsSection() {
   const { t } = adminI18n;
-  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useAdminDarkMode();
   const [saved, setSaved] = useState(loadSettings);
   const [draft, setDraft] = useState(saved);
   const [savedMsg, setSavedMsg] = useState(false);
@@ -75,9 +77,7 @@ export default function PlatformSettingsSection() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
+    logout();
   };
 
   const notificationDefs = [
@@ -109,7 +109,6 @@ export default function PlatformSettingsSection() {
 
   return (
     <div className="p-4 sm:p-8 max-w-[1000px] mx-auto">
-      {/* Header */}
       <div className="mb-6 sm:mb-10">
         <h1 className="text-2xl sm:text-[32px] font-semibold text-admin-text-primary tracking-[-0.64px]">{t('admin.settings.title')}</h1>
         <p className="text-sm sm:text-base text-admin-text-secondary mt-2">
@@ -125,7 +124,6 @@ export default function PlatformSettingsSection() {
             <h2 className="text-lg sm:text-xl font-medium text-admin-text-primary tracking-[-0.2px]">{t('admin.settings.preferences')}</h2>
           </div>
           <div className="flex flex-col gap-6 sm:gap-8">
-            {/* System Language */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm sm:text-base font-bold text-admin-text-primary">{t('admin.settings.systemLanguage')}</p>
@@ -141,6 +139,18 @@ export default function PlatformSettingsSection() {
                   <option value="en">{t('admin.common.english')}</option>
                   <option value="ar">{t('admin.common.arabic')}</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm sm:text-base font-bold text-admin-text-primary">{t('admin.settings.darkMode') || 'Dark Mode'}</p>
+                <p className="text-xs font-medium text-admin-text-secondary tracking-[0.24px] mt-0.5">{t('admin.settings.darkModeDesc') || 'Switch between light and dark appearance'}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Sun className={`w-4 h-4 ${!isDarkMode ? 'text-admin-brand' : 'text-admin-text-muted'}`} />
+                <Toggle checked={isDarkMode} onChange={toggleDarkMode} />
+                <Moon className={`w-4 h-4 ${isDarkMode ? 'text-admin-brand' : 'text-admin-text-muted'}`} />
               </div>
             </div>
           </div>

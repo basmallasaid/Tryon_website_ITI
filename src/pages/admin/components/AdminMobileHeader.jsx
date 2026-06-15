@@ -1,10 +1,12 @@
-import { Bell, Mail, Moon } from 'lucide-react';
+import { Bell, Mail, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { useAdminDarkMode } from '../context/AdminDarkModeContext';
 
 const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' rx='40' fill='%231550D3'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial,sans-serif' font-size='28' font-weight='bold' fill='white'%3EAdmin%3C/text%3E%3C/svg%3E";
 
 export default function AdminMobileHeader({ className = '', unreadContacts = 0 }) {
   const { user } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useAdminDarkMode();
   const profile = user?.profile || user?.user?.profile;
   const avatar = profile?.avatar || user?.userImage || null;
 
@@ -26,8 +28,12 @@ export default function AdminMobileHeader({ className = '', unreadContacts = 0 }
               </span>
             )}
           </button>
-          <button className="p-2 text-admin-text-secondary">
-            <Moon className="w-5 h-5" />
+          <button
+            onClick={toggleDarkMode}
+            className="p-2 text-admin-text-secondary"
+            title={isDarkMode ? 'Light mode' : 'Dark mode'}
+          >
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
           <img
             src={avatar || DEFAULT_AVATAR}

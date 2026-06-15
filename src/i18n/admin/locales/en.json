@@ -219,6 +219,8 @@
       "preferences": "Preferences",
       "systemLanguage": "System Language",
       "systemLanguageDesc": "Choose your preferred language for the dashboard interface.",
+      "darkMode": "Dark Mode",
+      "darkModeDesc": "Switch between light and dark appearance",
       "notifications": "Notifications",
       "pushNotifications": "Push Notifications",
       "pushNotificationsDesc": "Receive real-time alerts for inventory changes and order status.",

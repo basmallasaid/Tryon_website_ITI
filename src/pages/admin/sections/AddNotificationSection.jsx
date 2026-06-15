@@ -232,6 +232,12 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
 
+  const todayStr = new Date().toISOString().split('T')[0];
+  const minTimeStr = (() => {
+    const d = new Date(Date.now() + 2 * 60 * 1000);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  })();
+
   const toggleChannel = (id) => {
     setChannels((prev) => {
       if (prev.includes(id)) {
@@ -269,6 +275,14 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
     if (channels.length === 0) {
       alert('Please select at least one delivery channel.');
       return;
+    }
+    if (scheduleEnabled && scheduledDate && scheduledTime) {
+      const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}`);
+      const minTime = new Date(Date.now() + 2 * 60 * 1000);
+      if (scheduledDateTime <= minTime) {
+        alert('Scheduled time must be at least 2 minutes from now.');
+        return;
+      }
     }
     setSubmitting(true);
     try {
@@ -453,6 +467,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
                     type="time"
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
+                    min={scheduledDate === todayStr ? minTimeStr : undefined}
                     className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
                   />
                 </div>
@@ -593,7 +608,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-2.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                    className="w-full px-3 py-2.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
                   />
                 </div>
                 <div className="flex-1">
@@ -602,7 +617,8 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
                     type="time"
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                    min={scheduledDate === todayStr ? minTimeStr : undefined}
+                    className="w-full px-3 py-2.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
                   />
                 </div>
               </div>

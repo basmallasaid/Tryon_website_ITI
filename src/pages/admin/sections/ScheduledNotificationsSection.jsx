@@ -62,7 +62,7 @@ function EditModal({ notification, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+      <div className="bg-admin-surface rounded-2xl shadow-xl w-full max-w-md">
         <div className="flex items-center justify-between p-5 border-b border-admin-border/30">
           <h3 className="text-lg font-bold text-admin-text-primary">{t('admin.scheduledNotifications.editSchedule')}</h3>
           <button onClick={onClose} className="p-1 hover:bg-admin-border/20 rounded-lg transition-colors">
@@ -158,7 +158,7 @@ export default function ScheduledNotificationsSection({ onBack, onAddNotificatio
       </div>
       <p className="text-sm text-admin-text-secondary mt-1 mb-6 ml-12">{t('admin.scheduledNotifications.description')}</p>
 
-      <div className="hidden md:block bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
+      <div className="hidden md:block bg-admin-surface border border-admin-border/40 rounded-2xl overflow-hidden">
         <div className="px-6 py-4 border-b border-admin-border/40 flex items-center justify-between">
           <h2 className="text-sm font-bold text-admin-text-primary">{t('admin.scheduledNotifications.upcoming')}</h2>
           <button onClick={onAddNotification} className="flex items-center gap-2 px-4 py-2 bg-admin-brand text-white rounded-xl text-xs font-medium hover:bg-admin-brand-light transition-colors">
@@ -237,7 +237,7 @@ export default function ScheduledNotificationsSection({ onBack, onAddNotificatio
             <Calendar className="w-4 h-4" /> {t('admin.scheduledNotifications.scheduleNew')}
           </button>
         </div>
-        <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
+        <div className="bg-admin-surface border border-admin-border/40 rounded-2xl overflow-hidden">
           {loading ? (
             <p className="p-4 text-center text-sm text-admin-text-muted">{t('admin.notifications.loading')}</p>
           ) : currentItems.length > 0 ? (
