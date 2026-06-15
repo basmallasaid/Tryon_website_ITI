@@ -1,4 +1,4 @@
-import React, {
+import {
   useEffect,
   useMemo,
   useState,
@@ -7,9 +7,9 @@ import React, {
 } from 'react';
 import FilterSidebar from '../../components/store/FilterSidebar';
 import ProductCard from '../../components/store/ProductCard';
-import { getAllProducts, getAllStores } from '../../api/userApi';
+import { getAllProducts, getAllStores, getProductMatchesApi } from '../../api/userApi';
+import { getProducts, saveProducts, getStores, saveStores, getCacheMeta, saveCacheMeta, dataHash, getBatchProductMatches, saveBatchProductMatches, getWardrobeHash } from '../../services/indexedDB';
 import {
-  SlidersHorizontal,
   Search,
   ChevronDown,
   LayoutGrid,
@@ -62,61 +62,97 @@ const StoresPage = () => {
     tryOnOnly: false,
   });
 
+  const applyData = useCallback((prodData, storeData) => {
+    setProducts(prodData);
+    setStores(storeData);
+
+    const categories = [
+      ...new Set(
+        prodData.map(p => p.category?.trim().toUpperCase()).filter(Boolean),
+      ),
+    ];
+    const brands = storeData.map(s => ({
+      id: normalizeId(s._id || s.id),
+      name: s.name?.trim().toUpperCase(),
+    }));
+    const colors = [
+      ...new Set(
+        prodData
+          .flatMap(p => p.color_tags || [])
+          .map(c => c?.trim().toUpperCase())
+          .filter(Boolean),
+      ),
+    ];
+    const seasons = [
+      ...new Set(
+        prodData
+          .flatMap(p => p.season_tags || [])
+          .map(s => s?.trim().toUpperCase())
+          .filter(Boolean),
+      ),
+    ];
+
+    const prices = prodData
+      .map(p => Number(p.price))
+      .filter(n => !isNaN(n));
+    const maxP = prices.length ? Math.max(...prices) : 2000;
+
+    setOptions({ categories, brands, colors, seasons });
+    setMaxPriceLimit(maxP);
+    setFilters(prev => ({ ...prev, maxPrice: maxP }));
+  }, []);
+
   useEffect(() => {
+    let cancelled = false;
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [prodRes, storeRes] = await Promise.all([
+
+        const apiPromise = Promise.all([
           getAllProducts(),
           getAllStores(),
         ]);
+
+        const [cachedProducts, cachedStores] = await Promise.all([
+          getProducts().catch(() => []),
+          getStores().catch(() => []),
+        ]);
+        if (cachedProducts.length && cachedStores.length && !cancelled) {
+          applyData(cachedProducts, cachedStores);
+          setLoading(false);
+        }
+
+        if (cancelled) return;
+        const [prodRes, storeRes] = await apiPromise;
+        if (cancelled) return;
+
         const prodData = prodRes?.data ?? [];
         const storeData = storeRes?.data ?? [];
-        setProducts(prodData);
-        setStores(storeData);
 
-        const categories = [
-          ...new Set(
-            prodData.map(p => p.category?.trim().toUpperCase()).filter(Boolean),
-          ),
-        ];
-        const brands = storeData.map(s => ({
-          id: normalizeId(s._id || s.id),
-          name: s.name?.trim().toUpperCase(),
-        }));
-        const colors = [
-          ...new Set(
-            prodData
-              .flatMap(p => p.color_tags || [])
-              .map(c => c?.trim().toUpperCase())
-              .filter(Boolean),
-          ),
-        ];
-        const seasons = [
-          ...new Set(
-            prodData
-              .flatMap(p => p.season_tags || [])
-              .map(s => s?.trim().toUpperCase())
-              .filter(Boolean),
-          ),
-        ];
+        const prodHash = dataHash(prodData);
+        const storeHash = dataHash(storeData);
+        const meta = await getCacheMeta(null, 'products').catch(() => null);
 
-        const prices = prodData
-          .map(p => Number(p.price))
-          .filter(n => !isNaN(n));
-        const maxP = prices.length ? Math.max(...prices) : 2000;
+        if (meta && prodHash === meta.dataHash && cachedProducts.length > 0 && cachedStores.length > 0) {
+          saveCacheMeta(null, 'products', { dataHash: prodHash }).catch(() => {});
+          return;
+        }
 
-        setOptions({ categories, brands, colors, seasons });
-        setMaxPriceLimit(maxP);
-        setFilters(prev => ({ ...prev, maxPrice: maxP }));
+        applyData(prodData, storeData);
+
+        saveProducts(prodData).catch(() => {});
+        saveStores(storeData).catch(() => {});
+        saveCacheMeta(null, 'products', { dataHash: prodHash }).catch(() => {});
+        saveCacheMeta(null, 'stores', { dataHash: storeHash }).catch(() => {});
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
     fetchData();
-  }, []);
+    return () => { cancelled = true; };
+  }, [applyData]);
 
   const handleTranslate = useCallback(async () => {
     if (products.length === 0) return;
@@ -146,8 +182,16 @@ const StoresPage = () => {
   const displayProducts =
     isArabic && translatedProducts.length > 0 ? translatedProducts : products;
 
+  const prevFilterKey = useRef('');
+  useEffect(() => {
+    const filterKey = JSON.stringify({ dp: displayProducts.length, f: filters, sq: searchQuery });
+    if (filterKey !== prevFilterKey.current) {
+      prevFilterKey.current = filterKey;
+      setCurrentPage(1);
+    }
+  }, [displayProducts, filters, searchQuery, setCurrentPage]);
+
   const filteredProducts = useMemo(() => {
-    setCurrentPage(1);
     return displayProducts.filter(product => {
       const productStoreId = normalizeId(product.store_id);
       const nameMatch = product.name
@@ -192,6 +236,71 @@ const StoresPage = () => {
   }, [filteredProducts, currentPage]);
 
   const showProducts = loading || translating;
+
+  const [productMatches, setProductMatches] = useState({})
+
+  useEffect(() => {
+    const ids = currentProducts.map(p => normalizeId(p._id || p.id)).filter(Boolean)
+    if (!ids.length) return
+    let cancelled = false
+
+    const run = async () => {
+      const [cached, wardrobeHash] = await Promise.all([
+        getBatchProductMatches(ids),
+        getWardrobeHash(),
+      ])
+
+      if (cancelled) return
+
+      const auth = (() => {
+        try {
+          const raw = localStorage.getItem('auth')
+          return raw ? JSON.parse(raw) : null
+        } catch { return null }
+      })()
+      const userId = auth?._id || auth?.user?._id
+      const meta = userId ? await getCacheMeta(userId, 'product_matches').catch(() => null) : null
+      const storedHash = meta?.wardrobeHash || ''
+
+      const matches = {}
+      let cacheIncomplete = false
+      for (const id of ids) {
+        if (cached[id]) {
+          const hasRealMatches = cached[id].matches && cached[id].matches.length > 0
+          if (cached[id].hasMatches === true && !hasRealMatches) cacheIncomplete = true
+          matches[id] = { hasMatches: cached[id].hasMatches, matches: cached[id].matches || [] }
+        } else {
+          matches[id] = { hasMatches: null, matches: [] }
+        }
+      }
+      if (!cancelled) setProductMatches(matches)
+
+      if (!cacheIncomplete && wardrobeHash && wardrobeHash === storedHash) return
+
+      const results = await Promise.all(
+        ids.map(id =>
+          getProductMatchesApi(id)
+            .then(res => ({ id, hasMatches: (res.data.matches || []).length > 0, matches: res.data.matches || [] }))
+            .catch(() => ({ id, hasMatches: false, matches: [] }))
+        )
+      )
+
+      if (cancelled) return
+
+      const updated = {}
+      for (const r of results) {
+        updated[r.id] = { hasMatches: r.hasMatches, matches: r.matches }
+      }
+      setProductMatches(updated)
+      saveBatchProductMatches(updated).catch(() => {})
+      if (userId && wardrobeHash) {
+        saveCacheMeta(userId, 'product_matches', { wardrobeHash }).catch(() => {})
+      }
+    }
+
+    run()
+    return () => { cancelled = true }
+  }, [currentProducts])
 
   return (
     <div className="min-h-screen bg-[var(--background)] px-4 sm:px-6 lg:px-10 py-6 font-roboto ">
@@ -286,18 +395,24 @@ const StoresPage = () => {
               <div
                 className={`grid gap-8 transition-all duration-500 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 2xl:grid-cols-3' : 'grid-cols-1'}`}
               >
-                {currentProducts.map((product, idx) => (
-                  <ProductCard
-                    key={normalizeId(product._id) || idx}
-                    product={product}
-                    viewMode={viewMode}
-                    store={stores.find(
-                      s =>
-                        normalizeId(s._id || s.id) ===
-                        normalizeId(product.store_id),
-                    )}
-                  />
-                ))}
+                {currentProducts.map((product, idx) => {
+                  const pid = normalizeId(product._id || product.id)
+                  const matchInfo = productMatches[pid] || {}
+                  return (
+                    <ProductCard
+                      key={pid || idx}
+                      product={product}
+                      viewMode={viewMode}
+                      hasMatches={'hasMatches' in matchInfo ? matchInfo.hasMatches : null}
+                      matches={matchInfo.matches || []}
+                      store={stores.find(
+                        s =>
+                          normalizeId(s._id || s.id) ===
+                          normalizeId(product.store_id),
+                      )}
+                    />
+                  )
+                })}
               </div>
 
               {/* --- Modern Pagination UI --- */}

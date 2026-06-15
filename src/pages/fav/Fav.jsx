@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { Heart, HeartOff, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
@@ -54,12 +54,12 @@ const FILTER_KEY_MAP = {
   "Recent Recycle": "fav.recentRecycle",
 };
 
-function FavoritesList({ items, removeItem }) {
+const FavoritesList = memo(({ items, removeItem }) => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const [activeFilter, setActiveFilter] = useState("All");
 
-  const filtered = items.filter((item) => {
+  const filtered = useMemo(() => items.filter((item) => {
     if (activeFilter === "All") return true;
     const cat = getCategory(item);
     if (activeFilter === "Store") return cat === "Store";
@@ -67,7 +67,7 @@ function FavoritesList({ items, removeItem }) {
     if (activeFilter === "Recent Try-On") return cat === "Try On";
     if (activeFilter === "Recent Recycle") return cat === "Recycle";
     return false;
-  });
+  }), [items, activeFilter]);
 
   const getFilterLabel = (filter) => t(FILTER_KEY_MAP[filter]);
 
@@ -160,7 +160,7 @@ function FavoritesList({ items, removeItem }) {
       </div>
     </div>
   );
-}
+});
 
 export default function Fav() {
   const { t, i18n } = useTranslation();

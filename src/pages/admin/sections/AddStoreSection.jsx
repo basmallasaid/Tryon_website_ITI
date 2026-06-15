@@ -51,7 +51,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
       }
       setSuccess(true);
     } catch (err) {
-      alert(err.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} store.`);
+      alert(`Failed to ${isEditing ? 'update' : 'create'} store.`);
     } finally {
       setSubmitting(false);
     }

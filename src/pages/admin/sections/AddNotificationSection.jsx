@@ -318,7 +318,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
       }
       setSuccess(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to send notification.');
+      alert('Failed to send notification.');
     } finally {
       setSubmitting(false);
     }

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Heart } from 'lucide-react';
 import { useFavorites } from '../../context/FavoritesContext';
 
-const WardrobeItemCard = ({ item, onClick }) => {
+const WardrobeItemCard = memo(({ item, onClick }) => {
   const { isFavorite, addItem, removeItem } = useFavorites();
   const favorited = isFavorite(item._id);
 
@@ -20,7 +20,7 @@ const WardrobeItemCard = ({ item, onClick }) => {
       onClick={() => onClick(item)}
       className="group relative aspect-[4/5] bg-surface-elevated rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer border border-[var(--border)]"
     >
-      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+      <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover" />
       <button
         onClick={handleFavorite}
         className="absolute top-4 right-4 p-2 bg-surface-elevated/80 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:scale-110 z-10 cursor-pointer"
@@ -37,6 +37,6 @@ const WardrobeItemCard = ({ item, onClick }) => {
       </div>
     </div>
   );
-};
+});
 
 export default WardrobeItemCard;

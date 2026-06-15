@@ -61,7 +61,7 @@ export default function AddUserSection({ onBack, editingUser }) {
       }
       setSuccess(true);
     } catch (err) {
-      alert(err.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} user.`);
+      alert(`Failed to ${isEditing ? 'update' : 'create'} user.`);
     } finally {
       setSubmitting(false);
     }

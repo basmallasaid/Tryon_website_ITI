@@ -136,7 +136,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
       }
       setSuccess(true);
     } catch (err) {
-      alert(err.response?.data?.message || `Failed to ${isEditing ? 'update' : 'create'} product.`);
+      alert(`Failed to ${isEditing ? 'update' : 'create'} product.`);
     } finally {
       setSubmitting(false);
     }

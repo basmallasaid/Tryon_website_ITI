@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   getFavorites,
   addFavorite,
@@ -9,6 +9,8 @@ import {
 import { useAuth } from "./AuthContext";
 import { showToast } from "../utils/toast";
 import i18n from "../i18n/i18n";
+import { getWardrobeItems, getProducts, clearUserCaches } from "../services/indexedDB";
+import { syncFavoritesCache } from "../services/cacheService";
 
 const FavoritesContext = createContext();
 
@@ -18,32 +20,75 @@ export const FavoritesProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [enrichmentMaps, setEnrichmentMaps] = useState(null);
-
-  // Track in-flight requests to prevent duplicate calls
+  const initialLoadDone = useRef(false);
   const pendingRef = useRef(new Set());
+  const mapsRef = useRef(null);
 
-  const fetchAll = useCallback(async () => {
-    if (!user?.token) return;
-    try {
-      setLoading(true);
-      setError(null);
-      const [favData, maps] = await Promise.all([
-        getFavorites(),
-        fetchEnrichmentData(),
-      ]);
-      setEnrichmentMaps(maps);
-      const raw = favData?.favorites ?? favData?.items ?? [];
-      setItems(raw.map((fav) => enrichFavorite(fav, maps)));
-    } catch (e) {
-      const msg = e.response?.data?.message || e.message || "Failed to load favorites.";
-      setError(msg);
-      showToast('error', i18n.t('fav.loadError'));
-    } finally {
-      setLoading(false);
-    }
-  }, [user?.token]);
+  const loadCachedMaps = useCallback(async () => {
+    const userId = user?.id || user?._id;
+    if (!userId) return { productsMap: {}, wardrobeMap: {}, tryonMap: {}, recycleMap: {} };
+    const [cachedProducts, cachedWardrobe] = await Promise.all([
+      getProducts().catch(() => []),
+      getWardrobeItems(userId).catch(() => []),
+    ]);
+    const maps = { productsMap: {}, wardrobeMap: {}, tryonMap: {}, recycleMap: {} };
+    cachedProducts.forEach(p => { maps.productsMap[p._id] = p });
+    cachedWardrobe.forEach(w => { maps.wardrobeMap[w._id] = w });
+    return maps;
+  }, [user]);
 
   useEffect(() => {
+    if (!user?.token) return;
+    loadCachedMaps().then(maps => {
+      if (!mapsRef.current) {
+        mapsRef.current = maps;
+        setEnrichmentMaps(maps);
+      }
+    });
+  }, [user?.token, loadCachedMaps]);
+
+  const fetchAll = useCallback(async (force = false) => {
+    if (!user?.token) {
+      setItems([]);
+      setLoading(false);
+      return;
+    }
+
+    const userId = user.id || user._id;
+    if (!initialLoadDone.current || force) setLoading(true);
+
+    await syncFavoritesCache({
+      userId,
+      fetchFn: () => getFavorites().then(res => res?.favorites ?? res?.items ?? []),
+      onData: async (raw) => {
+        try {
+          if (!mapsRef.current) {
+            mapsRef.current = await loadCachedMaps();
+            setEnrichmentMaps(mapsRef.current);
+          }
+          setItems(raw.map(fav => enrichFavorite(fav, mapsRef.current)));
+          setError(null);
+
+          const freshMaps = await fetchEnrichmentData().catch(() => null);
+          if (freshMaps) {
+            mapsRef.current = freshMaps;
+            setEnrichmentMaps(freshMaps);
+            setItems(raw.map(fav => enrichFavorite(fav, freshMaps)));
+          }
+        } catch (e) {
+          const msg = e.response?.data?.message || e.message || "Failed to load favorites.";
+          setError(msg);
+          showToast('error', i18n.t('fav.loadError'));
+        }
+        setLoading(false);
+        if (!initialLoadDone.current) initialLoadDone.current = true;
+      },
+      force,
+    });
+  }, [user?.token, loadCachedMaps]);
+
+  useEffect(() => {
+    initialLoadDone.current = false;
     fetchAll();
   }, [fetchAll]);
 
@@ -52,75 +97,55 @@ export const FavoritesProvider = ({ children }) => {
       setItems([]);
       setError(null);
       pendingRef.current.clear();
+      initialLoadDone.current = false;
     }
   }, [user]);
 
-  /*
-   * Optimistic addItem:
-   * 1. Immediately add a placeholder item to state
-   * 2. Send API request in background
-   * 3. On success → replace placeholder with real item from server
-   * 4. On failure → rollback (remove placeholder), show error toast
-   */
-  const addItem = async (itemId, itemType) => {
+  const addItem = useCallback(async (itemId, itemType) => {
     if (pendingRef.current.has(`add:${itemId}`)) return;
     pendingRef.current.add(`add:${itemId}`);
 
     const emptyMaps = { wardrobeMap: {}, productsMap: {}, tryonMap: {}, recycleMap: {} };
-
-    // Store previous state for rollback
     const prevItems = items;
 
-    // Check if already in favorites
     if (prevItems.some((i) => i.itemId === itemId)) {
       pendingRef.current.delete(`add:${itemId}`);
       return;
     }
 
-    // Create optimistic item
     const optimisticItem = enrichFavorite(
       { _id: `optimistic_add_${Date.now()}`, itemId, itemType },
-      enrichmentMaps || emptyMaps,
+      mapsRef.current || emptyMaps,
     );
     setItems((prev) => [...prev, optimisticItem]);
+    showToast('success', i18n.t('fav.addedSuccess'));
 
     try {
       const res = await addFavorite(itemId, itemType);
-      // Backend returns { favorites: [...] } — find the newly created one
       const newFav = res?.favorites?.find(
         (f) => (f.itemId?.$oid ?? f.itemId) === itemId,
       );
-      const realItem = enrichFavorite(
-        newFav ?? { _id: "", itemId, itemType },
-        enrichmentMaps || emptyMaps,
-      );
-      // Replace optimistic item with real server data
-      setItems((prev) =>
-        prev.map((i) => (i._id === optimisticItem._id ? realItem : i)),
-      );
-      showToast('success', i18n.t('fav.addedSuccess'));
+      if (newFav) {
+        const realItem = enrichFavorite(
+          newFav,
+          mapsRef.current || emptyMaps,
+        );
+        setItems((prev) =>
+          prev.map((i) => (i._id === optimisticItem._id ? realItem : i)),
+        );
+      }
     } catch {
-      // Rollback: restore previous state
       setItems(prevItems);
       showToast('error', i18n.t('fav.addedError'));
     } finally {
       pendingRef.current.delete(`add:${itemId}`);
     }
-  };
+  }, [items]);
 
-  /*
-   * Optimistic removeItem:
-   * 1. Immediately remove item from state
-   * 2. Send API request in background using the favorite document _id
-   * 3. On success → keep removed state
-   * 4. On failure → rollback (re-add item), show error toast
-   */
-  const removeItem = async (originalItemId) => {
+  const removeItem = useCallback(async (originalItemId) => {
     if (pendingRef.current.has(`remove:${originalItemId}`)) return;
     pendingRef.current.add(`remove:${originalItemId}`);
 
-    // If an add is still in-flight, the item hasn't been persisted yet — just
-    // cancel the pending add and remove from state without calling the API.
     if (pendingRef.current.has(`add:${originalItemId}`)) {
       pendingRef.current.delete(`add:${originalItemId}`);
       setItems((prev) => prev.filter((i) => i.itemId !== originalItemId));
@@ -134,30 +159,38 @@ export const FavoritesProvider = ({ children }) => {
       return;
     }
 
-    // Store previous state for rollback
     const prevItems = items;
-
-    // Immediately remove from UI
     setItems((prev) => prev.filter((i) => i._id !== match._id));
+    showToast('success', i18n.t('fav.removedSuccess'));
 
     try {
       await removeFavorite(match._id);
-      showToast('success', i18n.t('fav.removedSuccess'));
     } catch {
-      // Rollback: restore previous state
       setItems(prevItems);
       showToast('error', i18n.t('fav.removedError'));
     } finally {
       pendingRef.current.delete(`remove:${originalItemId}`);
     }
-  };
+  }, [items]);
 
-  const isFavorite = (itemId) => items.some((i) => i.itemId === itemId);
+  const isFavorite = useCallback((itemId) => items.some((i) => i.itemId === itemId), [items]);
+
+  const refetch = useCallback(() => fetchAll(true), [fetchAll]);
+
+  const clearCache = useCallback(async () => {
+    if (user) {
+      const userId = user.id || user._id;
+      await clearUserCaches(userId);
+    }
+    initialLoadDone.current = false;
+  }, [user]);
+
+  const providerValue = useMemo(() => ({
+    items, loading, error, refetch, addItem, removeItem, isFavorite, clearCache
+  }), [items, loading, error, refetch, addItem, removeItem, isFavorite, clearCache]);
 
   return (
-    <FavoritesContext.Provider
-      value={{ items, loading, error, refetch: fetchAll, addItem, removeItem, isFavorite }}
-    >
+    <FavoritesContext.Provider value={providerValue}>
       {children}
     </FavoritesContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   Shirt,
   Grid3x3,
@@ -28,6 +28,9 @@ import {
 } from '../../api/matchingApi';
 import { getAllProducts } from '../../api/userApi';
 import { showToast } from '../../utils/toast';
+
+let allProductsCache = null
+let allProductsPromise = null
 
 const imgSrc = image => {
   if (!image) return null;
@@ -136,16 +139,53 @@ export default function Matching() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowResults(false);
     setWardrobeMatches([]);
     setStoreMatches([]);
   }, [itemSource]);
 
   useEffect(() => {
-    getAllProducts()
-      .then(res => setAllProducts(Array.isArray(res.data) ? res.data : []))
-      .catch(() => {});
+    if (allProductsCache) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAllProducts(allProductsCache)
+      return
+    }
+    if (!allProductsPromise) {
+      allProductsPromise = getAllProducts()
+        .then(res => {
+          allProductsCache = Array.isArray(res.data) ? res.data : []
+          return allProductsCache
+        })
+        .catch(() => {
+          allProductsCache = []
+          return allProductsCache
+        })
+    }
+    let cancelled = false
+    allProductsPromise.then(data => {
+      if (!cancelled) setAllProducts(data)
+    })
+    return () => { cancelled = true }
   }, []);
+
+  const wardrobeMap = useMemo(() => {
+    const map = new Map()
+    for (const item of wardrobeItems) {
+      if (item._id) map.set(item._id, item)
+      if (item.id) map.set(item.id, item)
+    }
+    return map
+  }, [wardrobeItems])
+
+  const productsMap = useMemo(() => {
+    const map = new Map()
+    for (const p of allProducts) {
+      if (p._id) map.set(p._id, p)
+      if (p.id) map.set(p.id, p)
+    }
+    return map
+  }, [allProducts])
 
   const getMatchImage = match => {
     if (!match?.item) return null;
@@ -155,21 +195,16 @@ export default function Matching() {
       if (src) return imgSrc(src);
     }
     if (match.item.source === 'wardrobe') {
-      const wItem = wardrobeItems.find(
-        wi => wi._id === match.item.id || wi.id === match.item.id,
-      );
+      const wItem = wardrobeMap.get(match.item.id) || wardrobeMap.get(match.item._id);
       if (wItem?.image) return imgSrc(wItem.image);
     }
     if (match.item.source === 'store') {
-      const productId = match.item.id?.replace('store_', '');
-      const product = allProducts.find(
-        p => p._id === productId || p.id === productId,
-      );
+      const productId = match.item.id?.replace('store_', '') || match.item._id;
+      const product = productsMap.get(productId);
       if (product) {
         const raw = product.images || product.image;
         const first = Array.isArray(raw) ? raw[0] : raw;
-        const src =
-          typeof first === 'string' ? first : first?.url || first?.uri;
+        const src = typeof first === 'string' ? first : first?.url || first?.uri;
         if (src) return imgSrc(src);
       }
     }
@@ -691,7 +726,7 @@ export default function Matching() {
                   ) : (
                     storeMatches.map((match, index) => {
                       const imgUrl = getMatchImage(match);
-                      const productId = match.item?.id?.replace('store_', '');
+                      const productId = match.item?.id?.replace('store_', '') || match.item?._id;
                       const isFav = productId ? isFavorite(productId) : false;
                       const handleFav = e => {
                         e.stopPropagation();
@@ -702,9 +737,7 @@ export default function Matching() {
                           addItem(productId, 'PRODUCT');
                         }
                       };
-                      const product = allProducts.find(
-                        p => p._id === productId || p.id === productId,
-                      );
+                      const product = productsMap.get(productId);
                       return (
                         <div
                           key={match.item?.id || `sm-${index}`}

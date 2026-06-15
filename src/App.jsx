@@ -11,8 +11,12 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 // Contexts
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { WardrobeProvider } from "./context/WardrobeContext";
+import { RecommendationProvider } from "./context/RecommendationContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { ThemeProvider } from "./context/ThemeContext";
+
+// Hooks
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
 
 // Pages
 import Home from "./pages/home/Home";
@@ -37,6 +41,7 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import Layout from "./pages/Layout";
 import EditItemWardrobe from "./components/wardrobe/EditItemWardrobe";
 import NotFound from "./pages/NotFound/NotFound";
+import PWAUpdatePrompt from "./components/PWAUpdatePrompt";
 import { CircularProgress, Box } from "@mui/material";
 
 // Loading Component
@@ -89,9 +94,17 @@ function UserGuard() {
   );
 }
 
+
 function AuthGuard() {
   const auth = JSON.parse(localStorage.getItem("auth") || "null");
-  if (!auth) return <Navigate to="/login" replace />;
+  const isOnline = useOnlineStatus();
+
+  
+  if (!isOnline) return <Outlet />;
+
+ 
+  if (!auth && isOnline) return <Navigate to="/login" replace />;
+  
   return <Outlet />;
 }
 
@@ -149,6 +162,7 @@ function AppContent() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <RouterProvider router={router} />
+      <PWAUpdatePrompt />
     </Suspense>
   );
 }
@@ -159,9 +173,11 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <WardrobeProvider>
-          <FavoritesProvider>
-            <AppContent />
-          </FavoritesProvider>
+          <RecommendationProvider>
+            <FavoritesProvider>
+              <AppContent />
+            </FavoritesProvider>
+          </RecommendationProvider>
         </WardrobeProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { getUserApi, updateProfileApi, deleteUserAccountApi, updateUserImageApi, deleteUserImageApi, getSettingsApi } from '../../api/userApi';
 import { getAvatarByIdApi } from '../../api/avatarApi';
+import { getSubscription } from '../../services/indexedDB';
+import { saveProfile, getProfile } from '../../services/indexedDB';
 import { Camera, UserPlus, Lock, SquarePen, AlertTriangle, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { showToast } from '../../utils/toast';
@@ -25,27 +27,50 @@ export default function EditProfilePage() {
     const [avatarUrl, setAvatarUrl] = useState(null);
     const [avatarLoading, setAvatarLoading] = useState(false);
     const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+    const profileFetchRef = useRef(false);
 
     const userId = user?.id || user?._id;
 
     useEffect(() => {
-        const fetchUser = async () => {
-            if (!userId) {
+        if (!userId) {
+            setLoading(false);
+            return;
+        }
+        if (profileFetchRef.current) return;
+        profileFetchRef.current = true;
+
+        const loadProfile = async () => {
+            const cached = await getProfile(userId);
+            if (cached) {
+                const d = cached.data;
+                setFirstName(d.firstName || '');
+                setLastName(d.lastName || '');
+                setEmail(d.email || '');
+                setGender(d.gender || 'Male');
+                setUserImage(d.userImage || '');
+                setImagePreview(d.userImage || '');
                 setLoading(false);
-                return;
             }
 
             try {
                 const res = await getUserApi(userId);
                 const apiUser = res.data?.user ?? res.data;
                 const profile = apiUser?.profile ?? {};
+                const fresh = {
+                    firstName: profile.first_name || '',
+                    lastName: profile.last_name || '',
+                    email: apiUser?.email || '',
+                    gender: profile.gender || 'Male',
+                    userImage: apiUser?.userImage || '',
+                };
 
-                setFirstName(profile.first_name || '');
-                setLastName(profile.last_name || '');
-                setEmail(apiUser?.email || '');
-                setGender(profile.gender || 'Male');
-                setUserImage(apiUser?.userImage || '');
-                setImagePreview(apiUser?.userImage || '');
+                setFirstName(fresh.firstName);
+                setLastName(fresh.lastName);
+                setEmail(fresh.email);
+                setGender(fresh.gender);
+                setUserImage(fresh.userImage);
+                setImagePreview(fresh.userImage || '');
+                saveProfile(userId, fresh);
             } catch (error) {
                 console.error('Failed to load user profile:', error);
             } finally {
@@ -53,7 +78,7 @@ export default function EditProfilePage() {
             }
         };
 
-        fetchUser();
+        loadProfile();
     }, [userId]);
 
     useEffect(() => {
@@ -92,6 +117,13 @@ export default function EditProfilePage() {
             setSubscriptionStatus(null);
             return;
         }
+        const loadSubStatus = async () => {
+            const cached = await getSubscription(userId);
+            if (cached) {
+                setSubscriptionStatus(cached.data?.status || cached.data?.subscriptionStatus || null);
+            }
+        };
+        loadSubStatus();
         getSettingsApi({ email: user.email })
             .then((res) => {
                 setSubscriptionStatus(res.data.subscriptionStatus);
@@ -101,7 +133,7 @@ export default function EditProfilePage() {
             });
     }, [user?.email]);
 
-    const handleImageChange = async (event) => {
+    const handleImageChange = useCallback(async (event) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
@@ -136,14 +168,14 @@ export default function EditProfilePage() {
             console.error('Failed to upload image:', error);
             URL.revokeObjectURL(previewUrl);
             setImagePreview(userImage || '');
-            showToast('error', error.response?.data?.message || t("profile.failedUploadImage"));
+            showToast('error', t("profile.failedUploadImage"));
         } finally {
             setUploadingImage(false);
             event.target.value = '';
         }
-    };
+    }, [user, userImage, login, t]);
 
-    const handleImageRemove = async () => {
+    const handleImageRemove = useCallback(async () => {
         const result = await Swal.fire({
             title: t("profile.removeProfileImage"),
             text: t("profile.removeProfileImageDesc"),
@@ -161,19 +193,20 @@ export default function EditProfilePage() {
             setImagePreview('');
             setUserImageFile(null);
             login({ ...user, userImage: '' });
+            saveProfile(userId, { firstName, lastName, email, gender, userImage: '' });
 
             showToast('success', t("profile.profileImageRemoved"));
         } catch (error) {
             console.error('Failed to remove image:', error);
-            showToast('error', error.response?.data?.message || t("profile.failedRemoveImage"));
+            showToast('error', t("profile.failedRemoveImage"));
         }
-    };
+    }, [user, login, t, userId, firstName, lastName, email, gender]);
 
-    const handleCancel = () => {
+    const handleCancel = useCallback(() => {
         navigate('/');
-    };
+    }, [navigate]);
 
-    const handleDeleteAccount = async () => {
+    const handleDeleteAccount = useCallback(async () => {
         if (!email) {
             return Swal.fire({
                 icon: 'warning',
@@ -202,13 +235,13 @@ export default function EditProfilePage() {
             navigate('/');
         } catch (error) {
             console.error('Failed to delete account:', error);
-            showToast('error', error.response?.data?.message || t("profile.failedDeleteAccount"));
+            showToast('error', t("profile.failedDeleteAccount"));
         } finally {
             setDeleting(false);
         }
-    };
+    }, [email, t, logout, navigate]);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = useCallback(async (e) => {
         e.preventDefault();
         if (!userId) return;
 
@@ -226,8 +259,7 @@ export default function EditProfilePage() {
             const updatedUser = profileRes.data?.user ?? profileRes.data;
             const updatedImage = updatedUser?.userImage || updatedUser?.image || imagePreview || userImage;
             const updatedName = [firstName, lastName].filter(Boolean).join(" ").trim();
-
-            login({
+            const updatedUserData = {
                 ...user,
                 email,
                 userImage: updatedImage,
@@ -240,37 +272,26 @@ export default function EditProfilePage() {
                     last_name: lastName,
                     gender,
                 },
-            });
+            };
+
+            login(updatedUserData);
             setUserImage(updatedImage);
             setImagePreview(updatedImage);
-
-            if (login) {
-                login({
-                    ...user,
-                    email,
-                    userImage: updatedImage,
-                    firstName,
-                    lastName,
-                    name: updatedName,
-                    profile: {
-                        ...(user?.profile || {}),
-                        first_name: firstName,
-                        last_name: lastName,
-                        gender,
-                    },
-                });
-            }
+            saveProfile(userId, { firstName, lastName, email, gender, userImage: updatedImage });
 
             showToast('success', t("profile.profileUpdated"));
         } catch (error) {
             console.error('Failed to save profile:', error);
-            showToast('error', error.response?.data?.message || t("profile.failedSaveProfile"));
+            showToast('error', t("profile.failedSaveProfile"));
         } finally {
             setSaving(false);
         }
-    };
+    }, [userId, firstName, lastName, gender, email, imagePreview, userImage, user, login, t]);
 
-    const fullName = [firstName, lastName].filter(Boolean).join(' ') || 'Your Name';
+    const fullName = useMemo(
+        () => [firstName, lastName].filter(Boolean).join(' ') || 'Your Name',
+        [firstName, lastName]
+    );
 
     if (loading) {
         return (
@@ -295,6 +316,7 @@ export default function EditProfilePage() {
                                     src={imagePreview}
                                     alt={`${firstName} ${lastName}'s profile picture`}
                                     className="w-full h-full object-cover"
+                                    loading="lazy"
                                     onError={() => setImagePreview('')}
                                 />
                             ) : (

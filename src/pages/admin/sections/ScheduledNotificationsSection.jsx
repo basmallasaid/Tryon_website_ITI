@@ -54,7 +54,7 @@ function EditModal({ notification, onClose, onSave }) {
       }
       onSave();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to reschedule.');
+      alert('Failed to reschedule.');
     } finally {
       setSaving(false);
     }
