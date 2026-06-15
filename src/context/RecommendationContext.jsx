@@ -83,8 +83,17 @@ export function RecommendationProvider({ children }) {
           const translated = await translateIfNeeded(result.outfits[0]);
           setTodaysOutfit(translated);
           setTodaysWeather(result.weather || result.outfits[0]?.weather || null);
+
+          setHistory((prev) => {
+            const newEntry = {
+              _id: "post_" + Date.now(),
+              outfits: [result],
+              weather: result.weather || result.outfits[0]?.weather || null,
+              created_at: new Date().toISOString(),
+            };
+            return [newEntry, ...prev];
+          });
         }
-        await fetchHistory();
         fetchedRef.current = true;
       } catch {
         setError("Failed to fetch recommendation. Please try again.");
@@ -100,6 +109,7 @@ export function RecommendationProvider({ children }) {
     if (user) {
       fetchedRef.current = false;
       translatedRef.current = {};
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchDailyRecommendation();
     } else {
       setTodaysOutfit(null);
@@ -134,6 +144,7 @@ export function RecommendationProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRecommendation() {
   return useContext(RecommendationContext);
 }
