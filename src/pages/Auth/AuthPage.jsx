@@ -124,7 +124,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
                 onClose?.();
             }
         } catch (error) {
-            showToast('error', error.response?.data?.message || t("auth.loginFailed"));
+            showToast('error', t("auth.loginFailed"));
         }
     };
 
@@ -167,7 +167,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             });
             onClose?.();
         } catch (error) {
-            showToast('error', error.response?.data?.message || t("auth.registrationFailed"));
+            showToast('error', t("auth.registrationFailed"));
         }
     };
 
@@ -179,7 +179,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             setForgotEmail(email);
             setView("otp");
         } catch (error) {
-            showToast('error', error.response?.data?.message || t("auth.failedToSendReset"));
+            showToast('error', t("auth.failedToSendReset"));
         }
     };
 
@@ -188,7 +188,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             await otpVerifyApi({ email: forgotEmail, otp });
             setView("reset");
         } catch (error) {
-            showToast('error', error.response?.data?.message || t("auth.verificationFailed"));
+            showToast('error', t("auth.verificationFailed"));
         }
     };
 
@@ -199,7 +199,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             showToast('success', t("auth.resetSuccess"));
             setView("login");
         } catch (error) {
-            showToast('error', error.response?.data?.message || t("auth.failedToReset"));
+            showToast('error', t("auth.failedToReset"));
         }
     };
 

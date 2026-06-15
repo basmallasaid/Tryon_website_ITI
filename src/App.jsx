@@ -11,6 +11,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 // Contexts
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { WardrobeProvider } from "./context/WardrobeContext";
+import { RecommendationProvider } from "./context/RecommendationContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
@@ -159,9 +160,11 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <WardrobeProvider>
-          <FavoritesProvider>
-            <AppContent />
-          </FavoritesProvider>
+          <RecommendationProvider>
+            <FavoritesProvider>
+              <AppContent />
+            </FavoritesProvider>
+          </RecommendationProvider>
         </WardrobeProvider>
       </AuthProvider>
     </ThemeProvider>

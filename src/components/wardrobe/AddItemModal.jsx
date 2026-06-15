@@ -39,7 +39,7 @@ const AddItemModal = ({ isOpen, onClose }) => {
                 state: { analysisId, analysisResult, imageFile: selectedFile }
             });
         } catch (err) {
-            setError(err.response?.data?.message || err.message || t('wardrobe.analysisFailed'));
+            setError(t('wardrobe.analysisFailed'));
         } finally {
             setAnalyzing(false);
         }
