@@ -8,8 +8,8 @@ const Toast = Swal.mixin({
   timerProgressBar: false,
 });
 
-export const showToast = (icon, title) => {
-  Toast.fire({ icon, title });
+export const showToast = (icon, title, position) => {
+  Toast.fire({ icon, title, position: position || 'top-end' });
 };
 
 export default Toast;

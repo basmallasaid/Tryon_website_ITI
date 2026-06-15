@@ -17,7 +17,7 @@ function ApiKeyStatusBadge({ status }) {
 
 export default function ApiKeyCard({ name, icon: Icon, iconBg, iconColor, status, maskedKey, onEdit, onDelete, onView, onCopy }) {
   return (
-    <div className="bg-admin-surface rounded-xl border border-admin-border/40 shadow-sm p-4">
+    <div className="bg-surface-elevated rounded-xl border border-admin-border/40 shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
@@ -36,7 +36,7 @@ export default function ApiKeyCard({ name, icon: Icon, iconBg, iconColor, status
           </button>
           <button
             onClick={onDelete}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-accent-orange"
             title="Delete key"
           >
             <Trash2 className="w-4 h-4" />

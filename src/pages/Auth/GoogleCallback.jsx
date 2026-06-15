@@ -11,6 +11,7 @@ export default function GoogleCallback() {
   useEffect(() => {
     const token = searchParams.get("token");
     const email = searchParams.get("email");
+    const error = searchParams.get("error");
     const fname = searchParams.get("fname");
     const lname = searchParams.get("lname");
     const id = searchParams.get("_id");
@@ -35,14 +36,20 @@ export default function GoogleCallback() {
           navigate("/", { replace: true });
         }
       }
-    } else if (!window.opener) {
+    } else if (window.opener) {
+      window.opener.postMessage(
+        { type: "GOOGLE_AUTH_ERROR", payload: error || "google_login_failed" },
+        window.origin
+      );
+      window.close();
+    } else {
       navigate("/", { replace: true });
     }
   }, [login, navigate, searchParams]);
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", bgcolor: "#0A0E17" }}>
-      <CircularProgress sx={{ color: "#00E5FF" }} />
+    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh", bgcolor: "var(--background)" }}>
+      <CircularProgress sx={{ color: "var(--primary)" }} />
     </Box>
   );
 }

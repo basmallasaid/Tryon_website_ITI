@@ -280,7 +280,7 @@ export default function EmailCenterSection({ onReadChange }) {
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block bg-admin-surface border border-admin-border/40 rounded-2xl overflow-hidden">
+      <div className="hidden md:block bg-surface-elevated border border-admin-border/40 rounded-2xl overflow-hidden">
         <div className="flex items-center gap-2 px-6 py-3 border-b border-admin-border/40">
           {[{ key: 'Inbox', label: t('admin.emailCenter.inbox') }, { key: 'Unread', label: t('admin.emailCenter.unread') }, { key: 'All', label: t('admin.emailCenter.all') }].map(({ key, label }) => (
             <button
@@ -360,7 +360,7 @@ export default function EmailCenterSection({ onReadChange }) {
           ))}
         </div>
 
-        <div className="bg-admin-surface border border-admin-border/40 rounded-2xl overflow-hidden">
+        <div className="bg-surface-elevated border border-admin-border/40 rounded-2xl overflow-hidden">
           {loading ? (
             <p className="p-4 text-center text-sm text-admin-text-muted">{t('admin.emailCenter.loading')}</p>
           ) : currentItems.length > 0 ? (

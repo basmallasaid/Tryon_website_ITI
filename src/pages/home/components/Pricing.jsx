@@ -39,9 +39,9 @@ const Pricing = () => {
         </div>
 
         <div className="w-[798px] h-[94px] flex items-center justify-center max-[1100px]:w-full max-[1100px]:px-4">
-          <div className="relative flex items-center bg-[#ededed] rounded-full w-full h-full">
+          <div className="relative flex items-center bg-[#EDEDED] rounded-full w-full h-full">
             <span
-              className="absolute rounded-full border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
+              className="absolute rounded-full border border-[var(--border)] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
               style={{
                 top: "4px",
                 bottom: "4px",
@@ -69,7 +69,7 @@ const Pricing = () => {
         <div className="flex items-stretch justify-center gap-8 max-[1100px]:flex-col">
           {/* Card 1 - Essential */}
           <div className="w-[449px] max-[1100px]:w-full rounded-[32px] py-8 max-[1100px]:py-6 px-10 shadow-[0px_0px_4px_0px_#00000026] bg-surface-elevated flex flex-col gap-8">
-            <div className="w-[154px] h-8 rounded-full py-1 px-3 bg-[#a1a7b3] flex items-center justify-center self-start">
+            <div className="w-[154px] h-8 rounded-full py-1 px-3 bg-[var(--text-secondary)] flex items-center justify-center self-start">
               <span className="font-roboto font-medium text-[14px] leading-[117%] text-surface-elevated text-center">
                 {t("pricing.currentPlan")}
               </span>
@@ -103,7 +103,7 @@ const Pricing = () => {
           </div>
 
           {/* Card 2 - Pro Stylist */}
-          <div className="relative w-[449px] max-[1100px]:w-full rounded-[32px] overflow-hidden shrink-0">
+          <div className="relative w-[449px] max-[1100px]:w-full rounded-[32px] overflow-hidden shrink-0 shadow-[0_0_20px_4px_rgba(255,138,61,0.1),0_0_40px_8px_rgba(64,185,255,0.08),0_0_60px_12px_rgba(142,211,33,0.06)]">
             <span
               className="absolute inset-0 p-[4px] rounded-[32px] pointer-events-none"
               style={{
@@ -216,7 +216,7 @@ const Pricing = () => {
 
               <button
                 onClick={() => navigate("/pricing")}
-                className="w-full h-16 px-2 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xl text-[#F1F5F9] transition-all duration-300 bg-accent-orange cursor-pointer hover:scale-105 active:scale-95"
+                className="w-full h-16 px-2 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xl text-white transition-all duration-300 bg-accent-orange cursor-pointer hover:scale-105 active:scale-95"
               >
                 {t("pricing.subscribeNow")}
               </button>

@@ -30,12 +30,45 @@ const pricingKeys = {
   },
 };
 
+function SuccessPopup({ open, onClose, t }) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay px-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-[500px] rounded-lg border border-border-strong p-8 gap-6 bg-surface-elevated animate-fadeInScale flex flex-col items-center text-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-16 h-16 rounded-full bg-success-bg flex items-center justify-center">
+          <CircleCheck className="w-8 h-8 text-success-text" />
+        </div>
+        <div className="flex flex-col gap-2">
+          <h3 className="font-roboto font-bold text-[24px] leading-[38.4px] text-text-primary">
+            {t("pricing.successTitle")}
+          </h3>
+          <p className="font-roboto text-[16px] leading-[24px] text-text-secondary">
+            {t("pricing.successDesc")}
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full h-12 rounded-lg bg-gradient-to-r from-primary via-[#69C9AC] to-[#AAE338] font-semibold text-base text-white cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+        >
+          {t("pricing.successButton")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function CancelModal({ open, onClose, onConfirm, cancelling, endDate }) {
   const { t } = useTranslation();
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay px-4"
       onClick={onClose}
     >
       <div
@@ -109,7 +142,7 @@ export default function PricingPage() {
   const isPostPayment = useRef(false);
   const retryIntervalRef = useRef(null);
 
-  const fetchSubscription = () => {
+  const fetchSubscription = (retries = 0, delay = 1000) => {
     if (!user) {
       setLoading(false);
       return;
@@ -133,8 +166,14 @@ export default function PricingPage() {
             clearInterval(retryIntervalRef.current);
             retryIntervalRef.current = null;
           }
-        } else if (!isPostPayment.current) {
+          isPostPayment.current = false;
+        } else if (isPostPayment.current && retries > 0) {
+          retryIntervalRef.current = setTimeout(() => {
+            fetchSubscription(retries - 1, delay);
+          }, delay);
+        } else {
           setSubscription(null);
+          isPostPayment.current = false;
         }
       })
       .catch(() => {})
@@ -144,8 +183,9 @@ export default function PricingPage() {
   useEffect(() => {
     if (searchParams.get("success") === "true") {
       if (user) {
+        isPostPayment.current = true;
         setSearchParams({}, { replace: true });
-        showToast("success", t("pricing.subscriptionSuccess"));
+        setShowSuccessPopup(true);
         syncSubscriptionApi({ userId: user.id })
           .then(() => fetchSubscription(3, 1000))
           .catch(() => fetchSubscription(3, 1000));
@@ -169,6 +209,7 @@ export default function PricingPage() {
   useEffect(() => {
     if (justSubscribed && user) {
       setJustSubscribed(false);
+      isPostPayment.current = true;
       setSearchParams({}, { replace: true });
       syncSubscriptionApi({ userId: user.id })
         .then(() => fetchSubscription(3, 1000))
@@ -267,7 +308,7 @@ export default function PricingPage() {
               </p>
             </div>
             <div className="flex justify-center w-full">
-              <div className="relative w-[900px] max-w-full rounded-[32px] overflow-hidden">
+              <div className="relative w-[900px] max-w-full rounded-[32px] overflow-hidden shadow-[0_0_20px_4px_rgba(255,138,61,0.1),0_0_40px_8px_rgba(64,185,255,0.08),0_0_60px_12px_rgba(142,211,33,0.06)]">
                 <span
                   className="absolute inset-0 p-[4px] rounded-[32px] pointer-events-none"
                   style={{
@@ -289,7 +330,7 @@ export default function PricingPage() {
                     </div>
 
                     <div className="flex flex-col gap-1 pb-4 border-b border-border-strong">
-                      <span className="font-roboto font-bold text-[24px] leading-[38.4px] text-[#131e2b]">
+                      <span className="font-roboto font-bold text-[24px] leading-[38.4px] text-text-primary">
                         {t("pricing.proStyle")}
                       </span>
                       <span className="font-roboto font-normal text-[12px] text-border-disabled">
@@ -374,9 +415,9 @@ export default function PricingPage() {
             </div>
 
             <div className="w-[798px] h-[94px] flex items-center justify-center max-[1100px]:w-full max-[1100px]:px-4">
-              <div className="relative flex items-center bg-[#ededed] rounded-full w-full h-full">
+              <div className="relative flex items-center bg-[#EDEDED] rounded-full w-full h-full">
                 <span
-                  className="absolute rounded-full border border-[#e9ebee] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
+                  className="absolute rounded-full border border-[var(--border)] bg-surface-elevated shadow-[0px_1px_2px_0px_#0000000D] transition-all duration-300 ease-in-out"
                   style={{
                     top: "4px",
                     bottom: "4px",
@@ -413,7 +454,7 @@ export default function PricingPage() {
 
             <div className="flex items-stretch justify-center gap-8 max-[1100px]:flex-col">
               <div className="w-[449px] max-[1100px]:w-full rounded-[32px] py-8 max-[1100px]:py-6 px-10 shadow-[0px_0px_4px_0px_#00000026] bg-surface-elevated flex flex-col gap-8">
-                <div className="w-[154px] h-8 rounded-full py-1 px-3 bg-[#a1a7b3] flex items-center justify-center self-start">
+                <div className="w-[154px] h-8 rounded-full py-1 px-3 bg-[var(--text-secondary)] flex items-center justify-center self-start">
                   <span className="font-roboto font-medium text-[14px] leading-[117%] text-surface-elevated text-center">
                     {t("pricing.currentPlan")}
                   </span>
@@ -446,7 +487,7 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <div className="relative w-[449px] max-[1100px]:w-full rounded-[32px] overflow-hidden shrink-0">
+              <div className="relative w-[449px] max-[1100px]:w-full rounded-[32px] overflow-hidden shrink-0 shadow-[0_0_20px_4px_rgba(255,138,61,0.1),0_0_40px_8px_rgba(64,185,255,0.08),0_0_60px_12px_rgba(142,211,33,0.06)]">
                 <span
                   className="absolute inset-0 p-[4px] rounded-[32px] pointer-events-none"
                   style={{
@@ -560,7 +601,7 @@ export default function PricingPage() {
                   <button
                     onClick={handleSubscribe}
                     disabled={subscribing}
-                    className="w-full h-16 px-2 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xl text-[#F1F5F9] transition-all duration-300 bg-accent-orange cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50"
+                    className="w-full h-16 px-2 py-2 rounded-lg flex items-center justify-center gap-2 font-semibold text-xl text-white transition-all duration-300 bg-accent-orange cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50"
                   >
                     {subscribing && (
                       <Loader2 className="w-5 h-5 animate-spin" />
@@ -583,6 +624,11 @@ export default function PricingPage() {
           onConfirm={handleCancel}
           cancelling={cancelling}
           endDate={subscription?.endDate}
+        />
+        <SuccessPopup
+          open={showSuccessPopup}
+          onClose={() => { setShowSuccessPopup(false); setSuccessPopupShown(true); }}
+          t={t}
         />
       </div>
     </section>

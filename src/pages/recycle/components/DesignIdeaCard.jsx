@@ -57,7 +57,7 @@ const DesignIdeaCard = ({ idea, index, selected, onSelect, disabled }) => {
       )}
 
       <div
-        className="w-full bg-white p-6 sm:p-8 flex flex-col"
+        className="w-full bg-surface-elevated p-6 sm:p-8 flex flex-col"
         style={{
           borderRadius: isSelected ? "14px" : "16px",
           margin: isSelected ? "2px" : undefined,
@@ -69,8 +69,8 @@ const DesignIdeaCard = ({ idea, index, selected, onSelect, disabled }) => {
           <div
             className="flex h-8 w-8 items-center justify-center rounded-full text-xs"
             style={{
-              backgroundColor: "#D5D9DE",
-              color: "#3E4850",
+              backgroundColor: "var(--Border-Strong)",
+              color: "var(--text-primary)",
               fontWeight: "var(--Bold)",
             }}
           >

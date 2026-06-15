@@ -217,7 +217,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
                   <Pencil className="w-3.5 h-3.5" /> {t('admin.stores.selectEdit')}
                 </button>
               )}
-              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-admin-danger/10 text-admin-danger rounded-lg text-xs font-medium hover:bg-admin-danger/20 transition-colors">
+              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-accent-orange/10 text-accent-orange rounded-lg text-xs font-medium hover:bg-accent-orange/20 transition-colors">
                 <Trash2 className="w-3.5 h-3.5" /> {t('admin.stores.selectDelete', { count: selectedIds.size })}
               </button>
             </div>
@@ -225,7 +225,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
         </div>
 
         {showFilterPanel && (
-          <div className="bg-admin-surface border border-admin-border/40 rounded-xl p-4 mb-6 shadow-sm">
+          <div className="bg-surface-elevated border border-admin-border/40 rounded-xl p-4 mb-6 shadow-sm">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
                 <label className="text-xs font-medium text-admin-text-secondary">{t('admin.stores.discountRange')}</label>
@@ -271,7 +271,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
           </div>
         )}
 
-        <div className="bg-admin-surface rounded-xl border border-admin-border/40 shadow-sm overflow-hidden mb-6">
+        <div className="bg-surface-elevated rounded-xl border border-admin-border/40 shadow-sm overflow-hidden mb-6">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-admin-border/60">
@@ -384,7 +384,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
           </select>
           <button
             onClick={() => setShowFilterPanel(!showFilterPanel)}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${showFilterPanel || (discountMin !== '' || discountMax !== '' || sortBy !== 'none') ? 'bg-admin-brand border-admin-brand text-white' : 'bg-admin-surface border-admin-border text-admin-text-secondary'}`}
+            className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${showFilterPanel || (discountMin !== '' || discountMax !== '' || sortBy !== 'none') ? 'bg-admin-brand border-admin-brand text-white' : 'bg-surface-elevated border-admin-border text-admin-text-secondary'}`}
           >
             <SlidersHorizontal className="w-4 h-4" />
           </button>
@@ -397,7 +397,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
         )}
 
         {showFilterPanel && (
-          <div className="bg-admin-surface border border-admin-border/40 rounded-xl p-4 shadow-sm space-y-3">
+          <div className="bg-surface-elevated border border-admin-border/40 rounded-xl p-4 shadow-sm space-y-3">
             <div className="flex items-center gap-3">
               <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">{t('admin.stores.discountRange')}</label>
               <input
@@ -457,7 +457,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
                   <Pencil className="w-3.5 h-3.5" /> {t('admin.stores.selectEdit')}
                 </button>
               )}
-              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-admin-danger/10 text-admin-danger rounded-xl text-xs font-medium">
+              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 bg-accent-orange/10 text-accent-orange rounded-xl text-xs font-medium">
                 <Trash2 className="w-3.5 h-3.5" /> {t('admin.stores.selectDelete', { count: selectedIds.size })}
               </button>
             </div>

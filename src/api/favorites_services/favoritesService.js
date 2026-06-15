@@ -52,33 +52,42 @@ export const fetchEnrichmentData = async () => {
   return { wardrobeMap, productsMap, tryonMap, recycleMap };
 };
 
+function enrichFields(fav) {
+  return {
+    ...fav,
+    _id: normalizeId(fav._id ?? fav.id),
+    itemId: normalizeId(fav.itemId),
+  };
+}
+
 export const enrichFavorite = (fav, maps) => {
   const { wardrobeMap, productsMap, tryonMap, recycleMap } = maps;
-  const id = normalizeId(fav.itemId);
+  const enriched = enrichFields(fav);
+  const { itemId } = enriched;
 
   if (fav.itemType === "WARDROBE") {
-    const item = wardrobeMap[id];
-    if (!item) return { ...fav, image: null, name: null, category: "Wardrobe" };
-    return { ...fav, image: item.image, name: item.name, category: "Wardrobe" };
+    const item = wardrobeMap[itemId];
+    if (!item) return { ...enriched, image: null, name: null, category: "Wardrobe" };
+    return { ...enriched, image: item.image, name: item.name, category: "Wardrobe" };
   }
 
   if (fav.itemType === "PRODUCT") {
-    const product = productsMap[id];
-    if (!product) return { ...fav, image: null, name: null, category: "Store" };
-    return { ...fav, image: product.images?.[0] || product.image, name: product.name, category: "Store" };
+    const product = productsMap[itemId];
+    if (!product) return { ...enriched, image: null, name: null, category: "Store" };
+    return { ...enriched, image: product.images?.[0] || product.image, name: product.name, category: "Store" };
   }
 
   if (fav.itemType === "TRYON") {
-    const tryonItem = tryonMap[id];
+    const tryonItem = tryonMap[itemId];
     if (tryonItem) {
-      return { ...fav, image: tryonItem.imageUrl ?? tryonItem.image, name: tryonItem.name ?? "Try-On", category: "Try On" };
+      return { ...enriched, image: tryonItem.imageUrl ?? tryonItem.image, name: tryonItem.name ?? "Try-On", category: "Try On" };
     }
-    const recycleItem = recycleMap[id];
+    const recycleItem = recycleMap[itemId];
     if (recycleItem) {
-      return { ...fav, image: recycleItem.imageUrl ?? recycleItem.image, name: recycleItem.designTitle ?? recycleItem.name ?? "Recycle", category: "Recycle" };
+      return { ...enriched, image: recycleItem.imageUrl ?? recycleItem.image, name: recycleItem.designTitle ?? recycleItem.name ?? "Recycle", category: "Recycle" };
     }
-    return { ...fav, image: null, name: null, category: "Try On" };
+    return { ...enriched, image: null, name: null, category: "Try On" };
   }
 
-  return { ...fav, image: null, name: null, category: null };
+  return { ...enriched, image: null, name: null, category: null };
 };

@@ -2,8 +2,8 @@ import { Shirt, RefreshCw, Plus, Trash2 } from 'lucide-react';
 import QuotaBar from './QuotaBar';
 
 const statusStyles = {
-  Active: 'bg-[rgba(142,211,33,0.1)] text-[#5A8A10]',
-  Inactive: 'bg-[#FFE2E2] text-[#FB2C36]',
+  Active: 'bg-admin-success/10 text-admin-success',
+  Inactive: 'bg-admin-danger/10 text-admin-danger',
 };
 
 const roleStyles = {
@@ -17,7 +17,7 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
 
   if (mobile) {
     return (
-      <div className={`bg-admin-surface rounded-xl border shadow-sm p-4 transition-colors ${selected ? 'border-admin-brand bg-admin-brand/5' : 'border-admin-border/40'}`}>
+      <div className={`bg-surface-elevated rounded-xl border shadow-sm p-4 transition-colors ${selected ? 'border-admin-brand bg-admin-brand/5' : 'border-admin-border/40'}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3 min-w-0">
             <input
@@ -33,8 +33,8 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
               <span className="text-xs font-bold text-white">{user.initials}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-[#1E1E24] leading-5 truncate">{user.name}</p>
-              <p className="text-xs text-[#99A1AF] leading-4 truncate">{user.email}</p>
+              <p className="text-sm font-semibold text-text-primary leading-5 truncate">{user.name}</p>
+              <p className="text-xs text-text-disabled leading-4 truncate">{user.email}</p>
             </div>
           </div>
           <span
@@ -63,10 +63,10 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
           />
           <QuotaBar
             icon={RefreshCw}
-            iconColor="text-[#2B7FFF]"
+            iconColor="text-admin-brand-light"
             used={user.recycling.used}
             total={user.recycling.total}
-            barColor="bg-[#3B82F6]"
+            barColor="bg-admin-brand-light"
           />
         </div>
       </div>
@@ -74,7 +74,7 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
   }
 
   return (
-    <tr className={`border-b border-[#F9FAFB] hover:bg-admin-brand-activeBg/30 transition-colors ${selected ? 'bg-admin-brand/5' : ''}`}>
+    <tr className={`border-b border-admin-border hover:bg-admin-brand-activeBg/30 transition-colors ${selected ? 'bg-admin-brand/5' : ''}`}>
       <td className="py-3 px-4">
         <div className="flex items-center gap-3">
           <input
@@ -90,8 +90,8 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
             <span className="text-xs font-bold text-white">{user.initials}</span>
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#1E1E24] leading-5 truncate">{user.name}</p>
-            <p className="text-xs text-[#99A1AF] leading-4 truncate">{user.email}</p>
+            <p className="text-sm font-semibold text-text-primary leading-5 truncate">{user.name}</p>
+            <p className="text-xs text-text-disabled leading-4 truncate">{user.email}</p>
           </div>
         </div>
       </td>
@@ -118,10 +118,10 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
       <td className="py-3 px-4">
         <QuotaBar
           icon={RefreshCw}
-          iconColor="text-[#2B7FFF]"
+          iconColor="text-admin-brand-light"
           used={user.recycling.used}
           total={user.recycling.total}
-          barColor="bg-[#3B82F6]"
+          barColor="bg-admin-brand-light"
         />
       </td>
 

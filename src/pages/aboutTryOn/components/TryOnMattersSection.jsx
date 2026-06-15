@@ -45,7 +45,7 @@ export default function TryOnMattersSection() {
           {benefits.map(benefit => (
             <div
               key={benefit.titleKey}
-              className="group relative bg-white rounded-2xl p-8 border border-gray-100 hover:border-transparent transition-all duration-300 hover:shadow-xl"
+              className="group relative bg-surface-elevated rounded-2xl p-8 border border-[var(--border)] hover:border-transparent transition-all duration-300 hover:shadow-xl"
             >
               <div
                 className={`inline-flex items-center justify-center w-10 h-10 rounded-full p-2 ${benefit.bgColor} mb-6`}

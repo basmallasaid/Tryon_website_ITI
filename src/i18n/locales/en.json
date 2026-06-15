@@ -16,7 +16,8 @@
     "wardrobe": "Wardrobe",
     "dark": "Dark",
     "light": "Light",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "recommendations": "Recommendations"
   },
   "hero": {
     "yourPersonal": "Your Personal",
@@ -147,7 +148,10 @@
     "confirmCancellation": "Confirm Cancellation",
     "subscriptionSuccess": "Subscription activated successfully!",
     "loginPromptTitle": "Subscription Requires Login",
-    "loginPromptDesc": "Create an account or log in to subscribe to a plan and unlock premium features."
+    "loginPromptDesc": "Create an account or log in to subscribe to a plan and unlock premium features.",
+    "successTitle": "Subscription Activated!",
+    "successDesc": "Your Pro Stylist plan is now active. Enjoy unlimited lookbooks, hyper-realistic try-on, and personalized style coaching.",
+    "successButton": "Go to My Subscription"
   },
   "questions": {
     "title": "Styling Questions?",
@@ -263,7 +267,11 @@
     "resetSuccess": "Password reset successfully! Please login with your new password.",
     "failedToSendReset": "Failed to send reset link",
     "verificationFailed": "Verification failed",
-    "failedToReset": "Failed to reset password"
+    "failedToReset": "Failed to reset password",
+    "googleLoginFailed": "Google login failed. Please try again.",
+    "googlePopupBlocked": "Popup was blocked. Please allow popups for this site.",
+    "googleEmailExists": "This email is already registered. Please login or use a different email.",
+    "googleTryDifferentEmail": "Error while logging in. Try with a different email."
   },
   "stores": {
     "title": "Stores",
@@ -336,6 +344,7 @@
     "analysisFailed": "Failed to analyze images. Please try again.",
     "noImageReturned": "No image was returned from the server.",
     "generationFailed": "Image generation failed. Please try again.",
+    "generationError": "Error executing this action. Please try again.",
     "unsupportedFileType": "Unsupported file type. Accepted: {{types}}",
     "fileTooLarge": "\"{{name}}\" exceeds the 10MB size limit.",
     "selectItemsStep": "Select Items",
@@ -431,7 +440,11 @@
     "save": "Save",
     "productPreselected": "This product is pre-selected for try-on",
     "selectModelAndGenerate": "Select your model above and generate",
-    "tryOnResult": "Try-on result"
+    "tryOnResult": "Try-on result",
+    "generationError": "Error executing this action. Please try again.",
+    "categoryConflict": "Cannot combine \"{{cat1}}\" with \"{{cat2}}\".",
+    "categoryRequired": "Category Required",
+    "categoryRequiredText": "Please assign a category to each uploaded image before generating."
   },
   "matching": {
     "title": "Matching",
@@ -465,7 +478,8 @@
     "noWardrobeMatches": "No wardrobe matches found",
     "storeMatches": "Matching Items From Store",
     "noStoreMatches": "No store matches found",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "generationError": "Error executing this action. Please try again."
   },
   "wardrobe": {
     "health": "Wardrobe Health",
@@ -582,8 +596,24 @@
     "weight": "Weight",
     "height": "Height",
     "skinTone": "Skin Tone",
+    "skinTones": {
+      "very-light": "Very Light",
+      "light": "Light",
+      "medium": "Medium",
+      "tan": "Tan",
+      "brown": "Brown",
+      "dark": "Dark"
+    },
     "faceShape": "Face Shape",
     "hairColor": "Hair Color",
+    "hairColors": {
+      "black": "Black",
+      "dark-brown": "Dark Brown",
+      "brown": "Brown",
+      "light-brown": "Light Brown",
+      "blonde": "Blonde",
+      "red": "Red"
+    },
     "eyeColor": "Eye Color",
     "beardStyle": "Beard Style",
     "facialExpression": "Facial Expression",
@@ -596,6 +626,8 @@
     "generatingAvatar": "Generating your avatar...",
     "generationFailed": "Avatar generation failed. Please try again.",
     "noImageReturned": "No image was returned from the server.",
+    "fillAllFields": "Please fill in all required fields.",
+    "generationError": "Error executing this action. Please try again.",
     "useInTryOn": "Use in Try-On",
     "upgrade": "Upgrade to Generate More"
   },
@@ -650,6 +682,7 @@
     "notInstalled": "Not installed",
     "paymentMethods": "Payment Methods",
     "secureSettings": "Secure settings",
+    "adminDashboard": "Admin Dashboard",
     "wishlist": "Wishlist",
     "yourSavedItems": "Your saved items",
     "editProfile": "Edit Profile",
@@ -688,6 +721,42 @@
     "languageArabic": "العربية",
     "languageEnglish": "English"
   },
+  "recommendation": {
+    "greetingMorning": "Good Morning",
+    "greetingAfternoon": "Good Afternoon",
+    "greetingEvening": "Good Evening",
+    "guest": "Guest",
+    "subtitle": "Let's dress smart today.",
+    "todaysRecommendation": "Today's recommendation",
+    "viewDetails": "Outfit Details",
+    "todaysLook": "Today's Look",
+    "weatherBasedDesc": "Perfect for {{condition}}, {{temp}}° today",
+    "recommendedForYou": "Curated just for you based on your style",
+    "whyWeChoseThis": "Why we chose this",
+    "aiAnalysis": "AI Analysis",
+    "defaultAnalysis": "Based on your style profile and current trends, we curated this outfit to maximize both comfort and style.",
+    "matchScore": "match score",
+    "historyTitle": "Previous recommendations",
+    "weeklyTitle": "This Week",
+    "today": "Today",
+    "noOutfit": "No recommendation yet",
+    "addItemsHint": "Add items to your wardrobe to get started",
+    "noOutfitForDay": "No outfit",
+    "noHistory": "No previous recommendations yet",
+    "errorFetching": "Could not fetch today's recommendation",
+    "outfitReady": "Your outfit is ready!",
+    "clothingItem": "Clothing Item",
+    "top": "Top",
+    "bottom": "Bottom",
+    "savedOutfit": "Saved outfit",
+    "matched": "Matched",
+    "outfitDetails": "Outfit Details",
+    "previousRecommendation": "Previous Recommendation",
+    "outfitItems": "Outfit Items",
+    "todayChoice": "Today's Choice",
+    "weatherDescription": "Perfect for today's warm weather and your wardrobe pieces. A balanced mix of comfort and style.",
+    "noOutfitsForWeek": "No outfits this week yet"
+  },
   "fav": {
     "title": "Favorites",
     "subtitle": "Start exploring our curated collections to build your digital favorite screen.",
@@ -710,5 +779,18 @@
     "addedSuccess": "Added to favorites successfully",
     "addedError": "Failed to add item to favorites",
     "loadError": "Unable to load favorites"
+  },
+  "loading": {
+    "title": "Getting ready...",
+    "msg1": "Styling your perfect look...",
+    "msg2": "Teaching AI about your fashion taste...",
+    "msg3": "Searching your wardrobe for hidden gems...",
+    "msg4": "Convincing the outfit to cooperate...",
+    "msg5": "Making fashion magic happen...",
+    "msg6": "Preparing your next favorite outfit...",
+    "msg7": "Matching colors like a professional stylist...",
+    "msg8": "Almost ready, your style is cooking...",
+    "msg9": "Consulting with digital fashion experts...",
+    "msg10": "Polishing every detail to perfection..."
   }
 }

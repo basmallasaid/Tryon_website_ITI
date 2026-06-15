@@ -6,17 +6,17 @@ const FilterSection = ({ title, children }) => {
   const [isOpen, setIsOpen] = useState(true); 
 
   return (
-    <div className="group border-b border-gray-100/60 py-6 last:border-none">
+    <div className="group border-b border-[var(--border)] py-6 last:border-none">
       <div 
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between mb-2 cursor-pointer group-hover:opacity-80 transition-opacity"
       >
-        <h3 className="text-[12px] font-black text-gray-900 uppercase tracking-[0.15em]">
+        <h3 className="text-[12px] font-black text-text-primary uppercase tracking-[0.15em]">
           {title}
         </h3>
         <ChevronDown
           size={14}
-          className={`text-gray-300 transition-transform duration-300 ${
+          className={`text-text-disabled transition-transform duration-300 ${
             isOpen ? "rotate-0" : "-rotate-90"
           }`}
         />
@@ -57,22 +57,22 @@ const FilterSidebar = ({
   };
 
   return (
-    <div className="w-full xl:w-80 bg-[#FEFEFE] rounded-[2.5rem] p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.02)] h-fit xl:sticky xl:top-8 border border-gray-50/50">
+    <div className="w-full xl:w-80 bg-surface-elevated rounded-[2.5rem] p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.02)] h-fit xl:sticky xl:top-8 border border-[var(--border)]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-50">
+      <div className="flex items-center justify-between mb-8 pb-4 border-b border-[var(--border)]">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-[#40B9FF]/10 rounded-lg text-[#40B9FF]">
+          <div className="p-2 bg-[var(--primary)]/10 rounded-lg text-[var(--primary)]">
             <SlidersHorizontal size={18} />
           </div>
 
-          <h2 className="text-xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-xl font-black text-text-primary tracking-tight">
             {t("stores.filters")}
           </h2>
         </div>
 
         <button
           onClick={() => window.location.reload()}
-          className="text-[10px] font-black text-gray-400 hover:text-[#40B9FF] transition-colors uppercase tracking-widest"
+          className="text-[10px] font-black text-text-secondary hover:text-[var(--primary)] transition-colors uppercase tracking-widest"
         >
           {t("stores.reset")}
         </button>
@@ -93,7 +93,7 @@ const FilterSidebar = ({
                   onChange={() =>
                     toggleArrayFilter('selectedCategories', cat)
                   }
-                  className="peer appearance-none w-5 h-5 rounded-lg border-2 border-gray-100 checked:bg-[#40B9FF] checked:border-[#40B9FF] transition-all duration-300 cursor-pointer"
+                  className="peer appearance-none w-5 h-5 rounded-lg border-2 border-[var(--border)] checked:bg-[var(--primary)] checked:border-[var(--primary)] transition-all duration-300 cursor-pointer"
                 />
 
                 <Check
@@ -102,7 +102,7 @@ const FilterSidebar = ({
                 />
               </div>
 
-              <span className="text-[13px] font-bold text-gray-500 group-hover:label:text-gray-900 capitalize transition-colors">
+              <span className="text-[13px] font-bold text-text-secondary group-hover:label:text-text-primary capitalize transition-colors">
                 {cat}
               </span>
             </label>
@@ -123,7 +123,7 @@ const FilterSidebar = ({
                   type="checkbox"
                   checked={filters.selectedBrands.includes(b.id)}
                   onChange={() => toggleArrayFilter('selectedBrands', b.id)}
-                  className="peer appearance-none w-5 h-5 rounded-lg border-2 border-gray-100 checked:bg-[#40B9FF] checked:border-[#40B9FF] transition-all duration-300 cursor-pointer"
+                  className="peer appearance-none w-5 h-5 rounded-lg border-2 border-[var(--border)] checked:bg-[var(--primary)] checked:border-[var(--primary)] transition-all duration-300 cursor-pointer"
                 />
 
                 <Check
@@ -132,7 +132,7 @@ const FilterSidebar = ({
                 />
               </div>
 
-              <span className="text-[13px] font-bold text-gray-500 group-hover:label:text-gray-900 transition-colors">
+              <span className="text-[13px] font-bold text-text-secondary group-hover:label:text-text-primary transition-colors">
                 {b.name}
               </span>
             </label>
@@ -157,8 +157,8 @@ const FilterSidebar = ({
                 className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center shadow-sm
                 ${
                   isActive
-                    ? 'border-[#40B9FF] scale-110 shadow-lg shadow-[#40B9FF]/20'
-                    : 'border-white hover:border-gray-200'
+                    ? 'border-[var(--primary)] scale-110 shadow-lg shadow-[var(--primary)]/20'
+                    : 'border-surface-elevated hover:border-[var(--border)]'
                 }`}
                 style={{ backgroundColor: color.toLowerCase() }}
               >
@@ -191,8 +191,8 @@ const FilterSidebar = ({
               className={`px-4 py-2 rounded-xl text-[11px] font-black border transition-all duration-300
               ${
                 filters.selectedSeasons.includes(season)
-                  ? 'bg-[#40B9FF] border-[#40B9FF] text-white shadow-md shadow-[#40B9FF]/20'
-                  : 'bg-gray-50 border-transparent text-gray-400 hover:bg-gray-100'
+                  ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/20'
+                  : 'bg-[var(--bg-secondary)] border-transparent text-text-secondary hover:bg-[var(--surface)]'
               }`}
             >
               {season.toUpperCase()}
@@ -215,26 +215,26 @@ const FilterSidebar = ({
                 maxPrice: parseInt(e.target.value),
               }))
             }
-            className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#40B9FF]"
+            className="w-full h-1.5 bg-[var(--bg-secondary)] rounded-lg appearance-none cursor-pointer accent-[var(--primary)]"
           />
 
           <div className="flex justify-between mt-4">
             <div className="flex flex-col">
-              <span className="text-[9px] font-black text-gray-300 uppercase">
+              <span className="text-[9px] font-black text-text-disabled uppercase">
                 {t("stores.limit")}
               </span>
 
-              <span className="text-[13px] font-black text-gray-400 tracking-tighter">
+              <span className="text-[13px] font-black text-text-secondary tracking-tighter">
                 0
               </span>
             </div>
 
             <div className="flex flex-col items-end">
-              <span className="text-[9px] font-black text-gray-300 uppercase">
+              <span className="text-[9px] font-black text-text-disabled uppercase">
                 {t("stores.current")}
               </span>
 
-              <span className="text-[13px] font-black text-[#40B9FF] tracking-tighter">
+              <span className="text-[13px] font-black text-[var(--primary)] tracking-tighter">
                 {filters.maxPrice}
                 <small className="text-[10px] opacity-60 font-bold ml-1">
                   {products?.[0]?.currency || 'EGP'}

@@ -54,8 +54,8 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
               onClick={onToggle} 
               className="group relative overflow-hidden rounded-2xl border-2 border-white/70 px-12 py-3 text-xl font-bold transition-all hover:border-white"
             >
-              <span className="relative z-10 group-hover:text-sky-600 transition-colors">{t("auth.backToLogin")}</span>
-              <div className="absolute inset-0 bg-white translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300"></div>
+              <span className="relative z-10 group-hover:text-primary transition-colors">{t("auth.backToLogin")}</span>
+              <div className="absolute inset-0 bg-surface-elevated translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300"></div>
             </button>
           </>
         ) : isLogin ? (
@@ -71,8 +71,8 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
               onClick={onToggle} 
               className="group relative overflow-hidden rounded-2xl border-2 border-white/70 px-16 py-3 text-xl font-bold transition-all hover:border-white shadow-xl"
             >
-              <span className="relative z-10 group-hover:text-sky-600 transition-colors">{t("auth.signUp")}</span>
-              <div className="absolute inset-0 bg-white translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300"></div>
+              <span className="relative z-10 group-hover:text-primary transition-colors">{t("auth.signUp")}</span>
+              <div className="absolute inset-0 bg-surface-elevated translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300"></div>
             </button>
           </>
         ) : (
@@ -86,8 +86,8 @@ export default function SlidingOverlay({ view, onToggle, onForgot, inModal }) {
               onClick={onToggle} 
               className="group relative overflow-hidden rounded-2xl border-2 border-white/70 px-16 py-3 text-xl font-bold transition-all hover:border-white shadow-xl"
             >
-              <span className="relative z-10 group-hover:text-sky-600 transition-colors">{t("auth.login")}</span>
-              <div className="absolute inset-0 bg-white translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300"></div>
+              <span className="relative z-10 group-hover:text-primary transition-colors">{t("auth.login")}</span>
+              <div className="absolute inset-0 bg-surface-elevated translate-y-[101%] group-hover:translate-y-0 transition-transform duration-300"></div>
             </button>
           </>
         )}

@@ -3,6 +3,7 @@ import { Heart, HeartOff, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 import { useFavorites } from "../../context/FavoritesContext";
+import EmptyState from "../../components/EmptyState";
 
 const SOURCE_LABELS = {
   Wardrobe: "WARDROBE",
@@ -43,21 +44,6 @@ function getSourceLabel(item) {
   return SOURCE_LABELS[cat] || cat.toUpperCase() || "FROM STORE";
 }
 
-function EmptyState() {
-  const { t, i18n } = useTranslation();
-  const isArabic = i18n.language === "ar";
-  return (
-    <div className="min-h-screen bg-bg-secondary font-roboto flex flex-col items-center justify-center" dir={isArabic ? 'rtl' : 'ltr'}>
-      <div className="w-32 h-32 rounded-full bg-surface-elevated flex items-center justify-center mb-6 shadow-sm">
-        <Heart size={52} className="text-primary" />
-      </div>
-      <h2 className="text-[36px] leading-[38px] font-black text-text-primary text-center px-4">
-        {t("fav.emptyMessage")}
-      </h2>
-    </div>
-  );
-}
-
 const FILTERS = ["All", "Store", "Wardrobe", "Recent Try-On", "Recent Recycle"];
 
 const FILTER_KEY_MAP = {
@@ -72,7 +58,6 @@ function FavoritesList({ items, removeItem }) {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
   const [activeFilter, setActiveFilter] = useState("All");
-  const [removingIds, setRemovingIds] = useState(new Set());
 
   const filtered = items.filter((item) => {
     if (activeFilter === "All") return true;
@@ -84,23 +69,11 @@ function FavoritesList({ items, removeItem }) {
     return false;
   });
 
-  const handleRemove = async (item) => {
-    const id = item._id || item.id;
-    if (removingIds.has(id)) return;
-    setRemovingIds((prev) => new Set(prev).add(id));
-    try {
-      await removeItem(item.itemId || item.item_id || id);
-    } catch {
-    } finally {
-      setRemovingIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
-    }
-  };
-
   const getFilterLabel = (filter) => t(FILTER_KEY_MAP[filter]);
+
+  const handleRemove = (item) => {
+    removeItem(item.itemId || item.item_id || item._id || item.id);
+  };
 
   return (
     <div className="min-h-screen bg-bg-secondary font-roboto" dir={isArabic ? 'rtl' : 'ltr'}>
@@ -143,7 +116,6 @@ function FavoritesList({ items, removeItem }) {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {filtered.map((item) => {
               const id = item._id || item.id;
-              const isRemoving = removingIds.has(id);
               const sourceLabel = getSourceLabel(item);
               const badgeColor = SOURCE_COLORS[sourceLabel] || "bg-border-strong text-text-secondary";
               const imageUrl = item.image || item.images?.[0] || item.image_url || "https://via.placeholder.com/300x400?text=No+Image";
@@ -162,14 +134,9 @@ function FavoritesList({ items, removeItem }) {
                     />
                     <button
                       onClick={() => handleRemove(item)}
-                      disabled={isRemoving}
-                      className="absolute top-3 ltr:right-3 rtl:left-3 p-2 bg-surface-elevated/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-rose-50 hover:scale-110 disabled:opacity-50 cursor-pointer z-10"
+                      className="absolute top-3 ltr:right-3 rtl:left-3 p-2 bg-surface-elevated/90 backdrop-blur-sm rounded-full shadow-sm transition-all duration-200 hover:bg-[var(--accent-light)] hover:scale-110 cursor-pointer z-10"
                     >
-                      {isRemoving ? (
-                        <Loader2 size={16} className="animate-spin text-accent-pink" />
-                      ) : (
-                        <Heart size={16} className="text-accent-pink fill-accent-pink" />
-                      )}
+                      <Heart size={16} className="text-accent-pink fill-accent-pink" />
                     </button>
                     <span
                       className={`absolute bottom-3 ltr:left-3 rtl:right-3 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm ${badgeColor}`}
@@ -243,7 +210,7 @@ export default function Fav() {
     );
   }
 
-  if (items.length === 0) return <EmptyState />;
+  if (items.length === 0) return <EmptyState message={t("fav.emptyMessage")} />;
 
   return <FavoritesList items={items} removeItem={removeItem} />;
 }

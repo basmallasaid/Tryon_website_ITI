@@ -24,9 +24,9 @@ function ConfirmDialog({ open, title, message, confirmLabel, onConfirm, onCancel
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/40" />
-      <div className="relative bg-admin-surface rounded-2xl shadow-xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
-        <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${danger ? 'bg-red-100' : 'bg-amber-100'}`}>
-          <AlertTriangle className={`w-6 h-6 ${danger ? 'text-red-600' : 'text-amber-600'}`} />
+      <div className="relative bg-surface-elevated rounded-2xl shadow-xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+        <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${danger ? 'bg-accent-orange/20' : 'bg-amber-100'}`}>
+          <AlertTriangle className={`w-6 h-6 ${danger ? 'text-accent-orange' : 'text-amber-600'}`} />
         </div>
         <h3 className="text-lg font-bold text-admin-text-primary text-center">{title}</h3>
         <p className="text-sm text-admin-text-secondary text-center mt-2">{message}</p>
@@ -34,7 +34,7 @@ function ConfirmDialog({ open, title, message, confirmLabel, onConfirm, onCancel
           <button onClick={onCancel} className="flex-1 py-2.5 border border-admin-border rounded-xl text-sm font-medium text-admin-text-primary hover:bg-admin-brand-bg transition-colors">
             {t('admin.apiManagement.cancel')}
           </button>
-          <button onClick={onConfirm} className={`flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-colors ${danger ? 'bg-red-500 hover:bg-red-600' : 'bg-admin-brand hover:bg-admin-brand-light'}`}>
+          <button onClick={onConfirm} className={`flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-colors ${danger ? 'bg-accent-orange hover:opacity-90' : 'bg-admin-brand hover:bg-admin-brand-light'}`}>
             {confirmLabel}
           </button>
         </div>
@@ -62,7 +62,7 @@ function EditDialog({ open, apiKey, onSave, onCancel }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/40" />
-      <div className="relative bg-admin-surface rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="relative bg-surface-elevated rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-bold text-admin-text-primary">{t('admin.apiManagement.editKey')}</h3>
           <button onClick={onCancel} className="p-1 rounded-lg hover:bg-admin-border/20 transition-colors">
@@ -122,7 +122,7 @@ function ApiKeyRow({ api, onCopy, copiedId, onEdit, onDelete }) {
   const Icon = svc.icon;
 
   return (
-    <div className="bg-admin-surface rounded-xl border border-admin-border/40 shadow-sm p-4">
+    <div className="bg-surface-elevated rounded-xl border border-admin-border/40 shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${svc.iconBg}`}>
@@ -137,7 +137,7 @@ function ApiKeyRow({ api, onCopy, copiedId, onEdit, onDelete }) {
           <button onClick={() => onEdit(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title={t('admin.apiManagement.editTooltip')}>
             <EditIcon className="w-4 h-4" />
           </button>
-          <button onClick={() => onDelete(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-admin-text-secondary" title={t('admin.apiManagement.deleteTooltip')}>
+          <button onClick={() => onDelete(api)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-admin-brand-activeBg transition-colors text-accent-orange" title={t('admin.apiManagement.deleteTooltip')}>
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           </button>
         </div>
@@ -155,7 +155,7 @@ function ApiKeyRow({ api, onCopy, copiedId, onEdit, onDelete }) {
 function SecurityNoticeCard() {
   const { t } = useAdminTranslation();
   return (
-    <div className="flex items-start gap-3 bg-[#EDEEF0] rounded-xl p-4">
+    <div className="flex items-start gap-3 bg-admin-brand-bg rounded-xl p-4">
       <div className="w-10 h-10 flex items-center justify-center shrink-0">
         <Shield className="w-5 h-5 text-brand-secondary" />
       </div>

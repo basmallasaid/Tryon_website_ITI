@@ -62,7 +62,7 @@ export default function HeroSection() {
             <div className="relative w-full max-w-[586px] mx-auto lg:ml-auto lg:mr-0 lg:h-full">
               <div className="flex rounded-2xl overflow-hidden shadow-lg lg:h-full">
                 {/* Before Panel */}
-                <div className="relative w-1/2 aspect-[3/4] lg:aspect-auto lg:h-full bg-gray-100">
+                <div className="relative w-1/2 aspect-[3/4] lg:aspect-auto lg:h-full bg-[var(--bg-secondary)]">
                   <div className="absolute inset-0 overflow-hidden">
                     <img
                       src="/before.png"
@@ -84,7 +84,7 @@ export default function HeroSection() {
                 </div>
 
                 {/* After Panel */}
-                <div className="relative w-1/2 aspect-[3/4] lg:aspect-auto lg:h-full bg-gray-100">
+                <div className="relative w-1/2 aspect-[3/4] lg:aspect-auto lg:h-full bg-[var(--bg-secondary)]">
                   <div className="absolute inset-0 overflow-hidden">
                     <img
                       src="/after.png"
@@ -92,7 +92,7 @@ export default function HeroSection() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="absolute top-0 ltr:right-0 rtl:left-0 w-0 h-0 ltr:border-l-[80px] rtl:border-r-[80px] border-t-[80px] ltr:border-l-transparent rtl:border-r-transparent border-t-[#8ed321]">
+                  <div className="absolute top-0 ltr:right-0 rtl:left-0 w-0 h-0 ltr:border-l-[80px] rtl:border-r-[80px] border-t-[80px] ltr:border-l-transparent rtl:border-r-transparent border-t-secondary">
                     <span
                       className="absolute text-white text-[11px] font-bold uppercase tracking-widest ltr:right-[10px] rtl:left-[10px]"
                       style={{

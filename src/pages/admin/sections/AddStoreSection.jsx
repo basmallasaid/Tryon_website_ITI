@@ -93,7 +93,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
 
         <div className="space-y-6">
           {/* Store Profile */}
-          <div className="bg-admin-surface border border-admin-border/30 rounded-2xl p-8 shadow-sm">
+          <div className="bg-surface-elevated border border-admin-border/30 rounded-2xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-5 h-5 text-admin-brand"><Info className="w-5 h-5" /></div>
               <h2 className="text-xl font-medium text-admin-text-primary">Store Profile</h2>
@@ -136,7 +136,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
           </div>
 
           {/* Brand Assets */}
-          <div className="bg-admin-surface border border-admin-border/30 rounded-2xl p-8 shadow-sm">
+          <div className="bg-surface-elevated border border-admin-border/30 rounded-2xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-5 h-5 text-admin-brand"><ImageIcon className="w-5 h-5" /></div>
               <h2 className="text-xl font-medium text-admin-text-primary">Brand Assets</h2>
@@ -159,7 +159,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
           </div>
 
           {/* Commerce */}
-          <div className="bg-admin-surface border border-admin-border/30 rounded-2xl p-8 shadow-sm">
+          <div className="bg-surface-elevated border border-admin-border/30 rounded-2xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-5 h-5 text-admin-brand"><Tag className="w-5 h-5" /></div>
               <h2 className="text-xl font-medium text-admin-text-primary">Commerce</h2>
@@ -194,7 +194,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
                   onClick={() => setIsActive(!isActive)}
                   className={`relative w-11 h-6 rounded-full transition-colors ${isActive ? 'bg-admin-brand' : 'bg-admin-border'}`}
                 >
-                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${isActive ? 'translate-x-5' : ''}`} />
+                  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-surface-elevated rounded-full shadow-sm transition-transform ${isActive ? 'translate-x-5' : ''}`} />
                 </button>
                 <span className="text-sm text-admin-text-primary whitespace-nowrap">Active Status</span>
               </div>
@@ -205,7 +205,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
 
       {/* Mobile */}
       <div className="lg:hidden flex flex-col min-h-screen">
-        <div className="flex items-center gap-3 px-4 py-4 bg-white/80 backdrop-blur-md border-b border-admin-border/30">
+        <div className="flex items-center gap-3 px-4 py-4 bg-surface-elevated/80 backdrop-blur-md border-b border-admin-border/30">
           <button onClick={onBack} className="p-2 -ml-2 text-admin-text-secondary hover:text-admin-text-primary transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -226,7 +226,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
           </div>
 
           {/* Basic Information */}
-          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 shadow-sm">
+          <div className="bg-surface-elevated border border-admin-border rounded-2xl p-5 shadow-sm">
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Store Name *</label>
@@ -272,7 +272,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
           </div>
 
           {/* Commerce Settings */}
-          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 shadow-sm">
+          <div className="bg-surface-elevated border border-admin-border rounded-2xl p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-5">
               <Tag className="w-4 h-4 text-admin-brand" />
               <h3 className="text-xs font-bold text-admin-text-primary tracking-widest uppercase">Commerce Settings</h3>
@@ -313,14 +313,14 @@ export default function AddStoreSection({ onBack, editingStore }) {
                   onClick={() => setIsActive(!isActive)}
                   className={`relative w-12 h-7 rounded-full transition-colors ${isActive ? 'bg-admin-brand' : 'bg-admin-border'}`}
                 >
-                  <span className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${isActive ? 'translate-x-5' : ''}`} />
+                  <span className={`absolute top-1 left-1 w-5 h-5 bg-surface-elevated rounded-full shadow-sm transition-transform ${isActive ? 'translate-x-5' : ''}`} />
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="px-4 py-4 bg-admin-surface border-t border-admin-border/30 flex items-center gap-3">
+        <div className="px-4 py-4 bg-surface-elevated border-t border-admin-border/30 flex items-center gap-3">
           <button onClick={onBack} className="flex-1 py-3 border border-admin-border rounded-xl text-sm font-medium text-admin-text-secondary">Cancel</button>
           <button onClick={handleSubmit} disabled={submitting} className="flex-[2] flex items-center justify-center gap-2 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50">
             <CheckCircle className="w-5 h-5" />
