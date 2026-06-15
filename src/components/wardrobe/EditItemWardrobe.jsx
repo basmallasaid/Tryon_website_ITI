@@ -120,10 +120,8 @@ const EditItemWardrobe = () => {
         e.stopPropagation();
         if (favorited) {
             removeItem(id);
-            showToast('success', t('favorites.removed')); // اختياري
         } else {
             addItem(id, 'WARDROBE');
-            showToast('success', t('favorites.added')); // اختياري
         }
     };
 
