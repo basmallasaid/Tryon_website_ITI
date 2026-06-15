@@ -124,7 +124,7 @@ export default function AddUserSection({ onBack, editingUser }) {
 
         <div className="flex flex-col gap-6">
           {/* User Identity Card */}
-          <div className="bg-white border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm">
+          <div className="bg-admin-surface border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-8">
               <AddIcon className="w-5 h-5 text-[#1550D3]" />
               <h2 className="text-base text-[#191B23]">User Identity</h2>
@@ -178,7 +178,7 @@ export default function AddUserSection({ onBack, editingUser }) {
           </div>
 
           {/* Account Role */}
-          <div className="bg-white border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm">
+          <div className="bg-admin-surface border border-[#C3C5D7]/30 rounded-xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-5 h-5 text-[#1550D3]"><ShieldCheckIcon className="w-5 h-5" /></div>
               <h2 className="text-xl font-medium text-[#191B23]">Account Role</h2>
@@ -194,7 +194,7 @@ export default function AddUserSection({ onBack, editingUser }) {
                     className={`relative flex items-center gap-4 text-left p-5 rounded-xl border transition-all ${
                       selected
                         ? 'border-[#1550D3] bg-[#FAF8FF] shadow-sm'
-                        : 'border-[#C3C5D7] bg-white hover:border-[#1550D3]/40'
+                        : 'border-[#C3C5D7] bg-admin-surface hover:border-[#1550D3]/40'
                     }`}
                   >
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${selected ? 'bg-[#1550D3] text-white' : 'bg-[#FAF8FF] text-[#434654]'}`}>
@@ -257,7 +257,7 @@ export default function AddUserSection({ onBack, editingUser }) {
                 <button
                   key={role.id}
                   onClick={() => update('role', role.id)}
-                  className={`w-full flex items-center gap-3 text-left p-4 rounded-xl border transition-all ${selected ? 'border-[#1550D3] bg-[#FAF8FF]' : 'border-[#C3C5D7] bg-white'}`}
+                  className={`w-full flex items-center gap-3 text-left p-4 rounded-xl border transition-all ${selected ? 'border-[#1550D3] bg-[#FAF8FF]' : 'border-[#C3C5D7] bg-admin-surface'}`}
                 >
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${selected ? 'bg-[#1550D3] text-white' : 'bg-[#FAF8FF] text-[#434654]'}`}>
                     <Icon className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default function AddUserSection({ onBack, editingUser }) {
           </div>
         </div>
 
-        <div className="px-4 py-4 bg-white border-t border-admin-border/30">
+        <div className="px-4 py-4 bg-admin-surface border-t border-admin-border/30">
           <button
             onClick={handleSubmit}
             disabled={submitting || !form.email.trim() || (!isEditing && !form.password.trim())}

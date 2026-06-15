@@ -226,15 +226,15 @@ export default function AddProductSection({ onBack, editingProduct }) {
               <div className="space-y-6">
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Product Name *</label>
-                  <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g. Midnight Silk Gala Gown" className="w-full px-4 py-3.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
+                  <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="e.g. Midnight Silk Gala Gown" className="w-full px-4 py-3.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Description *</label>
-                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the materials, fit, and aesthetic details..." rows={4} className="w-full px-4 py-3 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors resize-none" />
+                  <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the materials, fit, and aesthetic details..." rows={4} className="w-full px-4 py-3 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors resize-none" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Assigned Store *</label>
-                  <select value={storeId} onChange={(e) => setStoreId(e.target.value)} className="w-full px-4 py-3.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none">
+                  <select value={storeId} onChange={(e) => setStoreId(e.target.value)} className="w-full px-4 py-3.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none">
                     {loadingStores ? (
                       <option>Loading stores…</option>
                     ) : stores.length === 0 ? (
@@ -253,7 +253,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Image URL</label>
-                  <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://example.com/image.jpg" className="w-full px-4 py-3.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
+                  <input type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://example.com/image.jpg" className="w-full px-4 py-3.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
                 </div>
                 {imageUrl && (
                   <div className="w-32 h-32 rounded-xl border border-admin-border overflow-hidden">
@@ -269,13 +269,13 @@ export default function AddProductSection({ onBack, editingProduct }) {
               <div className="space-y-6">
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Category *</label>
-                  <select value={primaryCategory} onChange={(e) => setPrimaryCategory(e.target.value)} className="w-full px-4 py-3.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none">
+                  <select value={primaryCategory} onChange={(e) => setPrimaryCategory(e.target.value)} className="w-full px-4 py-3.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none">
                     {Object.keys(categoryMap).map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Color Tags</label>
-                  <div className="flex flex-wrap items-center gap-2 px-4 py-3 bg-white border border-admin-border rounded-lg min-h-[50px]">
+                  <div className="flex flex-wrap items-center gap-2 px-4 py-3 bg-admin-surface border border-admin-border rounded-lg min-h-[50px]">
                     {colorTags.map((t) => (
                       <span key={t} className="flex items-center gap-1 px-3 py-1 bg-admin-success/20 text-admin-success text-xs font-bold rounded-full">
                         {t}
@@ -287,7 +287,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Season Tags</label>
-                  <div className="flex flex-wrap items-center gap-2 px-4 py-3 bg-white border border-admin-border rounded-lg min-h-[50px]">
+                  <div className="flex flex-wrap items-center gap-2 px-4 py-3 bg-admin-surface border border-admin-border rounded-lg min-h-[50px]">
                     {seasonTags.map((t) => (
                       <span key={t} className="flex items-center gap-1 px-3 py-1 bg-admin-amber/20 text-admin-amber text-xs font-bold rounded-full">
                         {t}
@@ -308,12 +308,12 @@ export default function AddProductSection({ onBack, editingProduct }) {
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Price (USD) *</label>
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-admin-text-muted">$</span>
-                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" className="w-full pl-8 pr-4 py-3.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
+                    <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" className="w-full pl-8 pr-4 py-3.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-admin-text-secondary mb-2 tracking-wider">Purchase URL *</label>
-                  <input type="url" value={purchaseUrl} onChange={(e) => setPurchaseUrl(e.target.value)} placeholder="https://yourstore.com/product" className="w-full px-4 py-3.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
+                  <input type="url" value={purchaseUrl} onChange={(e) => setPurchaseUrl(e.target.value)} placeholder="https://yourstore.com/product" className="w-full px-4 py-3.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none placeholder:text-admin-text-muted focus:border-admin-brand transition-colors" />
                 </div>
               </div>
             </section>
@@ -373,7 +373,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
           </div>
 
           {/* Basic Information */}
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 shadow-sm">
             <SectionHeader title="Basic Information" />
             <div className="space-y-4">
               <div>
@@ -400,7 +400,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
           </div>
 
           {/* Product Media */}
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 shadow-sm">
             <SectionHeader title="Product Media" />
             <div className="space-y-3">
               <label className="block text-xs font-medium text-admin-text-secondary mb-1.5 px-1">Image URL</label>
@@ -414,7 +414,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
           </div>
 
           {/* Classification */}
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 shadow-sm">
             <SectionHeader title="Classification" />
             <div className="space-y-4">
               <div>
@@ -451,7 +451,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
           </div>
 
           {/* Pricing */}
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 shadow-sm">
             <SectionHeader title="Pricing & Commerce" />
             <div className="space-y-4">
               <div>
@@ -469,7 +469,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
           </div>
 
           {/* Settings */}
-          <div className="bg-white border border-admin-border rounded-2xl p-5 shadow-sm">
+          <div className="bg-admin-surface border border-admin-border rounded-2xl p-5 shadow-sm">
             <SectionHeader title="Advanced Settings" />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -488,7 +488,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
           </div>
         </div>
 
-        <div className="px-4 py-4 bg-white border-t border-admin-border/30 flex items-center gap-3">
+        <div className="px-4 py-4 bg-admin-surface border-t border-admin-border/30 flex items-center gap-3">
           <button onClick={onBack} className="flex-1 py-3 border border-admin-border rounded-xl text-sm font-medium text-admin-text-secondary">Cancel</button>
           {isLastStep ? (
             <button onClick={handleSubmit} disabled={submitting} className="flex-[2] flex items-center justify-center gap-2 py-3 bg-admin-success text-white rounded-xl text-sm font-medium shadow-md disabled:opacity-50">

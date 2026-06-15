@@ -213,7 +213,7 @@ export default function AdminDashboardPage() {
             <ChevronDown className={`w-3 h-3 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
           </button>
           {showFilterDropdown && (
-            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-admin-border/40 rounded-xl shadow-lg z-50 py-1">
+            <div className="absolute right-0 top-full mt-1 w-48 bg-admin-surface border border-admin-border/40 rounded-xl shadow-lg z-50 py-1">
               <div className="px-3 py-2 border-b border-admin-border/30">
                 <span className="text-[10px] font-bold text-admin-text-muted uppercase tracking-wider">{t('admin.dashboard.role')}</span>
               </div>

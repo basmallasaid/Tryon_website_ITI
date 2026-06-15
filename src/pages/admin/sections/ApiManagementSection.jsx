@@ -24,7 +24,7 @@ function ConfirmDialog({ open, title, message, confirmLabel, onConfirm, onCancel
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/40" />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="relative bg-admin-surface rounded-2xl shadow-xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
         <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${danger ? 'bg-red-100' : 'bg-amber-100'}`}>
           <AlertTriangle className={`w-6 h-6 ${danger ? 'text-red-600' : 'text-amber-600'}`} />
         </div>
@@ -62,7 +62,7 @@ function EditDialog({ open, apiKey, onSave, onCancel }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onCancel}>
       <div className="absolute inset-0 bg-black/40" />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="relative bg-admin-surface rounded-2xl shadow-xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-lg font-bold text-admin-text-primary">{t('admin.apiManagement.editKey')}</h3>
           <button onClick={onCancel} className="p-1 rounded-lg hover:bg-admin-border/20 transition-colors">
@@ -122,7 +122,7 @@ function ApiKeyRow({ api, onCopy, copiedId, onEdit, onDelete }) {
   const Icon = svc.icon;
 
   return (
-    <div className="bg-white rounded-xl border border-admin-border/40 shadow-sm p-4">
+    <div className="bg-admin-surface rounded-xl border border-admin-border/40 shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${svc.iconBg}`}>

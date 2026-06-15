@@ -39,7 +39,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
         <h1 className="text-[20px] font-bold text-admin-text-primary">{t('admin.notifications.notificationDetails')}</h1>
       </div>
 
-      <div className="bg-white border border-admin-border/40 rounded-xl shadow-sm">
+      <div className="bg-admin-surface border border-admin-border/40 rounded-xl shadow-sm">
         <div className="p-6 border-b border-admin-border/30">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
@@ -145,7 +145,7 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
       </div>
 
       {/* Desktop Table */}
-      <div className="hidden md:block bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
+      <div className="hidden md:block bg-admin-surface border border-admin-border/40 rounded-2xl overflow-hidden">
         <div className="px-6 py-4 border-b border-admin-border/40 flex items-center justify-between">
           <h2 className="text-sm font-bold text-admin-text-primary">{t('admin.notifications.allNotifications')}</h2>
           <div className="flex items-center gap-3">
@@ -244,7 +244,7 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
             <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
           </button>
         </div>
-        <div className="bg-white border border-admin-border/40 rounded-2xl overflow-hidden">
+        <div className="bg-admin-surface border border-admin-border/40 rounded-2xl overflow-hidden">
           {loading ? (
             <p className="p-4 text-center text-sm text-admin-text-muted">{t('admin.notifications.loading')}</p>
           ) : currentItems.length > 0 ? (

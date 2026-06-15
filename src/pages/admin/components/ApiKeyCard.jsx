@@ -17,7 +17,7 @@ function ApiKeyStatusBadge({ status }) {
 
 export default function ApiKeyCard({ name, icon: Icon, iconBg, iconColor, status, maskedKey, onEdit, onDelete, onView, onCopy }) {
   return (
-    <div className="bg-white rounded-xl border border-admin-border/40 shadow-sm p-4">
+    <div className="bg-admin-surface rounded-xl border border-admin-border/40 shadow-sm p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>

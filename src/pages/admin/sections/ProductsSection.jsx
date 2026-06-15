@@ -193,7 +193,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
 
         {/* Filter Panel */}
         {showFilterPanel && (
-          <div className="bg-white border border-admin-border/40 rounded-xl p-4 mb-6 shadow-sm">
+          <div className="bg-admin-surface border border-admin-border/40 rounded-xl p-4 mb-6 shadow-sm">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
                 <label className="text-xs font-medium text-admin-text-secondary">{t('admin.products.priceRange')}</label>
@@ -238,7 +238,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
           </div>
         )}
 
-        <div className="bg-white rounded-xl border border-admin-border/40 shadow-sm overflow-hidden mb-6">
+        <div className="bg-admin-surface rounded-xl border border-admin-border/40 shadow-sm overflow-hidden mb-6">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-admin-category/50">
@@ -337,7 +337,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
           </select>
           <button
             onClick={() => setShowFilterPanel(!showFilterPanel)}
-            className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${showFilterPanel || hasFilters ? 'bg-admin-brand border-admin-brand text-white' : 'bg-white border-admin-border text-admin-text-secondary'}`}
+            className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${showFilterPanel || hasFilters ? 'bg-admin-brand border-admin-brand text-white' : 'bg-admin-surface border-admin-border text-admin-text-secondary'}`}
           >
             <SlidersHorizontal className="w-4 h-4" />
           </button>
@@ -350,7 +350,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
         )}
 
         {showFilterPanel && (
-          <div className="bg-white border border-admin-border/40 rounded-xl p-4 shadow-sm space-y-3">
+          <div className="bg-admin-surface border border-admin-border/40 rounded-xl p-4 shadow-sm space-y-3">
             <div className="flex items-center gap-3">
               <label className="text-xs font-medium text-admin-text-secondary whitespace-nowrap">{t('admin.products.priceRange')}</label>
               <input

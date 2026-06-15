@@ -17,7 +17,7 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
 
   if (mobile) {
     return (
-      <div className={`bg-white rounded-xl border shadow-sm p-4 transition-colors ${selected ? 'border-admin-brand bg-admin-brand/5' : 'border-admin-border/40'}`}>
+      <div className={`bg-admin-surface rounded-xl border shadow-sm p-4 transition-colors ${selected ? 'border-admin-brand bg-admin-brand/5' : 'border-admin-border/40'}`}>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3 min-w-0">
             <input

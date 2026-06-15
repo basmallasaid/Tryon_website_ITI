@@ -72,6 +72,7 @@
   --color-admin-input: #EDEEEF;
   --color-admin-profile: #EDEDF8;
   --color-admin-category: #E2E1ED;
+  --color-admin-surface: #ffffff;
 }
 
 *,
@@ -106,4 +107,24 @@ body {
 
 .animate-fadeInScale {
   animation: fadeInScale 0.3s ease-out;
+}
+
+.dark {
+  --color-admin-brand: #5B8DEF;
+  --color-admin-brand-light: #7BA4F5;
+  --color-admin-brand-bg: #1a1b2e;
+  --color-admin-brand-activeBg: #252640;
+  --color-admin-page: #0f1019;
+  --color-admin-sidebar: #141525;
+  --color-admin-border: #2e3048;
+  --color-admin-text-primary: #e8e9ed;
+  --color-admin-text-secondary: #a0a3b1;
+  --color-admin-text-muted: #6b7280;
+  --color-admin-success: #34d399;
+  --color-admin-amber: #fbbf24;
+  --color-admin-danger: #f87171;
+  --color-admin-input: #252640;
+  --color-admin-profile: #252640;
+  --color-admin-category: #2e3048;
+  --color-admin-surface: #1e1f33;
 }

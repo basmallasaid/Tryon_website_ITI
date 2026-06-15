@@ -15,7 +15,7 @@ const categoryLabels = { top: 'Tops', bottom: 'Bottoms', dress: 'Dresses', acc: 
 
 export default function ProductCard({ product }) {
   return (
-    <div className="bg-white border border-admin-border/40 rounded-2xl p-4 shadow-sm">
+    <div className="bg-admin-surface border border-admin-border/40 rounded-2xl p-4 shadow-sm">
       <div className="flex gap-4">
         <div className="w-24 h-24 rounded-xl bg-admin-category flex items-center justify-center overflow-hidden shrink-0">
           {product.image ? (

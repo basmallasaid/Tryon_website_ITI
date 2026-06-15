@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react';
 
 export default function StoreCard({ store, selected, onToggle }) {
   return (
-    <div className="bg-white rounded-xl border border-admin-border/40 p-4 shadow-sm">
+    <div className="bg-admin-surface rounded-xl border border-admin-border/40 p-4 shadow-sm">
       <div className="flex items-center gap-3 mb-3">
         <input
           type="checkbox"

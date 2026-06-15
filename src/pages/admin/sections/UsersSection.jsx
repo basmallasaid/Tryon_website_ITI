@@ -35,7 +35,7 @@ function DeleteConfirmDialog({ user, onClose, onSendNotification, onDelete, t })
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+      <div className="relative bg-admin-surface rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-admin-danger/10 flex items-center justify-center shrink-0">
@@ -276,7 +276,7 @@ export default function UsersSection({ onAddUser, roleFilter = 'All', onResetFil
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-2xl border border-[#BEC8D1] shadow-sm overflow-x-auto">
+        <div className="bg-admin-surface rounded-2xl border border-[#BEC8D1] shadow-sm overflow-x-auto">
           <table className="w-full text-left min-w-[700px] md:min-w-0">
             <thead>
               <tr className="bg-[#F5F7FA] border-b border-[#F3F4F6]">
