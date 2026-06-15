@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2, Zap, Clock } from 'lucide-react';
 import { getAllNotificationsApi, deleteNotificationApi } from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
 
@@ -86,7 +86,7 @@ function NotificationDetail({ notification, onBack, onDelete }) {
   );
 }
 
-export default function NotificationsSection({ onAddNotification, onAutomatedNotifications }) {
+export default function NotificationsSection({ onAddNotification, onAutomatedNotifications, onScheduledNotifications }) {
   const { t } = adminI18n;
   const typeConfig = getTypeConfig(t);
   const [notifications, setNotifications] = useState([]);
@@ -149,6 +149,9 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
         <div className="px-6 py-4 border-b border-admin-border/40 flex items-center justify-between">
           <h2 className="text-sm font-bold text-admin-text-primary">{t('admin.notifications.allNotifications')}</h2>
           <div className="flex items-center gap-3">
+            <button onClick={onScheduledNotifications} className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-primary hover:bg-admin-brand-activeBg transition-colors">
+              <Clock className="w-4 h-4" /> {t('admin.scheduledNotifications.title')}
+            </button>
             <button onClick={onAutomatedNotifications} className="flex items-center gap-2 px-4 py-2 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-primary hover:bg-admin-brand-activeBg transition-colors">
               <Zap className="w-4 h-4" /> {t('admin.automatedNotifications.title')}
             </button>
@@ -231,6 +234,9 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
       {/* Mobile Cards */}
       <div className="md:hidden">
         <div className="flex items-center gap-3 mb-4">
+          <button onClick={onScheduledNotifications} className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-primary">
+            <Clock className="w-4 h-4" /> {t('admin.scheduledNotifications.title')}
+          </button>
           <button onClick={onAutomatedNotifications} className="flex items-center gap-2 px-4 py-2.5 bg-admin-brand-bg border border-admin-border rounded-xl text-xs font-medium text-admin-text-primary">
             <Zap className="w-4 h-4" /> {t('admin.automatedNotifications.title')}
           </button>

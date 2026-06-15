@@ -45,3 +45,6 @@ export const sendEmailToUserApi = (data) => api.post('/emails/admin/send-to-user
 
 export const getAutomatedNotificationsApi = () => api.get('/automated-notifications');
 export const updateAutomatedNotificationApi = (operation, data) => api.put(`/automated-notifications/${operation}`, data);
+
+export const getScheduledNotificationsApi = () => api.get('/notifications/scheduled');
+export const cancelScheduledNotificationApi = (id) => api.delete(`/notifications/scheduled/${id}`);

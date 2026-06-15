@@ -280,6 +280,17 @@
       "save": "Save Changes",
       "saved": "Saved successfully",
       "loading": "Loading automated notifications..."
+    },
+    "scheduledNotifications": {
+      "title": "Scheduled",
+      "description": "View and manage notifications scheduled for future delivery.",
+      "upcoming": "Upcoming Scheduled Notifications",
+      "scheduleNew": "Schedule New",
+      "scheduledFor": "Scheduled For",
+      "recipient": "Recipient",
+      "editSchedule": "Edit Schedule",
+      "noScheduled": "No scheduled notifications found.",
+      "loading": "Loading scheduled notifications..."
     }
   }
 }

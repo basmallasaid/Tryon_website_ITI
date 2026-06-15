@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, ChevronDown, Send, CheckCircle, Users, User, Mail, Smartphone, Globe } from 'lucide-react';
+import { ArrowLeft, Calendar, ChevronDown, Send, CheckCircle, Users, User, Mail, Smartphone, Globe, Clock } from 'lucide-react';
 import { broadcastNotificationApi, sendToUserNotificationApi, getUsersApi } from '../../../api/adminApi';
 
 const CHANNELS = [
@@ -228,6 +228,9 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
   const [sentCount, setSentCount] = useState(0);
   const [successMessage, setSuccessMessage] = useState('');
   const [channels, setChannels] = useState(prefillChannels);
+  const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [scheduledTime, setScheduledTime] = useState('');
 
   const toggleChannel = (id) => {
     setChannels((prev) => {
@@ -275,16 +278,29 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
         channels,
         data: { type: 'general' },
       };
+
+      if (scheduleEnabled && scheduledDate && scheduledTime) {
+        payload.scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`).toISOString();
+      }
+
       if (sendMode === 'broadcast') {
         const res = await broadcastNotificationApi(payload);
         setSentCount(res.data?.deviceCount || 0);
         const chLabels = channels.map((c) => CHANNELS.find((ch) => ch.id === c)?.label).filter(Boolean).join(', ');
-        setSuccessMessage(`Broadcast to all users via ${chLabels}.`);
+        if (scheduleEnabled) {
+          setSuccessMessage(`Scheduled for ${scheduledDate} at ${scheduledTime} via ${chLabels}.`);
+        } else {
+          setSuccessMessage(`Broadcast to all users via ${chLabels}.`);
+        }
       } else {
         const res = await sendToUserNotificationApi({ ...payload, email: targetEmail.trim() });
         setSentCount(res.data?.deviceCount || 0);
         const chLabels = channels.map((c) => CHANNELS.find((ch) => ch.id === c)?.label).filter(Boolean).join(', ');
-        setSuccessMessage(`Sent to ${targetEmail.trim()} via ${chLabels}.`);
+        if (scheduleEnabled) {
+          setSuccessMessage(`Scheduled for ${scheduledDate} at ${scheduledTime} via ${chLabels}.`);
+        } else {
+          setSuccessMessage(`Sent to ${targetEmail.trim()} via ${chLabels}.`);
+        }
       }
       setSuccess(true);
     } catch (err) {
@@ -300,7 +316,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
         <div className="hidden lg:flex items-center justify-center min-h-screen p-8">
           <div className="text-center max-w-md">
             <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">Notification Sent!</h2>
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">{scheduleEnabled ? 'Notification Scheduled!' : 'Notification Sent!'}</h2>
             <p className="text-sm text-admin-text-secondary mb-2">"{title}"</p>
             <p className="text-xs text-admin-text-muted mb-6">{successMessage}</p>
             <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
@@ -311,7 +327,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
         <div className="lg:hidden flex items-center justify-center min-h-screen p-8">
           <div className="text-center max-w-md">
             <CheckCircle className="w-16 h-16 text-admin-success mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">Notification Sent!</h2>
+            <h2 className="text-2xl font-bold text-admin-text-primary mb-2">{scheduleEnabled ? 'Notification Scheduled!' : 'Notification Sent!'}</h2>
             <p className="text-sm text-admin-text-secondary mb-2">"{title}"</p>
             <p className="text-xs text-admin-text-muted mb-6">{successMessage}</p>
             <button onClick={onBack} className="px-6 py-3 bg-admin-brand text-white rounded-xl text-sm font-medium hover:bg-admin-brand-light transition-colors">
@@ -406,17 +422,55 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
 
           <TargetSection {...targetProps} />
 
+          <div className="bg-admin-brand-bg border border-admin-border/40 rounded-xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-admin-brand" />
+                <h2 className="text-xl font-medium text-admin-text-primary">Schedule</h2>
+              </div>
+              <button
+                onClick={() => setScheduleEnabled(!scheduleEnabled)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${scheduleEnabled ? 'bg-admin-brand' : 'bg-admin-border/60'}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${scheduleEnabled ? 'left-[22px]' : 'left-0.5'}`} />
+              </button>
+            </div>
+            {scheduleEnabled && (
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-admin-text-primary mb-2">Date *</label>
+                  <input
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-admin-text-primary mb-2">Time *</label>
+                  <input
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    className="w-full px-4 py-3 bg-admin-brand-bg border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center justify-end gap-4 pb-12">
             <button onClick={onBack} className="px-6 py-3 text-sm font-medium text-admin-text-primary rounded-xl hover:bg-admin-border/20 transition-colors">
               Cancel
             </button>
             <button
               onClick={handleSend}
-              disabled={submitting || !title.trim() || !message.trim() || (sendMode === 'individual' && !targetEmail.trim())}
+              disabled={submitting || !title.trim() || !message.trim() || (sendMode === 'individual' && !targetEmail.trim()) || (scheduleEnabled && (!scheduledDate || !scheduledTime))}
               className="px-8 py-3 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50 flex items-center gap-2"
             >
-              <Send className="w-4 h-4" />
-              {submitting ? 'Sending…' : sendMode === 'individual' ? 'Send to User' : 'Broadcast Now'}
+              {scheduleEnabled ? <Calendar className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+              {submitting ? 'Sending…' : scheduleEnabled ? 'Schedule' : sendMode === 'individual' ? 'Send to User' : 'Broadcast Now'}
             </button>
           </div>
         </div>
@@ -516,16 +570,54 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
           </div>
 
           <MobileTargetSection {...targetProps} />
+
+          <div className="bg-admin-brand-bg border border-admin-border/40 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-admin-brand" />
+                <span className="text-xs font-bold text-admin-brand tracking-wider">SCHEDULE</span>
+              </div>
+              <button
+                onClick={() => setScheduleEnabled(!scheduleEnabled)}
+                className={`relative w-11 h-6 rounded-full transition-colors ${scheduleEnabled ? 'bg-admin-brand' : 'bg-admin-border/60'}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${scheduleEnabled ? 'left-[22px]' : 'left-0.5'}`} />
+              </button>
+            </div>
+            {scheduleEnabled && (
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-admin-text-primary mb-1.5">Date *</label>
+                  <input
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-3 py-2.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-admin-text-primary mb-1.5">Time *</label>
+                  <input
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-white border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-admin-border/30">
           <button
             onClick={handleSend}
-            disabled={submitting || !title.trim() || !message.trim() || (sendMode === 'individual' && !targetEmail.trim())}
+            disabled={submitting || !title.trim() || !message.trim() || (sendMode === 'individual' && !targetEmail.trim()) || (scheduleEnabled && (!scheduledDate || !scheduledTime))}
             className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-admin-brand text-white rounded-xl text-sm font-bold shadow-md hover:bg-admin-brand-light transition-colors disabled:opacity-50"
           >
-            <Send className="w-4 h-4" />
-            {submitting ? 'Sending…' : sendMode === 'individual' ? 'Send to User' : 'Broadcast Now'}
+            {scheduleEnabled ? <Calendar className="w-4 h-4" /> : <Send className="w-4 h-4" />}
+            {submitting ? 'Sending…' : scheduleEnabled ? 'Schedule' : sendMode === 'individual' ? 'Send to User' : 'Broadcast Now'}
           </button>
         </div>
       </div>
