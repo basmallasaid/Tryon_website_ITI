@@ -259,6 +259,36 @@
     "topbar": {
       "filter": "تصفية",
       "clearFilter": "مسح التصفية"
+    },
+    "automatedNotifications": {
+      "title": "تلقائي",
+      "description": "تكوين الإشعارات التلقائية المرسلة للمستخدمين عند اكتمال عمليات الذكاء الاصطناعي.",
+      "tryOn": "التجربة الافتراضية",
+      "recycle": "إعادة التدوير",
+      "matching": "المطابقة",
+      "enabled": "مفعل",
+      "disabled": "معطل",
+      "titleTemplate": "عنوان الإشعار",
+      "bodyTemplate": "نص الإشعار",
+      "channels": "القنوات",
+      "app": "التطبيق",
+      "email": "البريد الإلكتروني",
+      "push": "الدفع",
+      "placeholders": "استخدم {{userName}} لاسم المستخدم، {{operation}} لنوع العملية",
+      "save": "حفظ التغييرات",
+      "saved": "تم الحفظ بنجاح",
+      "loading": "جاري تحميل الإشعارات التلقائية..."
+    },
+    "scheduledNotifications": {
+      "title": "المجدولة",
+      "description": "عرض وإدارة الإشعارات المجدولة للإرسال في وقت مستقبلي.",
+      "upcoming": "الإشعارات المجدولة القادمة",
+      "scheduleNew": "جدولة جديدة",
+      "scheduledFor": "مجدولة لـ",
+      "recipient": "المستلم",
+      "editSchedule": "تعديل الجدولة",
+      "noScheduled": "لا توجد إشعارات مجدولة.",
+      "loading": "جاري تحميل الإشعارات المجدولة..."
     }
   }
 }

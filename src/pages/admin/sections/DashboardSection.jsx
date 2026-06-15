@@ -8,7 +8,7 @@ import TopCategoriesChart from '../components/TopCategoriesChart';
 import { getStoresApi, getProductsApi, getNotificationsApi } from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
 
-export default function DashboardSection() {
+export default function DashboardSection({ onNavigate }) {
   const { t } = adminI18n;
   const [stores, setStores] = useState([]);
   const [products, setProducts] = useState([]);
@@ -93,7 +93,7 @@ export default function DashboardSection() {
         </div>
 
         <div className="flex gap-8 mb-8">
-          <QuickActionsPanel />
+          <QuickActionsPanel onNavigate={onNavigate} />
           <TopCategoriesChart
             categories={sortedCategories.map(([cat, count], i) => ({
               color: categoryColors[i] || 'bg-admin-border',
