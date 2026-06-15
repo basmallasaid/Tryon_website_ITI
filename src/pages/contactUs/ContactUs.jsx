@@ -74,7 +74,7 @@ export default function ContactUs() {
       setSubmitted(true);
       setFormData({ name: "", email: "", message: "" });
     } catch (err) {
-      setSubmitError(err.response?.data?.message || "Failed to send message. Please try again.");
+      setSubmitError(t('contactUs.sendFailed'));
     } finally {
       setSubmitting(false);
     }

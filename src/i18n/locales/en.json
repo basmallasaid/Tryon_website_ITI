@@ -151,7 +151,9 @@
     "loginPromptDesc": "Create an account or log in to subscribe to a plan and unlock premium features.",
     "successTitle": "Subscription Activated!",
     "successDesc": "Your Pro Stylist plan is now active. Enjoy unlimited lookbooks, hyper-realistic try-on, and personalized style coaching.",
-    "successButton": "Go to My Subscription"
+    "successButton": "Go to My Subscription",
+    "checkoutFailed": "Failed to start checkout. Please try again.",
+    "cancellationFailed": "Cancellation failed. Please try again."
   },
   "questions": {
     "title": "Styling Questions?",
@@ -179,6 +181,7 @@
     "phoneTitle": "Phone",
     "telegramTitle": "Telegram",
     "faqTitle": "Styling Questions?",
+    "sendFailed": "Failed to send message. Please try again.",
     "faq": {
       "q0": "How does the AI know my size?",
       "a0": "Our AI uses precise body mapping technology that analyzes your uploaded photos to calculate your unique body measurements. It then cross-references these with brand-specific size charts to recommend the perfect fit every time.",

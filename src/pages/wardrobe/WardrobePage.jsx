@@ -42,7 +42,7 @@ const WardrobePage = () => {
       const res = await getWardrobeApi();
       setItems(res.data.items || []);
     } catch (err) {
-      setError(err.response?.data?.message || err.message || t('wardrobe.failedToLoad'));
+      setError(t('wardrobe.failedToLoad'));
       setItems([]);
     } finally {
       setLoading(false);

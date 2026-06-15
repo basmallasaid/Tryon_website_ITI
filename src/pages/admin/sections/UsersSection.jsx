@@ -236,7 +236,7 @@ export default function UsersSection({
       });
       setDeleteTarget(null);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete user.');
+      alert('Failed to delete user.');
     } finally {
       setDeleting(false);
     }
