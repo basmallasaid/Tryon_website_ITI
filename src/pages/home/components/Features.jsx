@@ -8,19 +8,19 @@ const Features = () => {
   const cards = [
     {
       icon: stars,
-      bg: '#40B9FF33',
+      bg: 'var(--primary-light)',
       title: t('features.aiRecTitle'),
       desc: t('features.aiRecDesc'),
     },
     {
       icon: tryonIcon,
-      bg: '#FEEFE5',
+      bg: 'var(--accent-orange-light)',
       title: t('features.tryOnTitle'),
       desc: t('features.tryOnDesc'),
     },
     {
       icon: recycle,
-      bg: '#F0F8E6',
+      bg: 'var(--secondary-light)',
       title: t('features.recycleTitle'),
       desc: t('features.recycleDesc'),
     },

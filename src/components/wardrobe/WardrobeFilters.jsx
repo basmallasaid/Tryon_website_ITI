@@ -11,8 +11,8 @@ const WardrobeFilters = ({ categories, activeFilter, onFilterChange }) => {
           onClick={() => onFilterChange(cat)}
           className={`px-10 py-3 rounded-2xl text-sm font-bold transition-all duration-300 ${
             activeFilter?.toLowerCase() === cat.toLowerCase()
-            ? 'bg-[#40B9FF] text-white shadow-lg shadow-blue-100 scale-105'
-            : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50'
+            ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20 scale-105'
+            : 'bg-surface-elevated text-text-secondary border border-[var(--border)] hover:bg-[var(--bg-secondary)]'
           }`}
         >
           {cat === 'All' ? t('wardrobe.all') : t('wardrobe.opt_' + cat.toLowerCase(), cat)}

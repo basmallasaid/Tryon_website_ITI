@@ -3,26 +3,28 @@ import { User, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { generateAvatarApi, getAvatarByIdApi } from '../../api/avatarApi';
+import { getSettingsApi } from '../../api/userApi';
 import { useAuth } from '../../context/AuthContext';
 import { getAuth } from '../../utils/tokenUtils';
 import Button from '../../components/Button';
+import { showToast } from '../../utils/toast';
 
 const skinTones = [
-  { id: 'very-light', color: '#F6DFC8', label: 'Very Light' },
-  { id: 'light', color: '#E5C39B', label: 'Light' },
-  { id: 'medium', color: '#D2A46A', label: 'Medium' },
-  { id: 'tan', color: '#B88349', label: 'Tan' },
-  { id: 'brown', color: '#8E5A2A', label: 'Brown' },
-  { id: 'dark', color: '#4D2C12', label: 'Dark' },
+  { id: 'very-light', color: '#F6DFC8' },
+  { id: 'light', color: '#E5C39B' },
+  { id: 'medium', color: '#D2A46A' },
+  { id: 'tan', color: '#B88349' },
+  { id: 'brown', color: '#8E5A2A' },
+  { id: 'dark', color: '#4D2C12' },
 ];
 
 const hairColors = [
-  { id: 'black', color: '#000000', label: 'Black' },
-  { id: 'dark-brown', color: '#3A2414', label: 'Dark Brown' },
-  { id: 'brown', color: '#6B4423', label: 'Brown' },
-  { id: 'light-brown', color: '#A26B3D', label: 'Light Brown' },
-  { id: 'blonde', color: '#E6C27A', label: 'Blonde' },
-  { id: 'red', color: '#A53A2A', label: 'Red' },
+  { id: 'black', color: '#000000' },
+  { id: 'dark-brown', color: '#3A2414' },
+  { id: 'brown', color: '#6B4423' },
+  { id: 'light-brown', color: '#A26B3D' },
+  { id: 'blonde', color: '#E6C27A' },
+  { id: 'red', color: '#A53A2A' },
 ];
 
 const GENDER_OPTIONS = ['male', 'female'];
@@ -35,6 +37,21 @@ const INITIAL_FORM = {
   skin_tone: '',
   hair_color: '',
 };
+
+const parseNumeric = val => {
+  if (!val) return '';
+  const num = parseInt(val);
+  return isNaN(num) ? String(val) : String(num);
+};
+
+const parseAvatarToForm = avatar => ({
+  age: parseNumeric(avatar.age),
+  gender: avatar.gender || '',
+  weight: parseNumeric(avatar.weight),
+  height: parseNumeric(avatar.height),
+  skin_tone: avatar.skin_tone || '',
+  hair_color: avatar.hair_color || '',
+});
 
 const buildPayload = form => ({
   age: form.age ? `${form.age}y` : '',
@@ -56,30 +73,66 @@ const inputBaseClass =
   'w-full h-12 rounded-lg border border-border-strong bg-surface-elevated px-4 text-sm font-semibold text-text-primary outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-placeholder appearance-none';
 
 export default function AvatarGeneration() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, login } = useAuth();
   const navigate = useNavigate();
+  const toastPosition = i18n.language === 'ar' ? 'top-start' : 'top-end';
   const [form, setForm] = useState(INITIAL_FORM);
   const [processing, setProcessing] = useState(false);
   const [generatedImageUrl, setGeneratedImageUrl] = useState(null);
-  const [apiError, setApiError] = useState('');
+
   const [fetchedAvatarUrl, setFetchedAvatarUrl] = useState(null);
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
   const previewRef = useRef(null);
 
   useEffect(() => {
     const avatarIds = user?.avatars;
     if (!avatarIds || avatarIds.length === 0) return;
-    getAvatarByIdApi(avatarIds[0])
+    getAvatarByIdApi(avatarIds[avatarIds.length - 1])
       .then(res => {
-        const url = res.data?.avatar?.image_url;
-        if (url) setFetchedAvatarUrl(url);
+        const avatar = res.data?.avatar;
+        if (!avatar) return;
+        if (avatar.image_url) setFetchedAvatarUrl(avatar.image_url);
+        setForm(prev => ({ ...prev, ...parseAvatarToForm(avatar) }));
       })
       .catch(() => {});
   }, [user?.avatars]);
 
-  const hasAvatar = !!(generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || user?.avatars?.length > 0);
-  const displayImageUrl = generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || null;
-  const showUpgrade = hasAvatar || !!generatedImageUrl;
+  const hasAvatar = !!(
+    generatedImageUrl ||
+    fetchedAvatarUrl ||
+    user?.generatedAvatar ||
+    user?.avatars?.length > 0
+  );
+  const displayImageUrl =
+    generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || null;
+  const isSubscribed = subscriptionStatus === 'active';
+  const subscriptionChecked = !subscriptionLoading;
+  const showUpgrade = subscriptionChecked && hasAvatar && !isSubscribed;
+
+  useEffect(() => {
+    if (subscriptionLoading) return;
+    if (hasAvatar && !isSubscribed) {
+      navigate('/pricing', { replace: true });
+    }
+  }, [subscriptionLoading, hasAvatar, isSubscribed, navigate]);
+
+  useEffect(() => {
+    if (!user?.email) {
+      setSubscriptionLoading(false);
+      return;
+    }
+    setSubscriptionLoading(true);
+    getSettingsApi({ email: user.email })
+      .then(res => {
+        setSubscriptionStatus(res.data.subscriptionStatus);
+      })
+      .catch(() => {
+        setSubscriptionStatus(null);
+      })
+      .finally(() => setSubscriptionLoading(false));
+  }, [user?.email]);
 
   useEffect(() => {
     if (generatedImageUrl && previewRef.current) {
@@ -93,12 +146,10 @@ export default function AvatarGeneration() {
   }, [generatedImageUrl]);
 
   const handleChange = field => e => {
-    setApiError('');
     setForm(prev => ({ ...prev, [field]: e.target.value }));
   };
 
   const handleSelect = field => value => {
-    setApiError('');
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
@@ -113,7 +164,7 @@ export default function AvatarGeneration() {
     ];
     const missing = required.find(f => !form[f]);
     if (missing) {
-      setApiError('Please fill in all fields.');
+      showToast('error', t('avatar.fillAllFields'), toastPosition);
       return;
     }
 
@@ -123,7 +174,6 @@ export default function AvatarGeneration() {
       return;
     }
 
-    setApiError('');
     setProcessing(true);
     setGeneratedImageUrl(null);
 
@@ -135,18 +185,14 @@ export default function AvatarGeneration() {
         setGeneratedImageUrl(imageUrl);
         login({ ...user, generatedAvatar: imageUrl });
       } else {
-        setApiError(t('avatar.noImageReturned'));
+        showToast('error', t('avatar.generationError'), toastPosition);
       }
     } catch (err) {
       if (err.response?.status === 401) {
         navigate('/', { replace: true, state: { openAuth: 'login' } });
         return;
       }
-      setApiError(
-        err.response?.data?.error ||
-          err.message ||
-          t('avatar.generationFailed'),
-      );
+      showToast('error', t('avatar.generationError'), toastPosition);
     } finally {
       setProcessing(false);
     }
@@ -186,7 +232,7 @@ export default function AvatarGeneration() {
               className="rounded-2xl bg-surface-elevated p-6 sm:p-8"
               style={{
                 border: '2px solid transparent',
-                backgroundImage: `linear-gradient(var(--color-surface-elevated), var(--color-surface-elevated)), linear-gradient(90deg, #FF8A3D, var(--color-primary), #A6E22E)`,
+                backgroundImage: `linear-gradient(var(--surface), var(--surface)), linear-gradient(90deg, #FF8A3D, var(--primary), #A6E22E)`,
                 backgroundOrigin: 'border-box',
                 backgroundClip: 'padding-box, border-box',
               }}
@@ -218,9 +264,9 @@ export default function AvatarGeneration() {
                         const isSelected = form.gender === o;
                         const borderColor = isSelected
                           ? o === 'male'
-                            ? 'var(--color-primary)'
-                            : '#E91E63'
-                          : 'var(--color-border-strong)';
+                            ? 'var(--primary)'
+                            : 'var(--accent)'
+                          : 'var(--Border-Strong)';
                         return (
                           <button
                             key={o}
@@ -233,10 +279,10 @@ export default function AvatarGeneration() {
                                 ? o === 'male'
                                   ? 'rgba(64, 185, 255, 0.08)'
                                   : 'rgba(233, 30, 99, 0.08)'
-                                : 'var(--color-surface-elevated)',
+                                : 'var(--surface)',
                               color: isSelected
-                                ? 'var(--color-text-primary)'
-                                : 'var(--color-text-disabled)',
+                                ? 'var(--text-primary)'
+                                : 'var(--Disabled-Text-color)',
                             }}
                           >
                             {t('avatar.' + o)}
@@ -292,11 +338,11 @@ export default function AvatarGeneration() {
                             backgroundColor: s.color,
                             borderColor:
                               form.skin_tone === s.id
-                                ? 'var(--color-primary)'
-                                : 'var(--color-border-strong)',
+                                ? 'var(--primary)'
+                                : 'var(--Border-Strong)',
                             boxShadow:
                               form.skin_tone === s.id
-                                ? '0 0 0 3px var(--color-primary)'
+                                ? '0 0 0 3px var(--primary)'
                                 : '0 0 0 1px rgba(0,0,0,0.08)',
                           }}
                         >
@@ -312,11 +358,11 @@ export default function AvatarGeneration() {
                           style={{
                             color:
                               form.skin_tone === s.id
-                                ? 'var(--color-text-primary)'
-                                : 'var(--color-text-disabled)',
+                                ? 'var(--text-primary)'
+                                : 'var(--Disabled-Text-color)',
                           }}
                         >
-                          {s.label}
+                          {t('avatar.skinTones.' + s.id)}
                         </span>
                       </button>
                     ))}
@@ -341,11 +387,11 @@ export default function AvatarGeneration() {
                             backgroundColor: h.color,
                             borderColor:
                               form.hair_color === h.id
-                                ? 'var(--color-primary)'
-                                : 'var(--color-border-strong)',
+                                ? 'var(--primary)'
+                                : 'var(--Border-Strong)',
                             boxShadow:
                               form.hair_color === h.id
-                                ? '0 0 0 3px var(--color-primary)'
+                                ? '0 0 0 3px var(--primary)'
                                 : '0 0 0 1px rgba(0,0,0,0.08)',
                           }}
                         >
@@ -361,11 +407,11 @@ export default function AvatarGeneration() {
                           style={{
                             color:
                               form.hair_color === h.id
-                                ? 'var(--color-text-primary)'
-                                : 'var(--color-text-disabled)',
+                                ? 'var(--text-primary)'
+                                : 'var(--Disabled-Text-color)',
                           }}
                         >
-                          {h.label}
+                          {t('avatar.hairColors.' + h.id)}
                         </span>
                       </button>
                     ))}
@@ -376,7 +422,9 @@ export default function AvatarGeneration() {
               <div className="mt-8">
                 <Button
                   variant="styling"
-                  onClick={showUpgrade ? () => navigate('/pricing') : handleGenerate}
+                  onClick={
+                    showUpgrade ? () => navigate('/pricing') : handleGenerate
+                  }
                   disabled={!showUpgrade && (!allFilled || processing)}
                   className={`w-full gap-3 ${
                     !showUpgrade && (!allFilled || processing)
@@ -420,7 +468,7 @@ export default function AvatarGeneration() {
                   <div className="flex flex-col items-center gap-3">
                     <div
                       className="h-12 w-12 animate-spin rounded-full border-4 border-border-strong"
-                      style={{ borderTopColor: 'var(--color-brand-secondary)' }}
+                      style={{ borderTopColor: 'var(--secondary)' }}
                     />
                     <p className="text-sm text-text-disabled">
                       {t('avatar.generatingAvatar')}
@@ -458,12 +506,6 @@ export default function AvatarGeneration() {
             </div>
           </div>
         </section>
-
-        {apiError && (
-          <div className="mt-6 max-w-6xl mx-auto rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {apiError}
-          </div>
-        )}
       </div>
     </div>
   );

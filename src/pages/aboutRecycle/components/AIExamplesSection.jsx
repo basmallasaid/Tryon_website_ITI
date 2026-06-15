@@ -37,7 +37,7 @@ export default function AIExamplesSection() {
           <h2 className="text-[28px] sm:text-[32px] lg:text-[36px] font-bold text-text-primary mb-4">
             {t('aboutRecycle.aiCanCreate')}
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-text-disabled text-lg max-w-2xl mx-auto leading-relaxed">
             {t('aboutRecycle.oldToNew')}
           </p>
         </div>

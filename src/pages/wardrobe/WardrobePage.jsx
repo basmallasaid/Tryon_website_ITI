@@ -21,17 +21,17 @@ const WardrobePage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // 1. استخراج التصنيفات الموجودة فعلياً في البيانات القادمة من الباك إند
+
   const dynamicCategories = useMemo(() => {
     if (items.length === 0) return ['All'];
 
-    // نأخذ كل الـ categories من الملابس، نحذف الفارغ، ونوحد شكل النص (أول حرف كبير)
+  
     const existingCats = items
       .map((item) => item.category)
-      .filter((cat) => cat) // التأكد أن التصنيف ليس null أو undefined
+      .filter((cat) => cat) 
       .map((cat) => cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase());
 
-    // نستخدم Set لحذف التكرار، ثم نضيف 'All' في البداية
+    
     return ['All', ...new Set(existingCats)];
   }, [items]);
 
@@ -73,7 +73,7 @@ const WardrobePage = () => {
     }
   };
 
-  // 2. منطق الفلترة المعتمد على التصنيف المختار
+ 
   const filteredItems = useMemo(() => {
     return activeFilter === 'All'
       ? items
@@ -83,11 +83,11 @@ const WardrobePage = () => {
   }, [items, activeFilter]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFF] p-6 md:p-12 font-sans">
+    <div className="min-h-screen bg-[var(--surface)] p-6 md:p-12 font-sans">
       <div className="max-w-7xl mx-auto space-y-12">
         <WardrobeHealth itemCount={items.length} />
 
-        {/* 3. تمرير الفلاتر الديناميكية */}
+        
         <WardrobeFilters
           categories={dynamicCategories}
           activeFilter={activeFilter}
@@ -96,36 +96,36 @@ const WardrobePage = () => {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24">
-            <Loader2 className="w-10 h-10 text-[#8ED321] animate-spin mb-4" />
-            <p className="text-gray-500 font-bold">
+            <Loader2 className="w-10 h-10 text-[var(--secondary)] animate-spin mb-4" />
+            <p className="text-text-secondary font-bold">
               {t('wardrobe.loading')}
             </p>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-24">
-            <AlertCircle size={48} className="text-red-400 mb-4" />
-            <p className="text-red-500 font-bold text-lg mb-2">
+            <AlertCircle size={48} className="text-error-text mb-4" />
+            <p className="text-error-text font-bold text-lg mb-2">
               {t('wardrobe.failedToLoad')}
             </p>
-            <p className="text-gray-400 text-sm text-center max-w-md">{error}</p>
+            <p className="text-text-disabled text-sm text-center max-w-md">{error}</p>
           </div>
         ) : items.length === 0 ? (
           <EmptyState onAdd={() => setIsAddModalOpen(true)} />
         ) : (
           <div className="space-y-8">
             <div className="flex justify-between items-center px-2">
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">
                 {t('wardrobe.showingItems', { count: filteredItems.length })}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-              {/* Add new item button */}
+             
                <button
                 onClick={() => setIsAddModalOpen(true)}
-                className="aspect-[4/5] border-4 border-dashed border-gray-100 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 text-gray-300 hover:border-[#40B9FF] hover:text-[#40B9FF] transition-all bg-white/50"
+                className="aspect-[4/5] border-4 border-dashed border-[var(--border)] rounded-[2.5rem] flex flex-col items-center justify-center gap-4 text-text-secondary hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all bg-surface-elevated/50"
               >
-                <div className="p-4 bg-gray-50 rounded-full"><Plus size={32} /></div>
+                <div className="p-4 bg-[var(--bg-secondary)] rounded-full"><Plus size={32} /></div>
                 <span className="font-bold text-[10px] tracking-widest uppercase">
                   {t('wardrobe.addItem')}
                 </span>

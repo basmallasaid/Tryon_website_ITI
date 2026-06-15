@@ -1,4 +1,4 @@
-import { LayoutDashboard, Store, Package, Bell, Mail, Users, KeyRound, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Store, Package, Bell, Mail, Users, KeyRound, Settings, ExternalLink, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useAdminTranslation } from '../../../i18n/admin/useAdminTranslation';
@@ -91,8 +91,16 @@ export default function AdminSidebar({ className = '', activePage, setActivePage
           </div>
         </div>
         <button
+          onClick={() => navigate('/')}
+          className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg hover:text-admin-brand transition-colors cursor-pointer"
+          style={{ letterSpacing: '0.24px' }}
+        >
+          <ExternalLink className="w-[18px] h-[18px]" />
+          {t('admin.sidebar.viewSite', 'View Site')}
+        </button>
+        <button
           onClick={handleLogout}
-          className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg hover:text-admin-danger transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-xs font-medium text-admin-text-secondary hover:bg-admin-brand-activeBg hover:text-accent-orange transition-colors cursor-pointer"
           style={{ letterSpacing: '0.24px' }}
         >
           <LogOut className="w-[18px] h-[18px]" />

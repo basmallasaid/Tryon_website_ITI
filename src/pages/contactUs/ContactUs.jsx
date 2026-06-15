@@ -82,12 +82,12 @@ export default function ContactUs() {
 
   if (submitted) {
     return (
-      <div className={`min-h-screen bg-[#F8FAFC] ${isArabic ? "rtl" : "ltr"}`}>
+      <div className={`min-h-screen bg-[var(--background)] ${isArabic ? "rtl" : "ltr"}`}>
         <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
             <div className="lg:col-span-5 space-y-10">
               <div className="space-y-4">
-                <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight">
+                <h1 className="text-4xl lg:text-6xl font-black text-text-primary tracking-tight">
                   {t("contactUs.heading")}
                 </h1>
                 <h2 className="text-3xl lg:text-5xl font-bold">
@@ -101,26 +101,26 @@ export default function ContactUs() {
                   <a
                     key={index}
                     href={card.href}
-                    className="group flex items-center gap-5 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-brand-secondary/30 transition-all duration-300"
+                    className="group flex items-center gap-5 p-4 bg-surface-elevated rounded-2xl border border-[var(--border)] shadow-sm hover:shadow-md hover:border-brand-secondary/30 transition-all duration-300"
                   >
                     <div className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm group-hover:scale-110 transition-transform`}>
                       {card.icon}
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{card.label}</p>
-                      <p className="text-slate-700 font-bold">{card.value}</p>
+                      <p className="text-[10px] font-black text-text-disabled uppercase tracking-widest">{card.label}</p>
+                      <p className="text-text-primary font-bold">{card.value}</p>
                     </div>
                   </a>
                 ))}
               </div>
             </div>
             <div className="lg:col-span-7">
-              <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 shadow-xl shadow-slate-200/50 border border-slate-50 relative overflow-hidden">
+              <div className="bg-surface-elevated rounded-[2.5rem] p-8 lg:p-12 shadow-xl border border-[var(--border)] relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-secondary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
                 <div className="relative z-10 text-center py-12">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-                  <h2 className="text-2xl font-bold text-slate-900 mb-3">Message Sent!</h2>
-                  <p className="text-slate-500 mb-8 max-w-md mx-auto">
+                  <CheckCircle className="w-16 h-16 text-success-text mx-auto mb-6" />
+                  <h2 className="text-2xl font-bold text-text-primary mb-3">Message Sent!</h2>
+                  <p className="text-text-secondary mb-8 max-w-md mx-auto">
                     Thank you for contacting us. We have received your message and will get back to you soon.
                   </p>
                   <button
@@ -134,7 +134,7 @@ export default function ContactUs() {
             </div>
           </div>
         </section>
-        <div className="bg-white border-t border-slate-100">
+        <div className="bg-surface-elevated border-t border-[var(--border)]">
           <Questions />
         </div>
       </div>
@@ -142,14 +142,14 @@ export default function ContactUs() {
   }
 
   return (
-    <div className={`min-h-screen bg-[#F8FAFC] ${isArabic ? "rtl" : "ltr"}`}>
+    <div className={`min-h-screen bg-[var(--background)] ${isArabic ? "rtl" : "ltr"}`}>
       <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           
           {/* Left Column: Content */}
           <div className="lg:col-span-5 space-y-10">
             <div className="space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-4xl lg:text-6xl font-black text-text-primary tracking-tight">
                 {t("contactUs.heading")}
               </h1>
               <h2 className="text-3xl lg:text-5xl font-bold">
@@ -157,7 +157,7 @@ export default function ContactUs() {
                   {t("contactUs.teamName")}
                 </span>
               </h2>
-              <p className="text-slate-500 text-lg leading-relaxed max-w-md">
+              <p className="text-text-secondary text-lg leading-relaxed max-w-md">
                 {t("contactUs.description")}
               </p>
             </div>
@@ -168,14 +168,14 @@ export default function ContactUs() {
                 <a
                   key={index}
                   href={card.href}
-                  className="group flex items-center gap-5 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-brand-secondary/30 transition-all duration-300"
+                  className="group flex items-center gap-5 p-4 bg-surface-elevated rounded-2xl border border-[var(--border)] shadow-sm hover:shadow-md hover:border-brand-secondary/30 transition-all duration-300"
                 >
                   <div className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm group-hover:scale-110 transition-transform`}>
                     {card.icon}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{card.label}</p>
-                    <p className="text-slate-700 font-bold">{card.value}</p>
+                    <p className="text-[10px] font-black text-text-disabled uppercase tracking-widest">{card.label}</p>
+                    <p className="text-text-primary font-bold">{card.value}</p>
                   </div>
                 </a>
               ))}
@@ -184,14 +184,14 @@ export default function ContactUs() {
 
           {/* Right Column: Form Card */}
           <div className="lg:col-span-7">
-            <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 shadow-xl shadow-slate-200/50 border border-slate-50 relative overflow-hidden">
+            <div className="bg-surface-elevated rounded-[2.5rem] p-8 lg:p-12 shadow-xl border border-[var(--border)] relative overflow-hidden">
               {/* Decorative background element */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-secondary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
               
               <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 ml-1">
+                    <label className="text-sm font-bold text-text-primary ml-1">
                       {t("contactUs.nameLabel")}
                     </label>
                     <input
@@ -200,18 +200,18 @@ export default function ContactUs() {
                       value={formData.name}
                       onChange={handleChange}
                       placeholder={t("contactUs.namePlaceholder")}
-                      className={`w-full h-14 px-5 rounded-2xl bg-slate-50 border-2 text-slate-900 focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none ${
-                        errors.name ? 'border-red-400' : 'border-transparent'
+                      className={`w-full h-14 px-5 rounded-2xl bg-[var(--bg-secondary)] border-2 text-text-primary focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none ${
+                        errors.name ? 'border-error-border' : 'border-transparent'
                       }`}
                     />
                     {errors.name && (
-                      <p className="text-red-500 text-xs ml-1 flex items-center gap-1">
+                      <p className="text-error-text text-xs ml-1 flex items-center gap-1">
                         <AlertCircle className="w-3 h-3" /> {errors.name}
                       </p>
                     )}
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 ml-1">
+                    <label className="text-sm font-bold text-text-primary ml-1">
                       {t("contactUs.emailLabel")}
                     </label>
                     <input
@@ -220,12 +220,12 @@ export default function ContactUs() {
                       value={formData.email}
                       onChange={handleChange}
                       placeholder={t("contactUs.emailPlaceholder")}
-                      className={`w-full h-14 px-5 rounded-2xl bg-slate-50 border-2 text-slate-900 focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none ${
-                        errors.email ? 'border-red-400' : 'border-transparent'
+                      className={`w-full h-14 px-5 rounded-2xl bg-[var(--bg-secondary)] border-2 text-text-primary focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none ${
+                        errors.email ? 'border-error-border' : 'border-transparent'
                       }`}
                     />
                     {errors.email && (
-                      <p className="text-red-500 text-xs ml-1 flex items-center gap-1">
+                      <p className="text-error-text text-xs ml-1 flex items-center gap-1">
                         <AlertCircle className="w-3 h-3" /> {errors.email}
                       </p>
                     )}
@@ -233,7 +233,7 @@ export default function ContactUs() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700 ml-1">
+                  <label className="text-sm font-bold text-text-primary ml-1">
                     {t("contactUs.messageLabel")}
                   </label>
                   <textarea
@@ -242,19 +242,19 @@ export default function ContactUs() {
                     onChange={handleChange}
                     placeholder={t("contactUs.messagePlaceholder")}
                     rows={5}
-                    className={`w-full p-5 rounded-2xl bg-slate-50 border-2 text-slate-900 focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none resize-none ${
-                      errors.message ? 'border-red-400' : 'border-transparent'
+                    className={`w-full p-5 rounded-2xl bg-[var(--bg-secondary)] border-2 text-text-primary focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none resize-none ${
+                      errors.message ? 'border-error-border' : 'border-transparent'
                     }`}
                   />
                   {errors.message && (
-                    <p className="text-red-500 text-xs ml-1 flex items-center gap-1">
+                    <p className="text-error-text text-xs ml-1 flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" /> {errors.message}
                     </p>
                   )}
                 </div>
 
                 {submitError && (
-                  <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                  <div className="flex items-center gap-2 p-3 bg-error-bg border border-error-border rounded-xl text-error-text text-sm">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     {submitError}
                   </div>
@@ -263,7 +263,7 @@ export default function ContactUs() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full h-16 rounded-2xl bg-[var(--color-primary)] text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-slate-200 active:scale-95 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-16 rounded-2xl bg-[var(--color-primary)] text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg active:scale-95 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <span>{submitError ? 'Retry' : t("contactUs.sendButton")}</span>
                   <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
@@ -276,7 +276,7 @@ export default function ContactUs() {
       </section>
 
       {/* FAQ Section */}
-      <div className="bg-white border-t border-slate-100">
+      <div className="bg-surface-elevated border-t border-[var(--border)]">
         <Questions />
       </div>
     </div>

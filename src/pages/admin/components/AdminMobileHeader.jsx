@@ -9,7 +9,7 @@ export default function AdminMobileHeader({ className = '', unreadContacts = 0 }
   const avatar = profile?.avatar || user?.userImage || null;
 
   return (
-    <div className={`${className} sticky top-0 z-10 bg-[rgba(250,248,255,0.8)] backdrop-blur-md shadow-sm pt-1`}>
+    <div className={`${className} sticky top-0 z-10 bg-admin-brand-bg/80 backdrop-blur-md shadow-sm pt-1`}>
       <div className="flex justify-between items-center px-4 h-10">
         <div className="w-[160px] h-[37px] flex items-center">
           <span className="text-xl font-bold text-admin-brand">Redolapy</span>

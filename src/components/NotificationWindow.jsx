@@ -7,7 +7,7 @@ import {
   clearAllNotifications,
 } from "../api/notificationApi";
 
-const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
+const NotificationWindow = ({ isArabic, onClose, onUnreadChange, isMobile }) => {
   const [notifications, setNotifications] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -110,19 +110,23 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
     <div
       ref={windowRef}
       onMouseDown={(e) => e.stopPropagation()}
-      className={`absolute top-full mt-4 w-[380px] max-h-[520px] bg-white rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-gray-100 z-[100] animate-fadeInScale flex flex-col overflow-hidden ${
-        isArabic ? "left-0" : "right-0"
+      className={`${
+        isMobile
+          ? "relative w-full min-[641px]:w-[380px] max-h-[70vh] min-[641px]:max-h-[520px]"
+          : "absolute top-full mt-4 w-[380px] max-w-[calc(100vw-2rem)] max-h-[520px]"
+      } bg-surface-elevated rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-[var(--border)] z-[100] animate-fadeInScale flex flex-col overflow-hidden ${
+        !isMobile ? (isArabic ? "left-0" : "right-0 max-[480px]:-right-2") : ""
       }`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
         <div className="flex items-center gap-2">
           <Bell size={18} className="text-brand-secondary" />
-          <h3 className="text-base font-bold text-gray-900">
+          <h3 className="text-base font-bold text-text-primary">
             Notifications
           </h3>
           {unreadCount > 0 && (
-            <span className="text-xs font-bold bg-rose-500 text-white px-2 py-0.5 rounded-full">
+            <span className="text-xs font-bold bg-accent-pink text-white px-2 py-0.5 rounded-full">
               {unreadCount}
             </span>
           )}
@@ -131,14 +135,14 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
           {notifications.length > 0 && (
             <button
               onClick={handleClearAll}
-              className="text-xs font-bold text-rose-500 hover:text-rose-600 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-rose-50"
+              className="text-xs font-bold text-accent-pink hover:opacity-80 transition-colors cursor-pointer px-2 py-1 rounded-lg hover:bg-[var(--accent-light)]"
             >
               Clear all
             </button>
           )}
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+            className="p-1.5 rounded-full hover:bg-[var(--bg-secondary)] text-text-disabled hover:text-text-secondary transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -148,12 +152,12 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
       {/* Notification List */}
       <div className="flex-1 overflow-y-auto">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-16 text-text-disabled">
             <Bell size={40} className="mb-3 opacity-30 animate-pulse" />
             <p className="text-sm font-bold">Loading...</p>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-16 text-text-disabled">
             <Bell size={40} className="mb-3 opacity-30" />
             <p className="text-sm font-bold">No notifications yet</p>
           </div>
@@ -161,8 +165,8 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
           notifications.map((notif) => (
             <div
               key={notif._id}
-              className={`border-b border-gray-50 transition-colors ${
-                !notif.read ? "bg-brand-secondary/5" : "hover:bg-gray-50"
+              className={`border-b border-[var(--border)] transition-colors ${
+                !notif.read ? "bg-brand-secondary/5" : "hover:bg-[var(--bg-secondary)]"
               }`}
             >
               <div
@@ -184,8 +188,8 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
                     <p
                       className={`text-sm truncate ${
                         !notif.read
-                          ? "font-black text-gray-900"
-                          : "font-bold text-gray-700"
+                          ? "font-black text-text-primary"
+                          : "font-bold text-text-secondary"
                       }`}
                     >
                       {notif.title}
@@ -196,23 +200,23 @@ const NotificationWindow = ({ isArabic, onClose, onUnreadChange }) => {
                           e.stopPropagation();
                           handleDelete(notif._id);
                         }}
-                        className="p-1 rounded-md hover:bg-rose-50 text-gray-300 hover:text-rose-500 transition-colors cursor-pointer"
+                        className="p-1 rounded-md text-text-disabled hover:text-accent-orange transition-colors cursor-pointer"
                       >
                         <Trash2 size={14} />
                       </button>
                       {expandedId === notif._id ? (
-                        <ChevronUp size={14} className="text-gray-300" />
+                        <ChevronUp size={14} className="text-text-disabled" />
                       ) : (
-                        <ChevronDown size={14} className="text-gray-300" />
+                        <ChevronDown size={14} className="text-text-disabled" />
                       )}
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 font-medium mt-0.5">
+                  <p className="text-xs text-text-disabled font-medium mt-0.5">
                     {formatTime(notif.createdAt)}
                   </p>
                   {/* Expanded body */}
                   {expandedId === notif._id && (
-                    <p className="text-sm text-gray-600 mt-2 leading-relaxed animate-fadeInScale">
+                    <p className="text-sm text-text-secondary mt-2 leading-relaxed animate-fadeInScale">
                       {notif.body}
                     </p>
                   )}
