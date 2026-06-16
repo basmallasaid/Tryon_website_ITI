@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2, Zap, Clock } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2, Zap, Clock, Filter, X } from 'lucide-react';
 import { getAllNotificationsApi, deleteNotificationApi } from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
 
@@ -15,12 +15,16 @@ function formatTime(dateStr) {
   return new Date(dateStr).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
+const ALL_TYPES = ['general', 'automated', 'scheduled', 'tryon', 'recycle', 'store', 'pricing'];
+
 const getTypeConfig = (t) => ({
   tryon: { label: t('admin.notifications.tryOn'), color: 'bg-admin-brand/10 text-admin-brand' },
   recycle: { label: t('admin.notifications.recycle'), color: 'bg-admin-amber/10 text-admin-amber' },
   store: { label: t('admin.notifications.store'), color: 'bg-admin-success/10 text-admin-success' },
   pricing: { label: t('admin.notifications.pricing'), color: 'bg-admin-danger/10 text-admin-danger' },
   general: { label: t('admin.notifications.general'), color: 'bg-admin-border/20 text-admin-text-secondary' },
+  automated: { label: t('admin.notifications.automated'), color: 'bg-admin-brand/10 text-admin-brand-light' },
+  scheduled: { label: t('admin.notifications.scheduled'), color: 'bg-admin-amber/10 text-admin-amber' },
 });
 
 function NotificationDetail({ notification, onBack, onDelete }) {
@@ -93,6 +97,9 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [showFilter, setShowFilter] = useState(false);
+  const filterRef = useRef(null);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -107,6 +114,23 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
     };
     fetchAll();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) setShowFilter(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleType = (type) => {
+    setSelectedTypes((prev) => prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]);
+    setCurrentPage(1);
+  };
+
+  const filtered = selectedTypes.length > 0
+    ? notifications.filter((n) => selectedTypes.includes(n.type))
+    : notifications;
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this notification?')) return;
@@ -129,9 +153,9 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
     );
   }
 
-  const totalPages = Math.ceil(notifications.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentItems = notifications.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+  const currentItems = filtered.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   return (
     <div className="p-4 sm:p-8">
@@ -159,6 +183,46 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
               <Bell className="w-4 h-4" /> {t('admin.notifications.createNew')}
             </button>
           </div>
+        </div>
+
+        {/* Filter */}
+        <div className="px-6 py-3 border-b border-admin-border/40 flex items-center gap-3">
+          <div className="relative" ref={filterRef}>
+            <button
+              onClick={() => setShowFilter((v) => !v)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${selectedTypes.length > 0 ? 'bg-admin-brand/10 border-admin-brand/30 text-admin-brand' : 'bg-admin-brand-bg border-admin-border text-admin-text-secondary hover:bg-admin-brand-activeBg'}`}
+            >
+              <Filter className="w-3.5 h-3.5" />
+              {t('admin.notifications.filterByType')}
+              {selectedTypes.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-admin-brand text-white rounded-full text-[10px]">{selectedTypes.length}</span>}
+            </button>
+            {showFilter && (
+              <div className="absolute z-30 top-full left-0 mt-1 w-52 bg-surface-elevated border border-admin-border rounded-xl shadow-lg py-1">
+                {ALL_TYPES.map((type) => {
+                  const cfg = typeConfig[type];
+                  return (
+                    <label
+                      key={type}
+                      className="flex items-center gap-2.5 px-3 py-2 hover:bg-admin-brand-activeBg/30 cursor-pointer transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTypes.includes(type)}
+                        onChange={() => toggleType(type)}
+                        className="w-3.5 h-3.5 rounded border-admin-border accent-admin-brand"
+                      />
+                      <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${cfg.color}`}>{cfg.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+          {selectedTypes.length > 0 && (
+            <button onClick={() => { setSelectedTypes([]); setCurrentPage(1); }} className="flex items-center gap-1 px-2 py-1 text-[11px] text-admin-text-muted hover:text-admin-text-primary transition-colors">
+              <X className="w-3 h-3" /> {t('admin.notifications.clearFilter')}
+            </button>
+          )}
         </div>
         <table className="w-full">
           <thead>
@@ -210,7 +274,7 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
         </table>
         <div className="flex items-center justify-between px-6 py-4 border-t border-admin-border/40">
           <p className="text-xs text-admin-text-muted">
-            {loading ? t('admin.notifications.loading') : t('admin.notifications.showing', { from: notifications.length === 0 ? 0 : startIdx + 1, to: Math.min(startIdx + ITEMS_PER_PAGE, notifications.length), total: notifications.length })}
+            {loading ? t('admin.notifications.loading') : t('admin.notifications.showing', { from: filtered.length === 0 ? 0 : startIdx + 1, to: Math.min(startIdx + ITEMS_PER_PAGE, filtered.length), total: filtered.length })}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -280,7 +344,7 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
         </div>
         <div className="flex items-center justify-between mt-4 px-1">
           <p className="text-xs text-admin-text-muted">
-            {loading ? t('admin.notifications.loading') : t('admin.notifications.showing', { from: notifications.length === 0 ? 0 : startIdx + 1, to: Math.min(startIdx + ITEMS_PER_PAGE, notifications.length), total: notifications.length })}
+            {loading ? t('admin.notifications.loading') : t('admin.notifications.showing', { from: filtered.length === 0 ? 0 : startIdx + 1, to: Math.min(startIdx + ITEMS_PER_PAGE, filtered.length), total: filtered.length })}
           </p>
           <div className="flex items-center gap-2">
             <button

@@ -608,7 +608,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-3 py-2.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                    className="w-full px-3 py-2.5 bg-surface-elevated border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
                   />
                 </div>
                 <div className="flex-1">
@@ -618,7 +618,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
                     min={scheduledDate === todayStr ? minTimeStr : undefined}
-                    className="w-full px-3 py-2.5 bg-admin-surface border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
+                    className="w-full px-3 py-2.5 bg-surface-elevated border border-admin-border rounded-lg text-sm text-admin-text-primary outline-none focus:border-admin-brand transition-colors"
                   />
                 </div>
               </div>

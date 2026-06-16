@@ -215,7 +215,7 @@ export default function PlatformSettingsSection() {
         <button
           onClick={handleSave}
           disabled={!hasChanges}
-          className="px-5 sm:px-8 py-2 sm:py-2.5 text-sm sm:text-base text-white bg-admin-brand rounded-lg shadow-[0_4px_6px_-1px_var(--admin-brand)/0.2,_0_2px_4px_-2px_var(--admin-brand)/0.2] hover:opacity-90 transition-colors disabled:opacity-40"
+          className="px-5 sm:px-8 py-2 sm:py-2.5 text-sm sm:text-base text-white bg-admin-brand rounded-lg shadow-[0_4px_6px_-1px_var(--color-admin-brand)/0.2,_0_2px_4px_-2px_var(--color-admin-brand)/0.2] hover:opacity-90 transition-colors disabled:opacity-40"
         >
           {t('admin.settings.saveConfiguration')}
         </button>

@@ -133,7 +133,11 @@
       "recycle": "Recycle",
       "store": "Store",
       "pricing": "Pricing",
-      "general": "General"
+      "general": "General",
+      "automated": "Automated",
+      "scheduled": "Scheduled",
+      "filterByType": "Filter by Type",
+      "clearFilter": "Clear"
     },
     "emailCenter": {
       "title": "Email Center",
@@ -172,7 +176,7 @@
       "edit": "Edit",
       "userCol": "User",
       "roleCol": "Role",
-      "virtualTryOn": "Virtual Try-On",
+      "virtualTryOn": "Virtual Tryon",
       "recycling": "Recycling",
       "statusCol": "Status",
       "admin": "Admin",

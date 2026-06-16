@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 
 const AdminDarkModeContext = createContext();
 
@@ -27,21 +27,12 @@ function saveDarkMode(value) {
 export function AdminDarkModeProvider({ children }) {
   const [isDarkMode, setIsDarkMode] = useState(loadDarkMode);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    saveDarkMode(isDarkMode);
-
-    return () => {
-      document.documentElement.classList.remove('dark');
-    };
-  }, [isDarkMode]);
-
   const toggleDarkMode = useCallback(() => {
-    setIsDarkMode((prev) => !prev);
+    setIsDarkMode((prev) => {
+      const next = !prev;
+      saveDarkMode(next);
+      return next;
+    });
   }, []);
 
   return (
