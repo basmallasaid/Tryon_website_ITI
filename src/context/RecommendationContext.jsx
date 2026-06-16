@@ -25,6 +25,7 @@ export function RecommendationProvider({ children }) {
   const translatedRef = useRef({});
   const lastFetchTimeRef = useRef(0);
   const postMadeForDateRef = useRef(null);
+  const isFetchingRef = useRef(false);
 
   const setLanguage = useCallback((lang) => {
     isArabicRef.current = lang === "ar";
@@ -61,10 +62,14 @@ export function RecommendationProvider({ children }) {
   }, []);
 
   const fetchDailyRecommendation = useCallback(async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
     const now = Date.now();
     const timeSinceLastFetch = now - lastFetchTimeRef.current;
 
     if (lastFetchTimeRef.current > 0 && timeSinceLastFetch < COOLDOWN_MS) {
+      isFetchingRef.current = false;
       setLoading(false);
       return;
     }
@@ -74,6 +79,7 @@ export function RecommendationProvider({ children }) {
     const todayKey = getLocalDateKey(new Date());
 
     if (!userId) {
+      isFetchingRef.current = false;
       setTodaysOutfit(null);
       setTodaysWeather(null);
       setHistory([]);
@@ -123,6 +129,21 @@ export function RecommendationProvider({ children }) {
       }
 
       if (postMadeForDateRef.current === todayKey) {
+        lastFetchTimeRef.current = Date.now();
+        setLoading(false);
+        return;
+      }
+
+      const cached = getCachedDailyOutfit();
+      if (cached?.outfits?.[0]) {
+        postMadeForDateRef.current = todayKey;
+        const outfit = {
+          ...cached.outfits[0],
+          composite_image: cached.outfits[0]?.compositeImage || cached.composite_image || null,
+        };
+        const translated = await translateIfNeeded(outfit);
+        setTodaysOutfit(translated);
+        setTodaysWeather(cached.weather || null);
         lastFetchTimeRef.current = Date.now();
         setLoading(false);
         return;
@@ -186,6 +207,7 @@ export function RecommendationProvider({ children }) {
       } catch { /* offline */ }
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   }, [fetchHistory, user, translateIfNeeded, mergeCompositeImage]);
 
