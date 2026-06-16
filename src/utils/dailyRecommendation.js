@@ -8,10 +8,20 @@ function dailyKey(key, userId) {
   return userId ? `${key}_${userId}` : key;
 }
 
-function getLocalDateKey(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
+export function getLocalDateKey(dateOrString) {
+  if (typeof dateOrString === "string") {
+    const match = dateOrString.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+    const d = new Date(dateOrString);
+    if (isNaN(d.getTime())) return "";
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+  const y = dateOrString.getFullYear();
+  const m = String(dateOrString.getMonth() + 1).padStart(2, "0");
+  const d = String(dateOrString.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
 
@@ -21,29 +31,30 @@ function getUserId() {
 }
 
 /**
- * Check if the most recent recommendation in history is within 24 hours.
- * Returns the today's entry if found, null otherwise.
+ * Find today's entry in recommendation history by matching date.
+ * Extracts YYYY-MM-DD from each entry's created_at and compares to today.
+ * If multiple entries exist for the same date, returns the latest one.
  */
-export function getRecentRecommendationFromHistory(history) {
-  if (!history || !history.length) return null;
+export function findTodayInHistory(history) {
+  if (!history?.length) return null;
 
-  const sorted = [...history].sort(
-    (a, b) => new Date(b.created_at) - new Date(a.created_at)
-  );
+  const todayKey = getLocalDateKey(new Date());
 
-  const latest = sorted[0];
-  if (!latest?.created_at) return null;
+  const todayEntries = history.filter((entry) => {
+    const entryDate = entry.created_at || entry.createdAt;
+    if (!entryDate) return false;
+    const entryKey = getLocalDateKey(entryDate);
+    return entryKey === todayKey;
+  });
 
-  const latestDate = new Date(latest.created_at);
-  const now = new Date();
-  const diffMs = now - latestDate;
-  const diffHours = diffMs / (1000 * 60 * 60);
+  if (todayEntries.length === 0) return null;
 
-  if (diffHours < 24) {
-    return latest;
-  }
-
-  return null;
+  const latest = todayEntries.reduce((a, b) => {
+    const dateA = new Date(a.created_at || a.createdAt);
+    const dateB = new Date(b.created_at || b.createdAt);
+    return dateA > dateB ? a : b;
+  });
+  return latest;
 }
 
 /**

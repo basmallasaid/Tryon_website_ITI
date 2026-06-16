@@ -5,6 +5,7 @@ import { Sparkles, Sun, Cloud, CloudRain, CloudSnow, Wind } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useWardrobe } from "../../context/WardrobeContext";
 import { useRecommendation } from "../../context/RecommendationContext";
+import { getLocalDateKey } from "../../utils/dailyRecommendation";
 import EmptyState from "../../components/EmptyState";
 import LoadingScreen from "../../components/LoadingScreen";
 import OutfitDetailModal from "../../components/OutfitDetailModal";
@@ -16,38 +17,20 @@ function getGreeting(t) {
   return t("recommendation.greetingEvening");
 }
 
-function toLocalDateKey(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
-
 function formatDate(dateStr, locale = "en-US") {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   return d.toLocaleDateString(locale, { month: "short", day: "numeric" });
 }
 
-function parseApiDate(value) {
-  if (!value) return null;
-  if (typeof value === "string") {
-    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (match) {
-      return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-    }
-  }
-  const d = new Date(value);
-  return isNaN(d.getTime()) ? null : d;
-}
-
 function deduplicateByDate(entries) {
   const map = {};
   entries.forEach((entry) => {
-    const parsed = parseApiDate(entry.created_at);
-    if (!parsed) return;
-    const dateKey = toLocalDateKey(parsed);
-    if (dateKey && (!map[dateKey] || new Date(entry.created_at) > new Date(map[dateKey].created_at))) {
+    const entryDate = entry.created_at || entry.createdAt;
+    if (!entryDate) return;
+    const dateKey = getLocalDateKey(entryDate);
+    if (!dateKey) return;
+    if (!map[dateKey] || new Date(entryDate) > new Date(map[dateKey].created_at || map[dateKey].createdAt)) {
       map[dateKey] = entry;
     }
   });
@@ -118,6 +101,14 @@ export default function RecommendationsPage() {
     setLanguage(i18n.language);
   }, [i18n.language, setLanguage]);
 
+  const wardrobeMap = useMemo(() => {
+    const map = new Map();
+    for (const item of wardrobeItems) {
+      map.set(item._id || item.id, item);
+    }
+    return map;
+  }, [wardrobeItems]);
+
   const userName = useMemo(() => {
     if (!user) return "";
     const profile = user.profile || user.user?.profile;
@@ -126,7 +117,7 @@ export default function RecommendationsPage() {
   }, [user]);
 
   const weeklyOutfits = useMemo(() => {
-    const todayKey = toLocalDateKey(new Date());
+    const todayKey = getLocalDateKey(new Date());
     const byDate = deduplicateByDate(history);
     if (todaysOutfit && !byDate[todayKey]) {
       byDate[todayKey] = {
@@ -138,7 +129,7 @@ export default function RecommendationsPage() {
     }
     const weekDates = buildWeekFromSaturday();
     return weekDates.map((dayDate, idx) => {
-      const dateKey = toLocalDateKey(dayDate);
+      const dateKey = getLocalDateKey(dayDate);
       const entry = byDate[dateKey] || null;
       const outfit = entry?.outfits?.[0] || null;
       return {
@@ -146,19 +137,25 @@ export default function RecommendationsPage() {
         dayIndex: idx,
         date: dateKey,
         entry,
-        outfitImage: entry?.composite_image || outfit?.compositeImage || outfit?.items?.[0]?.image || null,
+        outfitImage: entry?.composite_image || outfit?.composite_image || outfit?.compositeImage || outfit?.items?.[0]?.image || null,
         hasOutfit: !!entry,
         isToday: dateKey === todayKey,
       };
     });
   }, [history, todaysOutfit, todaysWeather]);
 
-  const weather = todaysWeather || weeklyOutfits.find((d) => d.isToday)?.entry?.weather || history[0]?.weather || null;
+  const weather = todaysWeather || weeklyOutfits.find((d) => d.isToday)?.entry?.weather || null;
   const todayEntry = weeklyOutfits.find((d) => d.isToday);
-  const todayOutfitEntry = todayEntry?.entry || todaysOutfit || history[0] || null;
+  const todayOutfitEntry = todayEntry?.entry || null;
   const todayOutfit = todayOutfitEntry?.outfits?.[0] || null;
-  const todayCompositeImage = todayOutfitEntry?.composite_image || todayOutfit?.compositeImage || todayOutfit?.items?.[0]?.image || null;
-  const currentItems = useMemo(() => todayOutfit?.items || [], [todayOutfit]);
+  const currentItems = useMemo(() => {
+    const topId = todayOutfit?.top_id;
+    const bottomId = todayOutfit?.bottom_id;
+    const top = topId ? wardrobeMap.get(topId) : null;
+    const bottom = bottomId ? wardrobeMap.get(bottomId) : null;
+    return [top, bottom].filter(Boolean);
+  }, [todayOutfit, wardrobeMap]);
+  const todayCompositeImage = todayOutfitEntry?.composite_image || todayOutfit?.composite_image || todayOutfit?.compositeImage || currentItems[0]?.image || null;
 
   if (recLoading || wardrobeLoading) {
     return <LoadingScreen visible />;
