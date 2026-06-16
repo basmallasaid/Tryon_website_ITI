@@ -47,8 +47,7 @@ export default function DashboardSection({ onNavigate }) {
     categoryCount[cat] = (categoryCount[cat] || 0) + 1;
   });
   const sortedCategories = Object.entries(categoryCount)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 3);
+    .sort((a, b) => b[1] - a[1]);
   const topCategoryPercent = sortedCategories.length > 0
     ? Math.round((sortedCategories[0][1] / totalProducts) * 100)
     : 0;
@@ -100,7 +99,6 @@ export default function DashboardSection({ onNavigate }) {
               label: categoryLabels[cat] || cat,
               count,
             }))}
-            topPercent={topCategoryPercent}
             loading={loading}
           />
         </div>

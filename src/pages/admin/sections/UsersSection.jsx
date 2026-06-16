@@ -371,19 +371,19 @@ export default function UsersSection({
           <table className="w-full text-left min-w-[700px] md:min-w-0">
             <thead>
               <tr className="bg-admin-brand-bg border-b border-admin-border">
-                <th className="py-2.5 px-4 w-12">
-                  <input
-                    type="checkbox"
-                    checked={
-                      filtered.length > 0 &&
-                      selectedIds.size === filtered.length
-                    }
-                    onChange={handleSelectAll}
-                    className="w-4 h-4 rounded border-admin-border accent-admin-brand cursor-pointer"
-                  />
-                </th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
-                  {t('admin.users.userCol')}
+                  <span className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={
+                        filtered.length > 0 &&
+                        selectedIds.size === filtered.length
+                      }
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 rounded border-admin-border accent-admin-brand cursor-pointer"
+                    />
+                    {t('admin.users.userCol')}
+                  </span>
                 </th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
                   {t('admin.users.roleCol')}
@@ -403,7 +403,7 @@ export default function UsersSection({
               {loading ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={5}
                     className="py-12 text-center text-sm text-admin-text-muted"
                   >
                     {t('admin.users.loadingUsers')}
@@ -421,7 +421,7 @@ export default function UsersSection({
               ) : (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={5}
                     className="py-12 text-center text-sm text-admin-text-muted"
                   >
                     {t('admin.users.noUsers')}

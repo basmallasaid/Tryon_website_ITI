@@ -4,10 +4,11 @@ import AdminTopBar from './components/AdminTopBar';
 import AdminMobileHeader from './components/AdminMobileHeader';
 import AdminBottomNav from './components/AdminBottomNav';
 import { useAdminTranslation } from '../../i18n/admin/useAdminTranslation';
-import { AdminDarkModeProvider } from './context/AdminDarkModeContext';
+import { AdminDarkModeProvider, useAdminDarkMode } from './context/AdminDarkModeContext';
 
-export default function AdminLayout({ activePage, setActivePage, topBarActions, unreadContacts, children }) {
+function AdminLayoutInner({ activePage, setActivePage, topBarActions, unreadContacts, children }) {
   const { i18n } = useAdminTranslation();
+  const { isDarkMode } = useAdminDarkMode();
   const isRTL = i18n.language === 'ar';
 
   useEffect(() => {
@@ -15,9 +16,14 @@ export default function AdminLayout({ activePage, setActivePage, topBarActions, 
     document.documentElement.lang = i18n.language;
   }, [isRTL, i18n.language]);
 
+  useEffect(() => {
+    const prev = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = isDarkMode ? '#111111' : '#f4f3f5';
+    return () => { document.body.style.backgroundColor = prev; };
+  }, [isDarkMode]);
+
   return (
-    <AdminDarkModeProvider>
-      <div className="font-geist bg-admin-page min-h-screen">
+      <div className={`font-geist min-h-screen admin-theme ${isDarkMode ? 'admin-dark' : ''}`} style={{ backgroundColor: 'var(--color-admin-page)' }}>
         <AdminSidebar className="hidden lg:flex" activePage={activePage} setActivePage={setActivePage} unreadContacts={unreadContacts} />
 
         <AdminMobileHeader className="lg:hidden" unreadContacts={unreadContacts} />
@@ -32,6 +38,13 @@ export default function AdminLayout({ activePage, setActivePage, topBarActions, 
 
         <AdminBottomNav className="lg:hidden fixed bottom-0 left-0 right-0 z-10" activePage={activePage} setActivePage={setActivePage} />
       </div>
+  );
+}
+
+export default function AdminLayout(props) {
+  return (
+    <AdminDarkModeProvider>
+      <AdminLayoutInner {...props} />
     </AdminDarkModeProvider>
   );
 }

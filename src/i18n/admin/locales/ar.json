@@ -131,7 +131,11 @@
       "recycle": "إعادة تدوير",
       "store": "المتجر",
       "pricing": "التسعير",
-      "general": "عام"
+      "general": "عام",
+      "automated": "تلقائي",
+      "scheduled": "مجدول",
+      "filterByType": "تصفية حسب النوع",
+      "clearFilter": "مسح"
     },
     "emailCenter": {
       "title": "مركز البريد",

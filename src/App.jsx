@@ -60,10 +60,30 @@ const LoadingFallback = () => (
 );
 
 // Guards
+function AdminLogoutWatcher() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const prevUser = useRef(user);
+
+  useEffect(() => {
+    if (prevUser.current && !user) {
+      navigate("/login", { replace: true });
+    }
+    prevUser.current = user;
+  }, [user, navigate]);
+
+  return null;
+}
+
 function AdminGuard() {
-  const auth = JSON.parse(localStorage.getItem("auth") || "null");
-  if (!auth || auth.role !== "admin") return <Navigate to="/" replace />;
-  return <Outlet />;
+  const { user } = useAuth();
+  if (!user || user.role !== "admin") return <Navigate to="/" replace />;
+  return (
+    <>
+      <AdminLogoutWatcher />
+      <Outlet />
+    </>
+  );
 }
 
 function LogoutWatcher() {
@@ -83,8 +103,7 @@ function LogoutWatcher() {
 
 function UserGuard() {
   const auth = JSON.parse(localStorage.getItem("auth") || "null");
-  const location = useLocation();
-  if (auth?.role === "admin" && location.pathname !== "/")
+  if (auth?.role === "admin")
     return <Navigate to="/admin" replace />;
   return (
     <>
