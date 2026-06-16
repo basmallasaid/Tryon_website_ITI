@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { X, Loader2, AlertCircle, Sparkles, ChevronRight } from 'lucide-react';
+import { X, Loader2, AlertCircle, Sparkles, ChevronRight, Shirt } from 'lucide-react';
+import { useWardrobe } from '../../context/WardrobeContext';
 
 const ColorDot = ({ color }) => (
   <span
@@ -10,9 +11,41 @@ const ColorDot = ({ color }) => (
   />
 );
 
+const imgSrc = image => {
+  if (!image) return null;
+  if (typeof image === 'string') {
+    if (image.startsWith('data:') || image.startsWith('http')) return image;
+    return `data:image/jpeg;base64,${image}`;
+  }
+  if (image.url) return image.url;
+  if (image.uri) return image.uri;
+  return null;
+};
+
 const MatchWardrobePopup = ({ isOpen, onClose, isArabic, matches, loading, error }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { items: wardrobeItems } = useWardrobe();
+
+  const wardrobeMap = useMemo(() => {
+    const map = new Map();
+    for (const item of wardrobeItems) {
+      map.set(item._id || item.id, item);
+    }
+    return map;
+  }, [wardrobeItems]);
+
+  const getMatchImage = match => {
+    if (!match?.item) return null;
+    const img = match.item.image;
+    if (img) {
+      const src = typeof img === 'string' ? img : img?.url || img?.uri;
+      if (src) return imgSrc(src);
+    }
+    const wItem = wardrobeMap.get(match.item.id) || wardrobeMap.get(match.item._id);
+    if (wItem?.image) return imgSrc(wItem.image);
+    return null;
+  };
 
   if (!isOpen) return null;
 
@@ -88,12 +121,16 @@ const MatchWardrobePopup = ({ isOpen, onClose, isArabic, matches, loading, error
                     }}
                 >
                     <div className="flex gap-5 p-5">
-                        <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden rounded-[1.5rem] bg-[var(--bg-secondary)] border border-[var(--border)]/50 group-hover:scale-[1.02] transition-transform duration-500">
-                            <img
-                                src={match.item.image}
-                                alt={match.item.name}
-                                className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
-                            />
+                        <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden rounded-[1.5rem] bg-[var(--bg-secondary)] border border-[var(--border)]/50 group-hover:scale-[1.02] transition-transform duration-500 flex items-center justify-center">
+                            {getMatchImage(match) ? (
+                                <img
+                                    src={getMatchImage(match)}
+                                    alt={match.item.name}
+                                    className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
+                                />
+                            ) : (
+                                <Shirt size={32} className="text-text-disabled" />
+                            )}
                             <div className="absolute top-2 left-2 bg-surface-elevated/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
                                 <span className="text-[14px] font-black text-text-primary">{match.score}</span>
                                 <span className="text-[9px] font-black text-text-disabled uppercase">%</span>
