@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { loginApi, registerApi, sendVerificationApi, forgotPasswordApi, otpVerifyApi, resetPasswordApi } from "../../api/authApi";
+import { registerApi, sendVerificationApi, forgotPasswordApi, otpVerifyApi, resetPasswordApi } from "../../api/authApi";
 import { getUserApi, updateProfileApi } from "../../api/userApi";
 import Login from "./Login";
 import Register from "./Register";
@@ -95,39 +95,6 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
         return () => window.removeEventListener("message", handleMessage);
     }, [login, onClose, navigate, t, toastPosition]);
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        const email = e.target.email.value;
-        const password = e.target.password.value;
-        try {
-            const res = await loginApi({ email, password });
-            console.log("Login successful", { response: res.data, email, timestamp: new Date().toISOString() });
-            const userRole = res.data.role;
-            login({ id: res.data._id, email: res.data.email, token: res.data.token, role: userRole });
-            const userRes = await getUserApi(res.data._id);
-            console.log("User profile data", { user: userRes.data, timestamp: new Date().toISOString() });
-            const apiUser = userRes.data?.user || userRes.data;
-            const fullName = apiUser?.profile
-              ? [apiUser.profile.first_name, apiUser.profile.last_name].filter(Boolean).join(" ").trim()
-              : apiUser?.name;
-            login({
-                id: res.data._id,
-                email: res.data.email,
-                token: res.data.token,
-                role: userRole,
-                ...apiUser,
-                name: fullName,
-            });
-            if (userRole === "admin") {
-                navigate("/admin", { replace: true });
-            } else {
-                onClose?.();
-            }
-        } catch (error) {
-            showToast('error', t("auth.loginFailed"));
-        }
-    };
-
     const handleRegister = async (e) => {
         e.preventDefault();
         const formData = {
@@ -208,7 +175,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
         const commonProps = { inModal };
         switch (view) {
             case "login":
-                return <Login isVisible onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} toggleAuth={toggleAuth} {...commonProps} mobile />;
+                return <Login isVisible onClose={onClose} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} toggleAuth={toggleAuth} {...commonProps} mobile />;
             case "register":
                 return <Register isVisible onRegister={handleRegister} toggleAuth={toggleAuth} onGoogleLogin={handleGoogleLogin} {...commonProps} mobile />;
             case "forgot":
@@ -236,7 +203,7 @@ export default function AuthPage({ initialIsLogin = true, inModal = false, onClo
             <div className={`hidden md:block w-full ${inModal ? '' : 'max-w-6xl'}`}>
                 <div className={`relative ${inModal ? 'h-[600px]' : 'h-[750px]'} w-full overflow-hidden rounded-[40px] bg-surface-elevated shadow-2xl`}>
 
-                    <Login isVisible={view === "login"} onLogin={handleLogin} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
+                    <Login isVisible={view === "login"} onClose={onClose} onForgot={handleForgot} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
 
                     <Register isVisible={view === "register"} onRegister={handleRegister} toggleAuth={toggleAuth} onGoogleLogin={handleGoogleLogin} inModal={inModal} />
 

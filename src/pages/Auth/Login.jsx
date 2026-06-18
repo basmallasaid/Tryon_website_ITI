@@ -1,10 +1,46 @@
-import React, { useState } from "react";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
-export default function LoginForm({ isVisible, onLogin, onForgot, onGoogleLogin, toggleAuth, inModal, mobile }) {
+import Spinner from "../../components/Spinner";
+import { loginApi } from "../../api/authApi";
+import { showToast } from "../../utils/toast";
+import { getUserApi } from "../../api/userApi";
+import { useAuth } from "../../context/AuthContext";
+
+export default function LoginForm({ isVisible, onForgot, onGoogleLogin, toggleAuth, inModal, mobile, onClose }) {
+  const { login } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const onLogin = async (e) => {
+      e.preventDefault();
+      setIsLoading(true);
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      try {
+          // console.log("Attempting login", 98, isLoading);
+          const {role, _id: id, token} = await loginApi({ email, password });
+          login({ id, email, token, role });
+          const userRes = await getUserApi(id);
+          const apiUser = userRes.data?.user || userRes.data;
+          const fullName = apiUser?.profile
+            ? [apiUser.profile.first_name, apiUser.profile.last_name].filter(Boolean).join(" ").trim()
+            : apiUser?.name;
+          login({id, email, token, role, ...apiUser, name: fullName});
+
+          if (role === "admin") navigate("/admin", { replace: true });
+          else onClose?.();
+      } catch (error) {
+          const message = error?.response?.data?.message;
+          showToast('error', message ?? t("auth.loginFailed"));
+      } finally {
+          setIsLoading(false);
+      }
+  };
 
   // ── Mobile layout: normal flow, no absolute positioning ──────────────────
   if (mobile) {
@@ -79,9 +115,9 @@ export default function LoginForm({ isVisible, onLogin, onForgot, onGoogleLogin,
 
           <button
             type="submit"
-            className="w-full py-3.5 rounded-2xl bg-[var(--primary)] font-bold text-white shadow-lg shadow-[var(--primary)]/20 transition-all hover:brightness-95 active:scale-95 text-sm"
+            className={`w-full py-3.5 rounded-2xl bg-[var(--primary)] font-bold text-white shadow-lg shadow-[var(--primary)]/20 transition-all hover:brightness-95 active:scale-95 text-sm ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
           >
-            {t("auth.login")}
+            {isLoading ? <Spinner /> : t("auth.login")}
           </button>
 
           <div className="flex items-center gap-4 py-1">
@@ -165,8 +201,8 @@ export default function LoginForm({ isVisible, onLogin, onForgot, onGoogleLogin,
             </div>
           </div>
 
-          <button type="submit" className={`w-full rounded-2xl bg-[var(--primary)] font-bold text-white shadow-lg shadow-[var(--primary)]/20 transition-all hover:bg-[var(--primary)] hover:-translate-y-0.5 active:scale-95 ${inModal ? 'py-3' : 'py-4'}`}>
-            {t("auth.login")}
+          <button type="submit" className={`w-full rounded-2xl bg-[var(--primary)] font-bold text-white shadow-lg shadow-[var(--primary)]/20 transition-all hover:bg-[var(--primary)] hover:-translate-y-0.5 active:scale-95 ${inModal ? 'py-3' : 'py-4'} ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}>
+            {isLoading ? <Spinner /> : t("auth.login")}
           </button>
 
           <div className="flex items-center justify-center gap-4 py-2">
