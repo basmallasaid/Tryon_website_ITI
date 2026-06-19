@@ -527,6 +527,7 @@
     "analysisFailed": "Analysis failed",
     "addedSuccess": "Item added to wardrobe successfully",
     "addFailed": "Failed to add item",
+    "addDuplicate": "This item already exists in your wardrobe",
     "opt_male": "Male",
     "opt_female": "Female",
     "opt_unisex": "Unisex",

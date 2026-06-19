@@ -524,6 +524,7 @@
     "analysisFailed": "فشل التحليل",
     "addedSuccess": "تمت إضافة القطعة إلى الخزانة بنجاح",
     "addFailed": "فشل إضافة القطعة",
+    "addDuplicate": "هذه القطعة موجودة بالفعل في خزانتك",
     "opt_male": "ذكر",
     "opt_female": "أنثى",
     "opt_unisex": "للجنسين",
