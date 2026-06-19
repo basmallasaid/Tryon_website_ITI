@@ -45,7 +45,11 @@ function getAvatarColor(name) {
 
 function mapRole(user, t) {
   if (user.role === 'admin') return t('admin.users.admin');
-  if (user.subscriptionStatus === 'active') return t('admin.users.premium');
+  if (user.subscriptionStatus === 'active') {
+    if (user.subscriptionInterval === 'month') return t('admin.users.premium') + ' (M)';
+    if (user.subscriptionInterval === 'year') return t('admin.users.premium') + ' (Y)';
+    return t('admin.users.premium');
+  }
   return t('admin.users.userRole');
 }
 

@@ -8,17 +8,26 @@ import ShieldCheckIcon from '../../../icons/ShieldCheckIcon';
 const roles = [
   { id: 'user', icon: User, title: 'User', description: 'Standard enterprise access with individual limits.' },
   { id: 'admin', icon: Star, title: 'Admin', description: 'Full access to dashboard and all management tools.' },
-  { id: 'premium', icon: Store, title: 'Premium', description: 'Advanced tools and unlimited catalog syncing.' },
+  { id: 'premium_monthly', icon: Store, title: 'Premium (M)', description: 'Monthly premium subscription with advanced tools.' },
+  { id: 'premium_yearly', icon: Shirt, title: 'Premium (Y)', description: 'Yearly premium subscription with advanced tools.' },
 ];
 
 export default function AddUserSection({ onBack, editingUser }) {
   const isEditing = !!editingUser;
-  const [form, setForm] = useState({
-    firstName: editingUser?.profile?.first_name || '',
-    lastName: editingUser?.profile?.last_name || '',
-    email: editingUser?.email || '',
-    password: '',
-    role: editingUser?.role || 'user',
+  const [form, setForm] = useState(() => {
+    const role = editingUser?.role || 'user';
+    const interval = editingUser?.subscriptionInterval;
+    const status = editingUser?.subscriptionStatus;
+    let resolvedRole = role;
+    if (role === 'user' && status === 'active' && interval === 'month') resolvedRole = 'premium_monthly';
+    else if (role === 'user' && status === 'active' && interval === 'year') resolvedRole = 'premium_yearly';
+    return {
+      firstName: editingUser?.profile?.first_name || '',
+      lastName: editingUser?.profile?.last_name || '',
+      email: editingUser?.email || '',
+      password: '',
+      role: resolvedRole,
+    };
   });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -40,12 +49,20 @@ export default function AddUserSection({ onBack, editingUser }) {
     }
     setSubmitting(true);
     try {
+      const roleMap = { premium_monthly: 'user', premium_yearly: 'user' };
+      const subMap = { premium_monthly: 'month', premium_yearly: 'year' };
+      const resolvedRole = roleMap[form.role] || form.role;
+      const resolvedInterval = subMap[form.role] || null;
+      const isPremium = !!resolvedInterval;
+
       if (isEditing) {
         const payload = {
           email: form.email.trim(),
           first_name: form.firstName.trim() || null,
           last_name: form.lastName.trim() || null,
-          role: form.role,
+          role: resolvedRole,
+          subscriptionStatus: isPremium ? 'active' : null,
+          subscriptionInterval: resolvedInterval,
         };
         if (form.password.trim()) {
           payload.password = form.password.trim();
@@ -57,7 +74,9 @@ export default function AddUserSection({ onBack, editingUser }) {
           password: form.password,
           first_name: form.firstName.trim() || null,
           last_name: form.lastName.trim() || null,
-          role: form.role,
+          role: resolvedRole,
+          subscriptionStatus: isPremium ? 'active' : null,
+          subscriptionInterval: resolvedInterval,
         });
       }
       setSuccess(true);
@@ -184,7 +203,7 @@ export default function AddUserSection({ onBack, editingUser }) {
               <div className="w-5 h-5 text-admin-brand"><ShieldCheckIcon className="w-5 h-5" /></div>
               <h2 className="text-xl font-medium text-admin-text-primary">Account Role</h2>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-4 gap-4">
               {roles.map(role => {
                 const Icon = role.icon;
                 const selected = form.role === role.id;
