@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Swal from 'sweetalert2';
 import { ArrowLeft, User, Store, Star, Shirt, RefreshCw, Minus, Plus, CheckCircle } from 'lucide-react';
 import { createAdminUserApi, updateUserApi } from '../../../api/adminApi';
 import AddIcon from '../../../icons/AddIcon';
@@ -26,15 +27,15 @@ export default function AddUserSection({ onBack, editingUser }) {
 
   const handleSubmit = async () => {
     if (!form.email.trim()) {
-      alert('Email is required.');
+      Swal.fire({ icon: 'warning', title: 'Missing Email', text: 'Email is required.', confirmButtonColor: '#1550D3' });
       return;
     }
     if (!isEditing && !form.password.trim()) {
-      alert('Password is required.');
+      Swal.fire({ icon: 'warning', title: 'Missing Password', text: 'Password is required.', confirmButtonColor: '#1550D3' });
       return;
     }
     if (isEditing && form.password.trim() && form.password.trim().length < 6) {
-      alert('Password must be at least 6 characters.');
+      Swal.fire({ icon: 'warning', title: 'Short Password', text: 'Password must be at least 6 characters.', confirmButtonColor: '#1550D3' });
       return;
     }
     setSubmitting(true);
@@ -61,7 +62,7 @@ export default function AddUserSection({ onBack, editingUser }) {
       }
       setSuccess(true);
     } catch (err) {
-      alert(`Failed to ${isEditing ? 'update' : 'create'} user.`);
+      Swal.fire({ icon: 'error', title: 'Error', text: `Failed to ${isEditing ? 'update' : 'create'} user.`, confirmButtonColor: '#1550D3' });
     } finally {
       setSubmitting(false);
     }

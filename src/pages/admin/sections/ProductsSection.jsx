@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { Filter, X, ChevronLeft, ChevronRight, Plus, SlidersHorizontal, Trash2, Pencil, ArrowUpDown, ArrowDown, ArrowUp } from 'lucide-react';
 import ProductRow from '../components/ProductRow';
 import ProductCard from '../components/ProductCard';
@@ -126,7 +127,7 @@ export default function ProductsSection({ onAddProduct, onEditProduct }) {
       setSelectedIds(new Set());
       fetchProducts();
     } catch (err) {
-      alert('Failed to delete some products.');
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete some products.', confirmButtonColor: '#1550D3' });
     }
   };
 

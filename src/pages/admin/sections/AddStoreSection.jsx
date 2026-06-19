@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { ArrowLeft, Info, Image as ImageIcon, Tag, CheckCircle } from 'lucide-react';
 import { createStoreApi, updateStoreApi } from '../../../api/adminApi';
 
@@ -30,7 +31,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
 
   const handleSubmit = async () => {
     if (!storeName.trim() || !description.trim() || !websiteUrl.trim() || !logoUrl.trim()) {
-      alert('Please fill all required fields (Name, Description, Website, Logo URL).');
+      Swal.fire({ icon: 'warning', title: 'Missing Fields', text: 'Please fill all required fields (Name, Description, Website, Logo URL).', confirmButtonColor: '#1550D3' });
       return;
     }
     setSubmitting(true);
@@ -51,7 +52,7 @@ export default function AddStoreSection({ onBack, editingStore }) {
       }
       setSuccess(true);
     } catch (err) {
-      alert(`Failed to ${isEditing ? 'update' : 'create'} store.`);
+      Swal.fire({ icon: 'error', title: 'Error', text: `Failed to ${isEditing ? 'update' : 'create'} store.`, confirmButtonColor: '#1550D3' });
     } finally {
       setSubmitting(false);
     }

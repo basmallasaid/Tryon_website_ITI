@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import {
   Shirt,
   RefreshCw,
@@ -236,7 +237,7 @@ export default function UsersSection({
       });
       setDeleteTarget(null);
     } catch (err) {
-      alert('Failed to delete user.');
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete user.', confirmButtonColor: '#1550D3' });
     } finally {
       setDeleting(false);
     }

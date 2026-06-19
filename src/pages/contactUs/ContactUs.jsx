@@ -23,7 +23,7 @@ const contactCards = [
     icon: <MessageSquare className="w-5 h-5" />,
     label: "Telegram",
     value: "@Redolapy_Support",
-    href: "#",
+    href: "https://t.me/+20123456789",
     color: "from-lime-400 to-lime-600",
   },
 ];

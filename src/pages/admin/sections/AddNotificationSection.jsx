@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { ArrowLeft, Calendar, ChevronDown, Send, CheckCircle, Users, User, Mail, Smartphone, Globe, Clock } from 'lucide-react';
 import { broadcastNotificationApi, sendToUserNotificationApi, getUsersApi } from '../../../api/adminApi';
 
@@ -265,22 +266,22 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
 
   const handleSend = async () => {
     if (!title.trim() || !message.trim()) {
-      alert('Please fill in both title and message.');
+      Swal.fire({ icon: 'warning', title: 'Missing Fields', text: 'Please fill in both title and message.', confirmButtonColor: '#1550D3' });
       return;
     }
     if (sendMode === 'individual' && !targetEmail.trim()) {
-      alert('Please select or enter a user email.');
+      Swal.fire({ icon: 'warning', title: 'Missing Email', text: 'Please select or enter a user email.', confirmButtonColor: '#1550D3' });
       return;
     }
     if (channels.length === 0) {
-      alert('Please select at least one delivery channel.');
+      Swal.fire({ icon: 'warning', title: 'No Channel Selected', text: 'Please select at least one delivery channel.', confirmButtonColor: '#1550D3' });
       return;
     }
     if (scheduleEnabled && scheduledDate && scheduledTime) {
       const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}`);
       const minTime = new Date(Date.now() + 2 * 60 * 1000);
       if (scheduledDateTime <= minTime) {
-        alert('Scheduled time must be at least 2 minutes from now.');
+        Swal.fire({ icon: 'warning', title: 'Invalid Schedule Time', text: 'Scheduled time must be at least 2 minutes from now.', confirmButtonColor: '#1550D3' });
         return;
       }
     }
@@ -318,7 +319,7 @@ export default function AddNotificationSection({ onBack, prefillEmail = '', pref
       }
       setSuccess(true);
     } catch (err) {
-      alert('Failed to send notification.');
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to send notification.', confirmButtonColor: '#1550D3' });
     } finally {
       setSubmitting(false);
     }

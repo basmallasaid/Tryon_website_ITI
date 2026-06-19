@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { Filter, X, ChevronLeft, ChevronRight, Plus, SlidersHorizontal, Trash2, Pencil, ArrowUp, ArrowDown } from 'lucide-react';
 import StoreRow from '../components/StoreRow';
 import StoreCard from '../components/StoreCard';
@@ -153,7 +154,7 @@ export default function StoresSection({ onAddStore, onEditStore }) {
       setSelectedIds(new Set());
       fetchData();
     } catch (err) {
-      alert('Failed to delete some stores.');
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete some stores.', confirmButtonColor: '#1550D3' });
     }
   };
 
