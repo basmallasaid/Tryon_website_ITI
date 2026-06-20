@@ -17,6 +17,13 @@ export function AuthProvider({ children }) {
     setUser(userData);
   }, []);
 
+  const clearAppCaches = async () => {
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.filter(k => k.startsWith('v1-')).map(k => caches.delete(k)));
+    } catch {  }
+  };
+
   const logout = useCallback(() => {
     const currentUser = user;
     removeAuth();
@@ -24,6 +31,7 @@ export function AuthProvider({ children }) {
     if (currentUser) {
       const userId = currentUser.id || currentUser._id;
       clearUserCaches(userId).catch(() => {});
+      clearAppCaches();
     }
   }, [user]);
 

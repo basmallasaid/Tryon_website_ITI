@@ -99,24 +99,10 @@ export default function AvatarGeneration() {
       .catch(() => {});
   }, [user?.avatars]);
 
-  const hasAvatar = !!(
-    generatedImageUrl ||
-    fetchedAvatarUrl ||
-    user?.generatedAvatar ||
-    user?.avatars?.length > 0
-  );
   const displayImageUrl =
     generatedImageUrl || fetchedAvatarUrl || user?.generatedAvatar || null;
   const isSubscribed = subscriptionStatus === 'active';
   const subscriptionChecked = !subscriptionLoading;
-  const showUpgrade = subscriptionChecked && hasAvatar && !isSubscribed;
-
-  useEffect(() => {
-    if (subscriptionLoading) return;
-    if (hasAvatar && !isSubscribed) {
-      navigate('/pricing', { replace: true });
-    }
-  }, [subscriptionLoading, hasAvatar, isSubscribed, navigate]);
 
   useEffect(() => {
     if (!user?.email) {
@@ -174,16 +160,28 @@ export default function AvatarGeneration() {
       return;
     }
 
+    if (subscriptionChecked && !isSubscribed && (user?.avatars?.length > 0 || user?.generatedAvatar)) {
+      navigate('/pricing');
+      return;
+    }
+
     setProcessing(true);
     setGeneratedImageUrl(null);
 
     try {
       const payload = buildPayload(form);
       const res = await generateAvatarApi(payload);
-      const imageUrl = res.data?.avatar?.image_url;
+      const avatar = res.data?.avatar;
+      const imageUrl = avatar?.image_url;
       if (imageUrl) {
         setGeneratedImageUrl(imageUrl);
-        login({ ...user, generatedAvatar: imageUrl });
+        const avatarId = avatar?._id;
+        const currentAvatars = user?.avatars || [];
+        const updatedAvatars =
+          avatarId && !currentAvatars.includes(avatarId)
+            ? [...currentAvatars, avatarId]
+            : currentAvatars;
+        login({ ...user, generatedAvatar: imageUrl, avatars: updatedAvatars });
       } else {
         showToast('error', t('avatar.generationError'), toastPosition);
       }
@@ -422,19 +420,15 @@ export default function AvatarGeneration() {
               <div className="mt-8">
                 <Button
                   variant="styling"
-                  onClick={
-                    showUpgrade ? () => navigate('/pricing') : handleGenerate
-                  }
-                  disabled={!showUpgrade && (!allFilled || processing)}
+                  onClick={handleGenerate}
+                  disabled={!allFilled || processing}
                   className={`w-full gap-3 ${
-                    !showUpgrade && (!allFilled || processing)
+                    !allFilled || processing
                       ? 'opacity-60 !cursor-not-allowed'
                       : ''
                   }`}
                 >
-                  {showUpgrade ? (
-                    <>{t('avatar.upgrade')}</>
-                  ) : processing ? (
+                  {processing ? (
                     <>
                       <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
                       {t('avatar.generating')}

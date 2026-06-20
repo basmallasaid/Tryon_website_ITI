@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa'
 
 const CACHE_VERSION = 'v1'
@@ -124,11 +124,11 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      "/kie-image": {
-        target: "https://tempfile.aiquickdraw.com",
+      '/kie-image': {
+        target: 'https://tempfile.aiquickdraw.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/kie-image/, ""),
+        rewrite: path => path.replace(/^\/kie-image/, ''),
       },
     },
   },
-})
+});

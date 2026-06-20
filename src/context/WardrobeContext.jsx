@@ -24,23 +24,29 @@ export function WardrobeProvider({ children }) {
       setLoading(true);
     }
 
-    await syncWardrobeCache({
-      userId,
-      fetchFn: () => getWardrobeApi(),
-      onCacheLoaded: (cachedData) => {
-        if (!initialLoadDone.current) {
-          setItems(cachedData);
+    try {
+      await syncWardrobeCache({
+        userId,
+        fetchFn: () => getWardrobeApi(),
+        onCacheLoaded: (cachedData) => {
+          if (!initialLoadDone.current) {
+            setItems(cachedData);
+            setLoading(false);
+            initialLoadDone.current = true;
+          }
+        },
+        onData: (freshData) => {
+          setItems(freshData || []);
           setLoading(false);
           initialLoadDone.current = true;
-        }
-      },
-      onData: (freshData) => {
-        setItems(freshData || []);
-        setLoading(false);
-        initialLoadDone.current = true;
-      },
-      force,
-    });
+        },
+        force,
+      });
+    } catch {
+      setItems([]);
+      setLoading(false);
+      initialLoadDone.current = true;
+    }
   }, [user]);
 
   useEffect(() => {
