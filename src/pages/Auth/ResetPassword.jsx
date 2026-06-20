@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Eye, EyeOff, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { showToast } from "../../utils/toast";
 
-export default function ResetPassword({ isVisible, onReset, onBackToLogin, inModal, mobile }) {
+export default function ResetPassword({
+  isVisible,
+  onReset,
+  onBackToLogin,
+  inModal,
+  mobile,
+}) {
   const { t } = useTranslation();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,8 +27,20 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
 
   const strength = getStrength(newPassword);
   const barColors = ["", "", "", ""];
-  const labels = [t("auth.strengthNone"), t("auth.strengthWeak"), t("auth.strengthMedium"), t("auth.strengthGood"), t("auth.strengthStrong")];
-  const labelColors = ["var(--Disabled-Text-color)", "var(--error-text)", "var(--accent-orange)", "var(--primary)", "var(--secondary)"];
+  const labels = [
+    t("auth.strengthNone"),
+    t("auth.strengthWeak"),
+    t("auth.strengthMedium"),
+    t("auth.strengthGood"),
+    t("auth.strengthStrong"),
+  ];
+  const labelColors = [
+    "var(--Disabled-Text-color)",
+    "var(--error-text)",
+    "var(--accent-orange)",
+    "var(--primary)",
+    "var(--secondary)",
+  ];
 
   if (newPassword) {
     for (let i = 0; i < strength; i++) barColors[i] = labelColors[strength];
@@ -30,15 +48,23 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) return showToast('warning', t("auth.passwordsNoMatch"));
+    if (newPassword !== confirmPassword)
+      return showToast("warning", t("auth.passwordsNoMatch"));
     onReset(newPassword, confirmPassword);
   };
 
   // Shared form content
   const formContent = (isMobileLayout = false) => (
-    <form onSubmit={handleSubmit} className={isMobileLayout ? "space-y-4" : (inModal ? "space-y-4" : "space-y-5")}>
+    <form
+      onSubmit={handleSubmit}
+      className={
+        isMobileLayout ? "space-y-4" : inModal ? "space-y-4" : "space-y-5"
+      }
+    >
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-bold text-text-primary">{t("auth.newPassword")}</label>
+        <label className="text-sm font-bold text-text-primary">
+          {t("auth.newPassword")}
+        </label>
         <div className="relative">
           <input
             type={showNew ? "text" : "password"}
@@ -47,7 +73,7 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
             placeholder={t("auth.passwordPlaceholder")}
             required
             className={`w-full rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)]/50 text-sm text-text-primary focus:bg-surface-elevated focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all ltr:pr-11 rtl:pl-11 ${
-              isMobileLayout ? "p-3.5" : (inModal ? "p-3" : "p-4")
+              isMobileLayout ? "p-3.5" : inModal ? "p-3" : "p-4"
             }`}
           />
           <button
@@ -71,13 +97,23 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
             />
           ))}
         </div>
-        <p className="text-xs" style={{ color: newPassword ? labelColors[strength] : "var(--Disabled-Text-color)" }}>
-          {t("auth.passwordStrength")} {newPassword ? labels[strength] : t("auth.strengthNone")}
+        <p
+          className="text-xs"
+          style={{
+            color: newPassword
+              ? labelColors[strength]
+              : "var(--Disabled-Text-color)",
+          }}
+        >
+          {t("auth.passwordStrength")}{" "}
+          {newPassword ? labels[strength] : t("auth.strengthNone")}
         </p>
       </div>
 
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-bold text-text-primary">{t("auth.confirmPasswordLabel")}</label>
+        <label className="text-sm font-bold text-text-primary">
+          {t("auth.confirmPasswordLabel")}
+        </label>
         <div className="relative">
           <input
             type={showConfirm ? "text" : "password"}
@@ -86,7 +122,7 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
             placeholder={t("auth.confirmPasswordPlaceholder")}
             required
             className={`w-full rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)]/50 text-sm text-text-primary focus:bg-surface-elevated focus:border-[var(--primary)] focus:ring-4 focus:ring-[var(--primary)]/10 outline-none transition-all ltr:pr-11 rtl:pl-11 ${
-              isMobileLayout ? "p-3.5" : (inModal ? "p-3" : "p-4")
+              isMobileLayout ? "p-3.5" : inModal ? "p-3" : "p-4"
             }`}
           />
           <button
@@ -102,13 +138,15 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
 
       <div className="flex items-center gap-2.5 rounded-xl bg-[var(--secondary-light)] p-3">
         <Info size={18} className="shrink-0 text-[var(--secondary)]" />
-        <p className="text-xs font-medium text-[var(--secondary)]">{t("auth.passwordHint")}</p>
+        <p className="text-xs font-medium text-[var(--secondary)]">
+          {t("auth.passwordHint")}
+        </p>
       </div>
 
       <button
         type="submit"
         className={`w-full rounded-xl bg-[var(--primary)] font-bold text-white shadow-lg transition-transform active:scale-95 hover:brightness-90 ${
-          isMobileLayout ? "py-3.5" : (inModal ? "py-3" : "py-4")
+          isMobileLayout ? "py-3.5" : inModal ? "py-3" : "py-4"
         } text-sm`}
       >
         {t("auth.updatePassword")}
@@ -118,7 +156,7 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
         <button
           type="button"
           onClick={onBackToLogin}
-          className="inline-flex items-center gap-1 font-semibold text-[var(--secondary)] border-b border-[var(--secondary)] pb-0.5 text-sm hover:opacity-80"
+          className="inline-flex items-center gap-1 font-semibold text-[var(--secondary)] border-b border-[var(--secondary)] pb-0.5 text-sm hover:opacity-80 cursor-pointer"
         >
           {t("auth.backToLogin")}
         </button>
@@ -149,10 +187,14 @@ export default function ResetPassword({ isVisible, onReset, onBackToLogin, inMod
       } ${inModal ? "p-6 md:p-10" : "p-8 md:p-16"} bg-surface-elevated`}
     >
       <div className="mx-auto w-full max-w-md">
-        <h2 className={`font-bold text-text-primary ${inModal ? "text-2xl" : "text-3xl"}`}>
+        <h2
+          className={`font-bold text-text-primary ${inModal ? "text-2xl" : "text-3xl"}`}
+        >
           {t("auth.setNewPassword")}
         </h2>
-        <p className={`mt-2 text-text-secondary leading-relaxed ${inModal ? "mb-5 text-sm" : "mb-8"}`}>
+        <p
+          className={`mt-2 text-text-secondary leading-relaxed ${inModal ? "mb-5 text-sm" : "mb-8"}`}
+        >
           {t("auth.setNewPasswordDesc")}
         </p>
         {formContent(false)}

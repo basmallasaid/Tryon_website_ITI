@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Check, CircleCheck, Loader2, X, Lock } from "lucide-react";
+import { Check, CircleCheck, Loader2, Lock } from "lucide-react";
 import { showToast } from "../../utils/toast";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -21,6 +21,8 @@ const pricingKeys = {
       "pricing.essential.items.0",
       "pricing.essential.items.1",
       "pricing.essential.items.2",
+      "pricing.essential.items.3",
+      "pricing.essential.items.4",
     ],
   },
   pro: {
@@ -29,6 +31,7 @@ const pricingKeys = {
       "pricing.pro.items.1",
       "pricing.pro.items.2",
       "pricing.pro.items.3",
+      "pricing.pro.items.4",
     ],
   },
 };
@@ -145,45 +148,48 @@ export default function PricingPage() {
   const isPostPayment = useRef(false);
   const retryIntervalRef = useRef(null);
 
-  const fetchSubscription = useCallback((retries = 0, delay = 1000) => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    getSettingsApi({ email: user.email })
-      .then((res) => {
-        if (res.data.subscriptionStatus === "active") {
-          const storedInterval =
-            localStorage.getItem("selectedInterval") || "month";
-          const subData = {
-            status: res.data.subscriptionStatus,
-            subscriptionId: res.data.subscriptionId,
-            endDate: res.data.subscriptionEndDate,
-            interval: res.data.subscriptionInterval || storedInterval,
-          };
-          setSubscription(subData);
-          setIsMonthly(
-            (res.data.subscriptionInterval || storedInterval) === "month",
-          );
-          saveSubscription(user.id || user._id, subData);
-          if (retryIntervalRef.current) {
-            clearTimeout(retryIntervalRef.current);
-            retryIntervalRef.current = null;
+  const fetchSubscription = useCallback(
+    (retries = 0, delay = 1000) => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      getSettingsApi({ email: user.email })
+        .then((res) => {
+          if (res.data.subscriptionStatus === "active") {
+            const storedInterval =
+              localStorage.getItem("selectedInterval") || "month";
+            const subData = {
+              status: res.data.subscriptionStatus,
+              subscriptionId: res.data.subscriptionId,
+              endDate: res.data.subscriptionEndDate,
+              interval: res.data.subscriptionInterval || storedInterval,
+            };
+            setSubscription(subData);
+            setIsMonthly(
+              (res.data.subscriptionInterval || storedInterval) === "month",
+            );
+            saveSubscription(user.id || user._id, subData);
+            if (retryIntervalRef.current) {
+              clearTimeout(retryIntervalRef.current);
+              retryIntervalRef.current = null;
+            }
+            isPostPayment.current = false;
+          } else if (isPostPayment.current && retries > 0) {
+            retryIntervalRef.current = setTimeout(() => {
+              fetchSubscription(retries - 1, delay);
+            }, delay);
+          } else {
+            setSubscription(null);
+            isPostPayment.current = false;
           }
-          isPostPayment.current = false;
-        } else if (isPostPayment.current && retries > 0) {
-          retryIntervalRef.current = setTimeout(() => {
-            fetchSubscription(retries - 1, delay);
-          }, delay);
-        } else {
-          setSubscription(null);
-          isPostPayment.current = false;
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [user]);
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    },
+    [user],
+  );
 
   useEffect(() => {
     if (searchParams.get("success") === "true") {
@@ -221,7 +227,12 @@ export default function PricingPage() {
   }, []);
 
   useEffect(() => {
-    if (user && !searchParams.get("success") && !searchParams.get("canceled") && !isPostPayment.current) {
+    if (
+      user &&
+      !searchParams.get("success") &&
+      !searchParams.get("canceled") &&
+      !isPostPayment.current
+    ) {
       fetchSubscription();
     }
   }, [user]);
@@ -258,8 +269,11 @@ export default function PricingPage() {
         interval: isMonthly ? "month" : "year",
       });
       window.location.href = res.data.url;
-    } catch (err) {
-      showToast("error", t("pricing.checkoutFailed") || "Failed to start checkout.");
+    } catch {
+      showToast(
+        "error",
+        t("pricing.checkoutFailed") || "Failed to start checkout.",
+      );
     } finally {
       setSubscribing(false);
     }
@@ -274,8 +288,11 @@ export default function PricingPage() {
       setSubscription(null);
       localStorage.removeItem("selectedInterval");
       showToast("success", "Subscription cancelled.");
-    } catch (err) {
-      showToast("error", t("pricing.cancellationFailed") || "Cancellation failed.");
+    } catch {
+      showToast(
+        "error",
+        t("pricing.cancellationFailed") || "Cancellation failed.",
+      );
     } finally {
       setCancelling(false);
     }
@@ -657,7 +674,10 @@ export default function PricingPage() {
         />
         <SuccessPopup
           open={showSuccessPopup}
-          onClose={() => { setShowSuccessPopup(false); setSuccessPopupShown(true); }}
+          onClose={() => {
+            setShowSuccessPopup(false);
+            setSuccessPopupShown(true);
+          }}
           t={t}
         />
       </div>

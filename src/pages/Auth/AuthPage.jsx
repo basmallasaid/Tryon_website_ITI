@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -161,7 +161,7 @@ export default function AuthPage({
         name: fullName,
       });
       onClose?.();
-    } catch (error) {
+    } catch {
       showToast("error", t("auth.registrationFailed"));
     }
   };
@@ -173,7 +173,7 @@ export default function AuthPage({
       await forgotPasswordApi({ email });
       setForgotEmail(email);
       setView("otp");
-    } catch (error) {
+    } catch {
       showToast("error", t("auth.failedToSendReset"));
     }
   };
@@ -182,7 +182,7 @@ export default function AuthPage({
     try {
       await otpVerifyApi({ email: forgotEmail, otp });
       setView("reset");
-    } catch (error) {
+    } catch {
       showToast("error", t("auth.verificationFailed"));
     }
   };
@@ -194,7 +194,7 @@ export default function AuthPage({
       await resetPasswordApi({ email: forgotEmail, password, confirmPassword });
       showToast("success", t("auth.resetSuccess"));
       setView("login");
-    } catch (error) {
+    } catch {
       showToast("error", t("auth.failedToReset"));
     }
   };

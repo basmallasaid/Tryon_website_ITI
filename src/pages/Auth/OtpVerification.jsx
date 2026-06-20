@@ -1,7 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function OtpVerification({ isVisible, email, onVerify, onBackToLogin, inModal, mobile }) {
+export default function OtpVerification({
+  isVisible,
+  email,
+  onVerify,
+  onBackToLogin,
+  inModal,
+  mobile,
+}) {
   const { t } = useTranslation();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timeLeft, setTimeLeft] = useState(300);
@@ -74,9 +81,10 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
               flex-1 min-w-0 max-w-[52px] aspect-square
               text-center font-bold rounded-xl outline-none transition-all duration-200
               text-lg xs:text-xl sm:text-2xl
-              ${digit
-                ? "bg-[var(--secondary)]/10 border-2 border-[var(--secondary)] text-text-primary"
-                : "bg-[var(--primary)]/10 border-2 border-transparent focus:bg-surface-elevated focus:border-[var(--secondary)]"
+              ${
+                digit
+                  ? "bg-[var(--secondary)]/10 border-2 border-[var(--secondary)] text-text-primary"
+                  : "bg-[var(--primary)]/10 border-2 border-transparent focus:bg-surface-elevated focus:border-[var(--secondary)]"
               }
             `}
           />
@@ -87,7 +95,8 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
         type="submit"
         className="w-full rounded-xl bg-[var(--primary)] font-bold text-white shadow-lg transition-transform active:scale-95 hover:brightness-95 inline-flex items-center justify-center gap-2 py-3.5 text-sm"
       >
-        {t("auth.verifyContinue")} <span className="inline-block rtl:rotate-180">→</span>
+        {t("auth.verifyContinue")}{" "}
+        <span className="inline-block rtl:rotate-180">→</span>
       </button>
 
       <div className="mt-6 text-center space-y-3">
@@ -97,16 +106,19 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
             {t("auth.resendCode")}
           </button>
         </p>
-        <p className={`text-sm font-semibold ${timeLeft > 0 ? "text-[var(--accent-orange)]" : "text-text-secondary"}`}>
+        <p
+          className={`text-sm font-semibold ${timeLeft > 0 ? "text-[var(--accent-orange)]" : "text-text-secondary"}`}
+        >
           {t("auth.requestNewCode")} {formatTime(timeLeft)}
         </p>
         <div className="pt-1">
           <button
             type="button"
             onClick={onBackToLogin}
-            className="inline-flex items-center gap-1 font-semibold text-[var(--secondary)] border-b border-[var(--secondary)] pb-0.5 text-sm hover:opacity-80"
+            className="inline-flex items-center gap-1 font-semibold text-[var(--secondary)] border-b border-[var(--secondary)] pb-0.5 text-sm hover:opacity-80 cursor-pointer"
           >
-            <span className="inline-block rtl:rotate-180">←</span> {t("auth.backToLogin")}
+            <span className="inline-block rtl:rotate-180">←</span>{" "}
+            {t("auth.backToLogin")}
           </button>
         </div>
       </div>
@@ -136,10 +148,14 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
       } ${inModal ? "p-6 md:p-10" : "p-8 md:p-16"}`}
     >
       <div className="mx-auto w-full max-w-md">
-        <h2 className={`font-bold text-text-primary ${inModal ? "text-2xl" : "text-3xl"}`}>
+        <h2
+          className={`font-bold text-text-primary ${inModal ? "text-2xl" : "text-3xl"}`}
+        >
           {t("auth.enterVerificationCode")}
         </h2>
-        <p className={`mt-2 text-text-secondary leading-relaxed ${inModal ? "mb-6 text-sm" : "mb-8"}`}>
+        <p
+          className={`mt-2 text-text-secondary leading-relaxed ${inModal ? "mb-6 text-sm" : "mb-8"}`}
+        >
           {t("auth.otpDesc", { email: maskEmail(email) })}
         </p>
         <form onSubmit={handleSubmit}>
@@ -158,26 +174,42 @@ export default function OtpVerification({ isVisible, email, onVerify, onBackToLo
                   digit
                     ? "bg-[var(--secondary)]/10 border-2 border-[var(--secondary)] text-text-primary"
                     : "bg-[var(--primary)]/10 border-2 border-transparent focus:bg-surface-elevated focus:border-[var(--secondary)]"
-                } ${inModal ? 'w-[46px] h-12 text-xl' : 'w-[52px] h-14 text-2xl'}`}
+                } ${inModal ? "w-[46px] h-12 text-xl" : "w-[52px] h-14 text-2xl"}`}
               />
             ))}
           </div>
 
-          <button type="submit" className={`w-full rounded-xl bg-[var(--primary)] font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-[var(--primary)] inline-flex items-center justify-center gap-2 ${inModal ? "py-3" : "py-4"}`}>
-            {t("auth.verifyContinue")} <span className="inline-block rtl:rotate-180">→</span>
+          <button
+            type="submit"
+            className={`w-full rounded-xl bg-[var(--primary)] font-bold text-white shadow-lg transition-transform active:scale-95 hover:bg-[var(--primary)] inline-flex items-center justify-center gap-2 ${inModal ? "py-3" : "py-4"}`}
+          >
+            {t("auth.verifyContinue")}{" "}
+            <span className="inline-block rtl:rotate-180">→</span>
           </button>
 
           <div className="mt-8 text-center space-y-4">
             <p className="text-sm font-semibold text-text-secondary">
               {t("auth.noCode")}{" "}
-              <button type="button" className="underline hover:text-text-primary">{t("auth.resendCode")}</button>
+              <button
+                type="button"
+                className="underline hover:text-text-primary"
+              >
+                {t("auth.resendCode")}
+              </button>
             </p>
-            <p className={`text-sm font-semibold ${timeLeft > 0 ? "text-[var(--accent-orange)]" : "text-text-secondary"}`}>
+            <p
+              className={`text-sm font-semibold ${timeLeft > 0 ? "text-[var(--accent-orange)]" : "text-text-secondary"}`}
+            >
               {t("auth.requestNewCode")} {formatTime(timeLeft)}
             </p>
             <div className="pt-2">
-              <button type="button" onClick={onBackToLogin} className="inline-flex items-center gap-1 font-semibold text-[var(--secondary)] border-b border-[var(--secondary)] pb-0.5 text-sm hover:opacity-80">
-                <span className="inline-block rtl:rotate-180">←</span> {t("auth.backToLogin")}
+              <button
+                type="button"
+                onClick={onBackToLogin}
+                className="inline-flex items-center gap-1 font-semibold text-[var(--secondary)] border-b border-[var(--secondary)] pb-0.5 text-sm hover:opacity-80 cursor-pointer"
+              >
+                <span className="inline-block rtl:rotate-180">←</span>{" "}
+                {t("auth.backToLogin")}
               </button>
             </div>
           </div>

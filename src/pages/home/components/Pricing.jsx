@@ -9,6 +9,8 @@ const pricingKeys = {
       "pricing.essential.items.0",
       "pricing.essential.items.1",
       "pricing.essential.items.2",
+      "pricing.essential.items.3",
+      "pricing.essential.items.4",
     ],
   },
   pro: {
@@ -17,6 +19,7 @@ const pricingKeys = {
       "pricing.pro.items.1",
       "pricing.pro.items.2",
       "pricing.pro.items.3",
+      "pricing.pro.items.4",
     ],
   },
 };
@@ -45,21 +48,29 @@ const Pricing = () => {
               style={{
                 top: "4px",
                 bottom: "4px",
-                    width: "calc(50% - 6px)",
-                    insetInlineStart: isMonthly ? "4px" : "calc(50% + 2px)",
+                width: "calc(50% - 6px)",
+                insetInlineStart: isMonthly ? "4px" : "calc(50% + 2px)",
               }}
             />
             <button
               onClick={() => setIsMonthly(true)}
               className="relative z-10 w-1/2 h-full rounded-full font-roboto font-bold text-[24px] leading-[38.4px] transition-colors duration-300 cursor-pointer"
-              style={{ color: isMonthly ? "var(--color-text-primary)" : "var(--color-border-disabled)" }}
+              style={{
+                color: isMonthly
+                  ? "var(--color-text-primary)"
+                  : "var(--color-border-disabled)",
+              }}
             >
               {t("pricing.monthly")}
             </button>
             <button
               onClick={() => setIsMonthly(false)}
               className="relative z-10 w-1/2 h-full rounded-full font-roboto font-bold text-[24px] leading-[38.4px] transition-colors duration-300 cursor-pointer"
-              style={{ color: !isMonthly ? "var(--color-text-primary)" : "var(--color-border-disabled)" }}
+              style={{
+                color: !isMonthly
+                  ? "var(--color-text-primary)"
+                  : "var(--color-border-disabled)",
+              }}
             >
               {t("pricing.yearly")}
             </button>

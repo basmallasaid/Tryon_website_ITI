@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Questions from "../home/components/Questions";
-import { Mail, Phone, Send, MessageSquare, CheckCircle, AlertCircle } from "lucide-react";
+import {
+  Mail,
+  Phone,
+  Send,
+  MessageSquare,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { submitContactApi } from "../../api/adminApi";
 
 const contactCards = [
@@ -33,7 +40,11 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function ContactUs() {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -73,8 +84,8 @@ export default function ContactUs() {
       });
       setSubmitted(true);
       setFormData({ name: "", email: "", message: "" });
-    } catch (err) {
-      setSubmitError(t('contactUs.sendFailed'));
+    } catch {
+      setSubmitError(t("contactUs.sendFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -82,7 +93,9 @@ export default function ContactUs() {
 
   if (submitted) {
     return (
-      <div className={`min-h-screen bg-[var(--background)] ${isArabic ? "rtl" : "ltr"}`}>
+      <div
+        className={`min-h-screen bg-[var(--background)] ${isArabic ? "rtl" : "ltr"}`}
+      >
         <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
             <div className="lg:col-span-5 space-y-10">
@@ -103,12 +116,18 @@ export default function ContactUs() {
                     href={card.href}
                     className="group flex items-center gap-5 p-4 bg-surface-elevated rounded-2xl border border-[var(--border)] shadow-sm hover:shadow-md hover:border-brand-secondary/30 transition-all duration-300"
                   >
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm group-hover:scale-110 transition-transform`}>
+                    <div
+                      className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm group-hover:scale-110 transition-transform`}
+                    >
                       {card.icon}
                     </div>
                     <div>
-                      <p className="text-[10px] font-black text-text-disabled uppercase tracking-widest">{card.label}</p>
-                      <p className="text-text-primary font-bold">{card.value}</p>
+                      <p className="text-[10px] font-black text-text-disabled uppercase tracking-widest">
+                        {card.label}
+                      </p>
+                      <p className="text-text-primary font-bold">
+                        {card.value}
+                      </p>
                     </div>
                   </a>
                 ))}
@@ -119,9 +138,12 @@ export default function ContactUs() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-secondary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
                 <div className="relative z-10 text-center py-12">
                   <CheckCircle className="w-16 h-16 text-success-text mx-auto mb-6" />
-                  <h2 className="text-2xl font-bold text-text-primary mb-3">Message Sent!</h2>
+                  <h2 className="text-2xl font-bold text-text-primary mb-3">
+                    Message Sent!
+                  </h2>
                   <p className="text-text-secondary mb-8 max-w-md mx-auto">
-                    Thank you for contacting us. We have received your message and will get back to you soon.
+                    Thank you for contacting us. We have received your message
+                    and will get back to you soon.
                   </p>
                   <button
                     onClick={() => setSubmitted(false)}
@@ -142,10 +164,11 @@ export default function ContactUs() {
   }
 
   return (
-    <div className={`min-h-screen bg-[var(--background)] ${isArabic ? "rtl" : "ltr"}`}>
+    <div
+      className={`min-h-screen bg-[var(--background)] ${isArabic ? "rtl" : "ltr"}`}
+    >
       <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-          
           {/* Left Column: Content */}
           <div className="lg:col-span-5 space-y-10">
             <div className="space-y-4">
@@ -170,11 +193,15 @@ export default function ContactUs() {
                   href={card.href}
                   className="group flex items-center gap-5 p-4 bg-surface-elevated rounded-2xl border border-[var(--border)] shadow-sm hover:shadow-md hover:border-brand-secondary/30 transition-all duration-300"
                 >
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm group-hover:scale-110 transition-transform`}>
+                  <div
+                    className={`p-3 rounded-xl bg-gradient-to-br ${card.color} text-white shadow-sm group-hover:scale-110 transition-transform`}
+                  >
                     {card.icon}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-text-disabled uppercase tracking-widest">{card.label}</p>
+                    <p className="text-[10px] font-black text-text-disabled uppercase tracking-widest">
+                      {card.label}
+                    </p>
                     <p className="text-text-primary font-bold">{card.value}</p>
                   </div>
                 </a>
@@ -187,7 +214,7 @@ export default function ContactUs() {
             <div className="bg-surface-elevated rounded-[2.5rem] p-8 lg:p-12 shadow-xl border border-[var(--border)] relative overflow-hidden">
               {/* Decorative background element */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-brand-secondary/5 rounded-full -mr-16 -mt-16 blur-2xl" />
-              
+
               <form onSubmit={handleSubmit} className="relative z-10 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
@@ -201,7 +228,9 @@ export default function ContactUs() {
                       onChange={handleChange}
                       placeholder={t("contactUs.namePlaceholder")}
                       className={`w-full h-14 px-5 rounded-2xl bg-[var(--bg-secondary)] border-2 text-text-primary focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none ${
-                        errors.name ? 'border-error-border' : 'border-transparent'
+                        errors.name
+                          ? "border-error-border"
+                          : "border-transparent"
                       }`}
                     />
                     {errors.name && (
@@ -221,7 +250,9 @@ export default function ContactUs() {
                       onChange={handleChange}
                       placeholder={t("contactUs.emailPlaceholder")}
                       className={`w-full h-14 px-5 rounded-2xl bg-[var(--bg-secondary)] border-2 text-text-primary focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none ${
-                        errors.email ? 'border-error-border' : 'border-transparent'
+                        errors.email
+                          ? "border-error-border"
+                          : "border-transparent"
                       }`}
                     />
                     {errors.email && (
@@ -243,7 +274,9 @@ export default function ContactUs() {
                     placeholder={t("contactUs.messagePlaceholder")}
                     rows={5}
                     className={`w-full p-5 rounded-2xl bg-[var(--bg-secondary)] border-2 text-text-primary focus:ring-2 focus:ring-brand-secondary/20 transition-all outline-none resize-none ${
-                      errors.message ? 'border-error-border' : 'border-transparent'
+                      errors.message
+                        ? "border-error-border"
+                        : "border-transparent"
                     }`}
                   />
                   {errors.message && (
@@ -265,20 +298,16 @@ export default function ContactUs() {
                   disabled={submitting}
                   className="w-full h-16 rounded-2xl bg-[var(--color-primary)] text-white font-bold text-lg flex items-center justify-center gap-3 shadow-lg active:scale-95 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>{submitError ? 'Retry' : t("contactUs.sendButton")}</span>
+                  <span>
+                    {submitError ? "Retry" : t("contactUs.sendButton")}
+                  </span>
                   <Send className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                 </button>
               </form>
             </div>
           </div>
-
         </div>
       </section>
-
-      {/* FAQ Section */}
-      <div className="bg-surface-elevated border-t border-[var(--border)]">
-        <Questions />
-      </div>
     </div>
   );
 }

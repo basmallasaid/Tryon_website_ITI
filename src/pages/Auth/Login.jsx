@@ -152,7 +152,7 @@ export default function LoginForm({
                 className="absolute cursor-pointer ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary p-1"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
               </button>
             </div>
             <div className="text-right rtl:text-left mt-0.5">
@@ -195,7 +195,7 @@ export default function LoginForm({
             <button
               type="button"
               onClick={toggleAuth}
-              className="font-bold text-[var(--primary)] hover:underline transition-all"
+              className="font-bold text-[var(--primary)] hover:underline transition-all cursor-pointer"
             >
               {t("auth.signUp")}
             </button>
@@ -254,7 +254,7 @@ export default function LoginForm({
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute ltr:right-4 rtl:left-4 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary cursor-pointer"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
               </button>
             </div>
             <div className="text-right mt-1">
