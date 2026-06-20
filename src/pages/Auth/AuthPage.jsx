@@ -161,8 +161,9 @@ export default function AuthPage({
         name: fullName,
       });
       onClose?.();
-    } catch {
-      showToast("error", t("auth.registrationFailed"));
+    } catch (err) {
+      const message = err?.response?.data?.message;
+      showToast("error", message ?? t("auth.registrationFailed"));
     }
   };
 
