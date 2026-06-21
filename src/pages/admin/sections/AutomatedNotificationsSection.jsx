@@ -3,9 +3,9 @@ import { ArrowLeft, Zap, Bell, Mail, Smartphone, Save } from 'lucide-react';
 import { getAutomatedNotificationsApi, updateAutomatedNotificationApi } from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
 
-const OPERATIONS = ['tryon', 'recycle', 'matching'];
+const OPERATIONS = ['tryon', 'recycle', 'matching', 'avatar'];
 
-const OP_ICONS = { tryon: '👔', recycle: '♻️', matching: '🎨' };
+const OP_ICONS = { tryon: '👔', recycle: '♻️', matching: '🎨', avatar: '🧑' };
 
 function Toggle({ checked, onChange }) {
   return (

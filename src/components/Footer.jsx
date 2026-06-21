@@ -1,17 +1,9 @@
-import GlobeIcon from '../icons/GlobeIcon';
-import ShareIcon from '../icons/ShareIcon';
-import AtSignIcon from '../icons/AtSignIcon';
 import PhoneIcon from '../icons/PhoneIcon';
 import MailIcon from '../icons/MailIcon';
 import TelegramIcon from '../icons/TelegramIcon';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const socialIcons = [
-  { icon: GlobeIcon, href: '#', label: 'Website' },
-  { icon: ShareIcon, href: '#', label: 'Share' },
-  { icon: AtSignIcon, href: '#', label: 'Contact' },
-];
 
 const contactInfo = [
   { icon: PhoneIcon, value: '+20123456789', href: 'tel:+20123456789' },
@@ -37,21 +29,9 @@ export default function Footer() {
               <h2 className="text-3xl font-bold  text-text-primary tracking-tight mb-4">
                 {t("footer.brand")}
               </h2>
-              <p className="text-text-disabled leading-relaxed max-w-sm mb-8  font-semibold">
+              <p className="text-text-disabled leading-relaxed max-w-sm mb-8 font-semibold">
                 {t("footer.tagline")}
               </p>
-              <div className="flex items-center gap-4">
-                {socialIcons.map(item => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    aria-label={item.label}
-                    className="size-5  flex items-center justify-center hover:text-text-secondary text-[var(--primary)] transition-all duration-200"
-                  >
-                    <item.icon className="w-4 h-4" />
-                  </a>
-                ))}
-              </div>
             </div>
 
             {/* Center Column — Platform */}

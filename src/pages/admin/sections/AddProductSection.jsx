@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { ArrowLeft, ArrowRight, Plus, Upload, X, Shirt, CheckCircle } from 'lucide-react';
 import { getStoresApi, createProductApi, updateProductApi } from '../../../api/adminApi';
 
@@ -110,7 +111,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
 
   const handleSubmit = async () => {
     if (!productName.trim() || !description.trim() || !price || !purchaseUrl.trim() || !storeId) {
-      alert('Please fill all required fields.');
+      Swal.fire({ icon: 'warning', title: 'Missing Fields', text: 'Please fill all required fields.', confirmButtonColor: '#1550D3' });
       return;
     }
     setSubmitting(true);
@@ -136,7 +137,7 @@ export default function AddProductSection({ onBack, editingProduct }) {
       }
       setSuccess(true);
     } catch (err) {
-      alert(`Failed to ${isEditing ? 'update' : 'create'} product.`);
+      Swal.fire({ icon: 'error', title: 'Error', text: `Failed to ${isEditing ? 'update' : 'create'} product.`, confirmButtonColor: '#1550D3' });
     } finally {
       setSubmitting(false);
     }

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import heroImg from "../../../assets/herosec.png";
 import Button from "../../../components/Button";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const { t } = useTranslation();

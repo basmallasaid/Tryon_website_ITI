@@ -26,6 +26,7 @@ import {
   analyzeRecycleApi,
   generateRecycleIdeaApi,
 } from '../../api/recycleApi';
+import { addToLatestRecycleApi } from '../../api/userApi';
 import { showToast } from '../../utils/toast';
 
 const MAX_SELECTION = 2;
@@ -245,6 +246,17 @@ export default function Recycle() {
       const data = res.data || {};
       if (data.image_url) {
         setGeneratedImageUrl(data.image_url);
+        try {
+          await addToLatestRecycleApi({
+            imageUrl: data.image_url,
+            designTitle: selectedIdea?.title || '',
+            designTitleAr: selectedIdea?.title_ar || '',
+            designDescription: selectedIdea?.design_description || '',
+            designDescriptionAr: selectedIdea?.design_description_ar || '',
+          });
+        } catch (e) {
+          console.error('Failed to save recycle result:', e);
+        }
       } else {
         showToast('error', t('recycle.generationError'), toastPosition);
       }

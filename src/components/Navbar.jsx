@@ -698,9 +698,9 @@ const Navbar = ({ onOpenAuth }) => {
               </div>
               <button
                 onClick={logout}
-                className="w-full py-3 bg-[var(--accent-light)] text-accent-pink rounded-xl font-bold flex items-center justify-center gap-2 active:brightness-90 transition-colors cursor-pointer"
+                className="w-full py-3 flex items-center justify-center gap-2 text-[var(--accent-orange)] font-black text-[13px] hover:scale-105 transition-all opacity-80 hover:opacity-100 uppercase tracking-tight cursor-pointer"
               >
-                <LogOut size={18} /> {t("nav.logout")}
+                {t("profile.signOut")} <LogOut size={16} />
               </button>
             </div>
           ) : (

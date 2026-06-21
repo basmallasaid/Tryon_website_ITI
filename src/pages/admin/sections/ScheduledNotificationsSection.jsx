@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { ArrowLeft, Calendar, Clock, Trash2, Edit3, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { getScheduledNotificationsApi, cancelScheduledNotificationApi, broadcastNotificationApi, sendToUserNotificationApi } from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
@@ -54,7 +55,7 @@ function EditModal({ notification, onClose, onSave }) {
       }
       onSave();
     } catch (err) {
-      alert('Failed to reschedule.');
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to reschedule.', confirmButtonColor: '#1550D3' });
     } finally {
       setSaving(false);
     }

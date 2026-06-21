@@ -277,10 +277,10 @@ const ProfilePopup = memo(({ user, logout, isArabic, changeLanguage, onClose, is
       </Link>
 
       {/* Logout */}
-      <div className="flex justify-end pt-2 border-t border-[var(--border)]">
+      <div className="flex justify-center pt-2 border-t border-[var(--border)]">
         <button
           onClick={logout}
-          className="flex items-center gap-2 text-[var(--accent-orange)] font-black text-[13px] hover:scale-105 transition-all opacity-80 hover:opacity-100 uppercase tracking-tight"
+          className="flex items-center gap-2 text-[var(--accent-orange)] font-black text-[13px] hover:scale-105 transition-all opacity-80 hover:opacity-100 uppercase tracking-tight cursor-pointer"
         >
           {t('profile.signOut')} <LogOut size={16} />
         </button>

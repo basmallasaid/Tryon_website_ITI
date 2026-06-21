@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import {
   Shirt,
   RefreshCw,
@@ -44,7 +45,11 @@ function getAvatarColor(name) {
 
 function mapRole(user, t) {
   if (user.role === 'admin') return t('admin.users.admin');
-  if (user.subscriptionStatus === 'active') return t('admin.users.premium');
+  if (user.subscriptionStatus === 'active') {
+    if (user.subscriptionInterval === 'month') return t('admin.users.premium') + ' (M)';
+    if (user.subscriptionInterval === 'year') return t('admin.users.premium') + ' (Y)';
+    return t('admin.users.premium');
+  }
   return t('admin.users.userRole');
 }
 
@@ -236,7 +241,7 @@ export default function UsersSection({
       });
       setDeleteTarget(null);
     } catch (err) {
-      alert('Failed to delete user.');
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to delete user.', confirmButtonColor: '#1550D3' });
     } finally {
       setDeleting(false);
     }

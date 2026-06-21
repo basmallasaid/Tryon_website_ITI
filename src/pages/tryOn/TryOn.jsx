@@ -772,17 +772,6 @@ export default function TryOn() {
                     >
                       {t('tryOn.activeWardrobe')}
                     </h3>
-                    <a
-                      href="#"
-                      className="text-text-secondary"
-                      style={{
-                        fontSize: '0.9rem',
-                        fontWeight: 600,
-                        textDecoration: 'none',
-                      }}
-                    >
-                      {t('tryOn.seeAll')}
-                    </a>
                   </div>
 
                   {!user ? (
