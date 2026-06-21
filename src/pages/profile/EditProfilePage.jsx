@@ -381,11 +381,11 @@ export default function EditProfilePage() {
                         <div className="w-full py-12 flex justify-center">
                             <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--Border-Strong)] border-t-[var(--primary)]" />
                         </div>
-                    ) : avatarUrl ? (
+                    ) : (avatarUrl || user?.generatedAvatar) ? (
                         <>
                             <div className="relative mb-4">
                                 <div className="w-32 h-32 rounded-full overflow-hidden">
-                                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                    <img src={avatarUrl || user?.generatedAvatar} alt="Avatar" className="w-full h-full object-cover" />
                                 </div>
                             </div>
                             <p className="text-text-secondary text-sm font-semibold mb-4">{t("profile.yourAvatar")}</p>

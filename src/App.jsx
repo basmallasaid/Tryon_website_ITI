@@ -1,11 +1,5 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from './assets/vite.svg'
-// import heroImg from './assets/hero.png'
-// import './App.css'
-import { lazy, Suspense, useEffect, useRef } from "react";
-import { useTranslation } from "react-i18next";
-import { Navigate, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Suspense, useEffect, useRef } from "react";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { createBrowserRouter, RouterProvider } from "react-router";
 
 // Contexts
@@ -103,8 +97,7 @@ function LogoutWatcher() {
 
 function UserGuard() {
   const auth = JSON.parse(localStorage.getItem("auth") || "null");
-  if (auth?.role === "admin")
-    return <Navigate to="/admin" replace />;
+  if (auth?.role === "admin") return <Navigate to="/admin" replace />;
   return (
     <>
       <LogoutWatcher />
@@ -113,17 +106,14 @@ function UserGuard() {
   );
 }
 
-
 function AuthGuard() {
   const auth = JSON.parse(localStorage.getItem("auth") || "null");
   const isOnline = useOnlineStatus();
 
-  
   if (!isOnline) return <Outlet />;
 
- 
   if (!auth && isOnline) return <Navigate to="/login" replace />;
-  
+
   return <Outlet />;
 }
 

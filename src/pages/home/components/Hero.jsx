@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import heroImg from "../../../assets/herosec.png";
 import Button from "../../../components/Button";
 import { useTranslation } from "react-i18next";
@@ -18,7 +19,7 @@ const Hero = () => {
         <p className="font-semibold text-base max-[600px]:text-sm leading-[22px] text-text-disabled w-[327px] max-[1000px]:w-full">
           {t("hero.heroDesc")}
         </p>
-        <Button variant="styling" className="max-[1000px]:w-full" onClick={() => navigate("/wardrobe")}>
+        <Button variant="styling" onClick={() => navigate("/wardrobe")} className="max-[1000px]:w-full">
           {t("hero.startStyling")}
         </Button>
       </div>

@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { X, Calendar, Sparkles } from "lucide-react";
+import { useWardrobe } from "../context/WardrobeContext";
 
 const imgSrc = (image) => {
   if (!image) return null;
@@ -31,11 +33,32 @@ function getItemStyle(item, isArabic) {
 export default function OutfitDetailModal({ outfit, dayName, date, isArabic, onClose }) {
   const { t } = useTranslation();
   const dateLocale = isArabic ? "ar-EG" : "en-US";
+  const { items: wardrobeItems } = useWardrobe();
+
+  const wardrobeMap = useMemo(() => {
+    const map = new Map();
+    for (const item of wardrobeItems) {
+      map.set(item._id || item.id, item);
+    }
+    return map;
+  }, [wardrobeItems]);
+
+  const getItemImage = (item) => {
+    if (!item) return null;
+    const img = item.image;
+    if (img) {
+      const src = typeof img === 'string' ? img : img?.url || img?.uri;
+      if (src) return imgSrc(src);
+    }
+    const wItem = wardrobeMap.get(item._id) || wardrobeMap.get(item.id);
+    if (wItem?.image) return imgSrc(wItem.image);
+    return null;
+  };
 
   if (!outfit) return null;
 
   const items = outfit.items || [];
-  const compositeImage = outfit.compositeImage || items[0]?.image || null;
+  const compositeImage = outfit.compositeImage || getItemImage(items[0]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -100,9 +123,9 @@ export default function OutfitDetailModal({ outfit, dayName, date, isArabic, onC
                     className="flex items-center gap-4 bg-[var(--bg-secondary)] rounded-2xl p-3 border border-[var(--border)]"
                   >
                     <div className="w-16 h-16 bg-surface-elevated rounded-xl overflow-hidden p-1.5 flex items-center justify-center shrink-0">
-                      {item.image ? (
+                      {getItemImage(item) ? (
                         <img
-                          src={imgSrc(item.image)}
+                          src={getItemImage(item)}
                           alt={getItemName(item, isArabic)}
                           className="w-full h-full object-contain"
                         />

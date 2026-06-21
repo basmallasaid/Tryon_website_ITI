@@ -3,11 +3,14 @@ import { useAuth } from "./AuthContext";
 import { getAllRecommendations } from "../api/recommendationsApi";
 import { getRecommendations, saveRecommendations } from "../services/indexedDB";
 import {
-  getRecentRecommendationFromHistory,
+  findTodayInHistory,
+  getLocalDateKey,
   getCachedDailyOutfit,
   fetchAndCacheDailyOutfit,
 } from "../utils/dailyRecommendation";
 import { translateOutfit } from "../utils/translate";
+
+const COOLDOWN_MS = 5 * 60 * 1000;
 
 const RecommendationContext = createContext();
 
@@ -20,10 +23,21 @@ export function RecommendationProvider({ children }) {
   const [error, setError] = useState(null);
   const isArabicRef = useRef(false);
   const translatedRef = useRef({});
-  const fetchedRef = useRef(false);
+  const lastFetchTimeRef = useRef(0);
+  const postMadeForDateRef = useRef(null);
+  const isFetchingRef = useRef(false);
 
   const setLanguage = useCallback((lang) => {
     isArabicRef.current = lang === "ar";
+  }, []);
+
+  const translateIfNeeded = useCallback(async (outfit) => {
+    if (!isArabicRef.current || !outfit) return outfit;
+    const cacheKey = outfit.compositeImage || outfit.composite_image || outfit.items?.[0]?.name || "";
+    if (translatedRef.current[cacheKey]) return translatedRef.current[cacheKey];
+    const translated = await translateOutfit(outfit);
+    translatedRef.current[cacheKey] = translated;
+    return translated;
   }, []);
 
   const fetchHistory = useCallback(async (userId) => {
@@ -38,100 +52,186 @@ export function RecommendationProvider({ children }) {
     }
   }, []);
 
+  const mergeCompositeImage = useCallback((entry) => {
+    if (!entry?.outfits?.[0]) return null;
+    const outfit = entry.outfits[0];
+    return {
+      ...outfit,
+      composite_image: outfit.compositeImage || entry.composite_image || null,
+    };
+  }, []);
+
   const fetchDailyRecommendation = useCallback(async () => {
-    if (fetchedRef.current) {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
+    const now = Date.now();
+    const timeSinceLastFetch = now - lastFetchTimeRef.current;
+
+    if (lastFetchTimeRef.current > 0 && timeSinceLastFetch < COOLDOWN_MS) {
+      isFetchingRef.current = false;
       setLoading(false);
       return;
     }
 
     const userId = user?.id || user?._id;
-    const doArabic = isArabicRef.current;
+    const hour = new Date().getHours();
+    const todayKey = getLocalDateKey(new Date());
 
-    const translateIfNeeded = async (outfit) => {
-      if (!doArabic || !outfit) return outfit;
-      const cacheKey = outfit.compositeImage || outfit.items?.[0]?.name || "";
-      if (translatedRef.current[cacheKey]) return translatedRef.current[cacheKey];
-      const translated = await translateOutfit(outfit);
-      translatedRef.current[cacheKey] = translated;
-      return translated;
-    };
+    if (!userId) {
+      isFetchingRef.current = false;
+      setTodaysOutfit(null);
+      setTodaysWeather(null);
+      setHistory([]);
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
 
-      if (userId) {
-        try {
-          const cachedRecs = await getRecommendations(userId);
-          if (cachedRecs?.length) {
-            const recentFromCached = getRecentRecommendationFromHistory(cachedRecs);
-            if (recentFromCached?.outfits?.[0]) {
-              const translated = await translateIfNeeded(recentFromCached.outfits[0]);
-              setTodaysOutfit(translated);
-              setTodaysWeather(recentFromCached.weather || recentFromCached.outfits[0]?.weather || null);
-              setHistory(cachedRecs);
-              setLoading(false);
-            }
+      try {
+        const cachedRecs = await getRecommendations(userId);
+        if (cachedRecs?.length) {
+          const cachedToday = findTodayInHistory(cachedRecs);
+          if (cachedToday?.outfits?.[0]) {
+            const outfit = mergeCompositeImage(cachedToday);
+            const translated = await translateIfNeeded(outfit);
+            setTodaysOutfit(translated);
+            setTodaysWeather(cachedToday.weather || null);
+            setHistory(cachedRecs);
+            setLoading(false);
           }
-        } catch { /* IndexedDB unavailable, proceed */ }
-      }
+        }
+      } catch { /* IndexedDB unavailable */ }
 
       const historyData = await fetchHistory(userId);
 
-      const recentFromHistory = getRecentRecommendationFromHistory(historyData);
-      if (recentFromHistory?.outfits?.[0]) {
-        const translated = await translateIfNeeded(recentFromHistory.outfits[0]);
+      const todayEntry = findTodayInHistory(historyData);
+
+      if (todayEntry?.outfits?.[0]) {
+        const outfit = mergeCompositeImage(todayEntry);
+        const translated = await translateIfNeeded(outfit);
         setTodaysOutfit(translated);
-        setTodaysWeather(recentFromHistory.weather || recentFromHistory.outfits[0]?.weather || null);
-        fetchedRef.current = true;
+        setTodaysWeather(todayEntry.weather || null);
+        lastFetchTimeRef.current = Date.now();
+        setLoading(false);
+        return;
+      }
+
+      if (hour < 6) {
+        setTodaysOutfit(null);
+        setTodaysWeather(null);
+        lastFetchTimeRef.current = Date.now();
+        setLoading(false);
+        return;
+      }
+
+      if (postMadeForDateRef.current === todayKey) {
+        lastFetchTimeRef.current = Date.now();
+        setLoading(false);
         return;
       }
 
       const cached = getCachedDailyOutfit();
       if (cached?.outfits?.[0]) {
-        const translated = await translateIfNeeded(cached.outfits[0]);
+        postMadeForDateRef.current = todayKey;
+        const outfit = {
+          ...cached.outfits[0],
+          composite_image: cached.outfits[0]?.compositeImage || cached.composite_image || null,
+        };
+        const translated = await translateIfNeeded(outfit);
         setTodaysOutfit(translated);
-        setTodaysWeather(cached.weather || cached.outfits[0]?.weather || null);
-        fetchedRef.current = true;
+        setTodaysWeather(cached.weather || null);
+        lastFetchTimeRef.current = Date.now();
+        setLoading(false);
         return;
       }
 
       try {
         const result = await fetchAndCacheDailyOutfit();
+        postMadeForDateRef.current = todayKey;
+
         if (result?.outfits?.[0]) {
-          const translated = await translateIfNeeded(result.outfits[0]);
+          const outfit = {
+            ...result.outfits[0],
+            composite_image: result.outfits[0]?.compositeImage || null,
+          };
+          const translated = await translateIfNeeded(outfit);
           setTodaysOutfit(translated);
-          setTodaysWeather(result.weather || result.outfits[0]?.weather || null);
+          setTodaysWeather(result.weather || null);
+
+          const syntheticEntry = {
+            _id: "today_" + todayKey,
+            outfits: result.outfits,
+            weather: result.weather,
+            composite_image: result.outfits[0]?.compositeImage || null,
+            created_at: new Date().toISOString(),
+          };
+          setHistory((prev) => {
+            const updated = [...prev, syntheticEntry];
+            if (userId) saveRecommendations(userId, updated).catch(() => {});
+            return updated;
+          });
         }
-        await fetchHistory(userId);
-        fetchedRef.current = true;
       } catch {
-        setError("Failed to fetch recommendation. Please try again.");
+        const cached = getCachedDailyOutfit();
+        if (cached?.outfits?.[0]) {
+          const outfit = {
+            ...cached.outfits[0],
+            composite_image: cached.outfits[0]?.compositeImage || cached.composite_image || null,
+          };
+          const translated = await translateIfNeeded(outfit);
+          setTodaysOutfit(translated);
+          setTodaysWeather(cached.weather || null);
+        } else {
+          setError("Failed to fetch recommendation. Please try again.");
+        }
       }
+
+      lastFetchTimeRef.current = Date.now();
     } catch (err) {
       console.error("[RecommendationContext]", err);
+      try {
+        const cached = getCachedDailyOutfit();
+        if (cached?.outfits?.[0]) {
+          const outfit = {
+            ...cached.outfits[0],
+            composite_image: cached.outfits[0]?.compositeImage || cached.composite_image || null,
+          };
+          const translated = await translateIfNeeded(outfit);
+          setTodaysOutfit(translated);
+          setTodaysWeather(cached.weather || null);
+        }
+      } catch { /* offline */ }
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
-  }, [fetchHistory, user]);
+  }, [fetchHistory, user, translateIfNeeded, mergeCompositeImage]);
 
   useEffect(() => {
     if (user) {
-      fetchedRef.current = false;
       translatedRef.current = {};
+      const todayKey = getLocalDateKey(new Date());
+      if (postMadeForDateRef.current !== todayKey) {
+        postMadeForDateRef.current = null;
+      }
       fetchDailyRecommendation();
     } else {
       setTodaysOutfit(null);
       setTodaysWeather(null);
       setHistory([]);
       setLoading(false);
-      fetchedRef.current = false;
+      lastFetchTimeRef.current = 0;
       translatedRef.current = {};
+      postMadeForDateRef.current = null;
     }
   }, [user, fetchDailyRecommendation]);
 
   const refetch = useCallback(async () => {
-    fetchedRef.current = false;
+    lastFetchTimeRef.current = 0;
     translatedRef.current = {};
     await fetchDailyRecommendation();
   }, [fetchDailyRecommendation]);

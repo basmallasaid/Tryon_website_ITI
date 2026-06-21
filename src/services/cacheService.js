@@ -42,6 +42,7 @@ export async function syncWardrobeCache({ userId, fetchFn, onData, onCacheLoaded
 
     if (meta && freshHash === meta.dataHash) {
       saveCacheMeta(userId, 'wardrobe', { dataHash: freshHash }).catch(() => {})
+      if (!cachedItems?.length) onData([])
       return
     }
 
@@ -95,6 +96,7 @@ export async function syncProductsCache({ fetchFn, onData, onCacheLoaded, force 
 
     if (meta && freshHash === meta.dataHash) {
       saveCacheMeta(null, 'products', { dataHash: freshHash }).catch(() => {})
+      if (!cachedItems?.length) onData([])
       return
     }
 
@@ -148,6 +150,7 @@ export async function syncStoresCache({ fetchFn, onData, onCacheLoaded, force = 
 
     if (meta && freshHash === meta.dataHash) {
       saveCacheMeta(null, 'stores', { dataHash: freshHash }).catch(() => {})
+      if (!cachedItems?.length) onData([])
       return
     }
 
@@ -203,6 +206,7 @@ export async function syncRecommendationsCache({ userId, fetchFn, onData, onCach
 
     if (meta && freshHash === meta.dataHash) {
       saveCacheMeta(userId, 'recommendations', { dataHash: freshHash }).catch(() => {})
+      if (!cachedItems?.length) onData([])
       return
     }
 
@@ -258,6 +262,7 @@ export async function syncFavoritesCache({ userId, fetchFn, onData, onCacheLoade
 
     if (meta && freshHash === meta.dataHash) {
       saveCacheMeta(userId, 'favorites', { dataHash: freshHash }).catch(() => {})
+      if (!cachedItems?.length) onData([])
       return
     }
 

@@ -672,7 +672,7 @@ export default function TryOn() {
                   <img
                     src={userPhoto}
                     alt="Uploaded"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                   />
                   <button
                     onClick={() => {

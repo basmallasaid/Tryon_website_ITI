@@ -9,6 +9,7 @@ import Swal from 'sweetalert2';
 import { showToast } from '../../utils/toast';
 
 import { useFavorites } from '../../context/FavoritesContext';
+import { useWardrobe } from '../../context/WardrobeContext';
 import { getCategoriesByGender } from '../../constants/wardrobeCategories';
 import { getWardrobeApi, deleteWardrobeItemApi, getAnalysisApi, addWardrobeItemFromAnalysisApi, updateAnalysisApi } from '../../api/userApi';
 
@@ -37,6 +38,7 @@ const EditItemWardrobe = () => {
     
     // ربط المفضلة بالـ Context
     const { isFavorite, addItem, removeItem } = useFavorites();
+    const { refetch } = useWardrobe();
     const favorited = !isNew && isFavorite(id);
 
     const isMatching = (val1, val2) => val1?.toLowerCase() === val2?.toLowerCase();
@@ -146,9 +148,14 @@ const EditItemWardrobe = () => {
                 });
                 await addWardrobeItemFromAnalysisApi(analysisId, { garment_index: 0 });
                 showToast('success', t('wardrobe.addedSuccess'));
+                await refetch();
                 navigate('/wardrobe');
             }
-        } catch (err) { showToast('error', t('wardrobe.addFailed')); } finally { setSaving(false); }
+        } catch (err) {
+            const isDuplicate = err.response?.status === 409
+                || err.response?.data?.message?.toLowerCase().includes('already exist');
+            showToast('error', isDuplicate ? t('wardrobe.addDuplicate') : t('wardrobe.addFailed'));
+        } finally { setSaving(false); }
     };
 
     const handleDelete = async () => {

@@ -10,9 +10,6 @@ import {
   Bell,
   Sun,
   Moon,
-  Mail,
-  CreditCard,
-  SquarePen,
 } from "lucide-react";
 import Button from "./Button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -126,8 +123,8 @@ const Navbar = ({ onOpenAuth }) => {
       try {
         const data = await getNotifications();
         setUnreadCount(data.unreadCount);
-      } catch (err) {
-        // silent
+      } catch {
+        // Silent catch
       }
     };
     fetchUnread();
@@ -165,7 +162,7 @@ const Navbar = ({ onOpenAuth }) => {
 
   return (
     <nav
-      className={`flex items-center justify-between bg-[var(--header-footer-bg)] px-20 max-[1300px]:px-14 max-[1150px]:px-10 max-[1100px]:px-8 max-[768px]:px-5 max-[480px]:px-4 py-6 max-[768px]:py-4 relative z-50 ${isArabic ? "rtl" : "ltr"}`}
+      className={`flex items-center justify-between bg-[var(--header-footer-bg)] px-20 max-[1400px]:px-14 max-[1150px]:px-10 max-[1250px]:px-8 max-[768px]:px-5 max-[480px]:px-4 py-6 max-[768px]:py-4 relative z-50 ${isArabic ? "rtl" : "ltr"}`}
     >
       {/* Logo */}
       <Link
@@ -180,7 +177,7 @@ const Navbar = ({ onOpenAuth }) => {
       </Link>
 
       {/* Navigation Links (Desktop) */}
-      <div className="hidden min-[1100px]:flex items-center gap-10 max-[1300px]:gap-6">
+      <div className="hidden min-[1250px]:flex items-center gap-10 max-[1400px]:gap-6">
         {/* Home */}
         <Link
           to="/"
@@ -259,7 +256,7 @@ const Navbar = ({ onOpenAuth }) => {
       </div>
 
       {/* Desktop Action Buttons & Icons */}
-      <div className="hidden min-[1100px]:flex items-center gap-4">
+      <div className="hidden min-[1250px]:flex items-center gap-4">
         {/* Utilities Center */}
         <div className="flex items-center bg-[var(--bg-secondary)] p-1 rounded-xl gap-1">
           {user && (
@@ -372,14 +369,14 @@ const Navbar = ({ onOpenAuth }) => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onOpenAuth?.("login")}
-                className={`h-11 font-bold text-brand-secondary hover:opacity-70 transition-all active:scale-95 ${isArabic ? "px-4" : "w-[90px]"}`}
+                className={`h-11 font-bold text-brand-secondary border border-brand-secondary rounded-lg hover:opacity-70 transition-all active:scale-95 ${isArabic ? "px-4" : "w-[90px]"} cursor-pointer`}
               >
                 {t("nav.login")}
               </button>
               <Button
                 variant="signup"
                 onClick={() => onOpenAuth?.("signup")}
-                className="!h-11 !px-6 !text-sm !font-bold"
+                className="!h-11 !px-4 !text-sm !font-bold"
               >
                 {t("nav.signup")}
               </Button>
@@ -389,11 +386,11 @@ const Navbar = ({ onOpenAuth }) => {
       </div>
 
       {/* ╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë */}
-      {/*  MOBILE / TABLET SECTION (below 1100px)        */}
+      {/*  MOBILE / TABLET SECTION (below 1250px)        */}
       {/* ╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë╬ô├▓├ë */}
 
       {/* Mobile Top Bar Actions */}
-      <div className="min-[1100px]:hidden flex items-center gap-1 max-[480px]:gap-0.5">
+      <div className="min-[1250px]:hidden flex items-center gap-1 max-[480px]:gap-0.5">
         {user ? (
           <>
             {/* Mobile Profile Button */}
@@ -467,7 +464,7 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* ╬ô├╢├ç╬ô├╢├ç Mobile Profile Popup (renders as fixed overlay on small screens) ╬ô├╢├ç╬ô├╢├ç */}
       {isProfileOpen && !isMobileOpen && (
-        <div className="absolute inset-0 pointer-events-none min-[1100px]:hidden">
+        <div className="absolute inset-0 pointer-events-none min-[1250px]:hidden">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/20 z-[90] pointer-events-auto"
@@ -495,7 +492,7 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* ╬ô├╢├ç╬ô├╢├ç Mobile Notification Window (renders as fixed overlay on small screens) ╬ô├╢├ç╬ô├╢├ç */}
       {isNotifOpen && (
-        <div className="absolute inset-0 pointer-events-none min-[1100px]:hidden">
+        <div className="absolute inset-0 pointer-events-none min-[1250px]:hidden">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-black/20 z-[90] pointer-events-auto"
@@ -518,7 +515,7 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* ╬ô├╢├ç╬ô├╢├ç Mobile Drawer Overlay ╬ô├╢├ç╬ô├╢├ç */}
       <div
-        className={`fixed inset-0 bg-overlay backdrop-blur-sm z-40 min-[1100px]:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-overlay backdrop-blur-sm z-40 min-[1250px]:hidden transition-opacity duration-300 ${
           isMobileOpen
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"
@@ -529,7 +526,7 @@ const Navbar = ({ onOpenAuth }) => {
 
       {/* ╬ô├╢├ç╬ô├╢├ç Mobile Drawer Panel ╬ô├╢├ç╬ô├╢├ç */}
       <div
-        className={`fixed top-0 ${isArabic ? "left-0" : "right-0"} h-full w-[280px] max-w-[85vw] bg-surface-elevated shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1100px]:hidden flex flex-col ${
+        className={`fixed top-0 ${isArabic ? "left-0" : "right-0"} h-full w-[280px] max-w-[85vw] bg-surface-elevated shadow-2xl z-50 transform transition-transform duration-300 ease-in-out min-[1250px]:hidden flex flex-col ${
           isMobileOpen
             ? "translate-x-0"
             : isArabic
@@ -682,8 +679,6 @@ const Navbar = ({ onOpenAuth }) => {
               <Globe size={18} /> {isArabic ? "العربية" : "EN"}
             </button>
           </div>
-
-
 
           {user ? (
             <div className="space-y-3">
