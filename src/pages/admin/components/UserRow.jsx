@@ -1,4 +1,4 @@
-import { Shirt, RefreshCw, Plus, Trash2 } from 'lucide-react';
+import { Shirt, RefreshCw, User } from 'lucide-react';
 import QuotaBar from './QuotaBar';
 
 const statusStyles = {
@@ -14,6 +14,23 @@ const roleStyles = {
 
 export default function UserRow({ user, mobile, selected, onToggle }) {
   const roleStyle = roleStyles[user.role] || roleStyles.User;
+
+  const quotaCell = (used, total, Icon, iconColor, barColor) => {
+    if (user.isAdmin) {
+      return (
+        <span className="text-xs text-text-disabled font-medium">N/A</span>
+      );
+    }
+    return (
+      <QuotaBar
+        icon={Icon}
+        iconColor={iconColor}
+        used={used}
+        total={total}
+        barColor={barColor}
+      />
+    );
+  };
 
   if (mobile) {
     return (
@@ -54,20 +71,9 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <QuotaBar
-            icon={Shirt}
-            iconColor="text-brand-secondary"
-            used={user.tryOn.used}
-            total={user.tryOn.total}
-            barColor="bg-brand-secondary"
-          />
-          <QuotaBar
-            icon={RefreshCw}
-            iconColor="text-admin-brand-light"
-            used={user.recycling.used}
-            total={user.recycling.total}
-            barColor="bg-admin-brand-light"
-          />
+          {quotaCell(user.tryOn.used, user.tryOn.total, Shirt, 'text-brand-secondary', 'bg-brand-secondary')}
+          {quotaCell(user.recycling.used, user.recycling.total, RefreshCw, 'text-admin-brand-light', 'bg-admin-brand-light')}
+          {quotaCell(user.avatar.used, user.avatar.total, User, 'text-purple-500', 'bg-purple-500')}
         </div>
       </div>
     );
@@ -106,23 +112,15 @@ export default function UserRow({ user, mobile, selected, onToggle }) {
       </td>
 
       <td className="py-3 px-4">
-        <QuotaBar
-          icon={Shirt}
-          iconColor="text-brand-secondary"
-          used={user.tryOn.used}
-          total={user.tryOn.total}
-          barColor="bg-brand-secondary"
-        />
+        {quotaCell(user.tryOn.used, user.tryOn.total, Shirt, 'text-brand-secondary', 'bg-brand-secondary')}
       </td>
 
       <td className="py-3 px-4">
-        <QuotaBar
-          icon={RefreshCw}
-          iconColor="text-admin-brand-light"
-          used={user.recycling.used}
-          total={user.recycling.total}
-          barColor="bg-admin-brand-light"
-        />
+        {quotaCell(user.recycling.used, user.recycling.total, RefreshCw, 'text-admin-brand-light', 'bg-admin-brand-light')}
+      </td>
+
+      <td className="py-3 px-4">
+        {quotaCell(user.avatar.used, user.avatar.total, User, 'text-purple-500', 'bg-purple-500')}
       </td>
 
       <td className="py-3 px-4">

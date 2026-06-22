@@ -221,6 +221,10 @@ export default function Recycle() {
       setSessionId(data.session_id);
       setIdeas(data.ideas || []);
     } catch (err) {
+      if (err.response?.status === 403) {
+        navigate('/pricing');
+        return;
+      }
       showToast('error', t('recycle.analysisFailed'), toastPosition);
     } finally {
       setAnalyzing(false);
@@ -261,6 +265,10 @@ export default function Recycle() {
         showToast('error', t('recycle.generationError'), toastPosition);
       }
     } catch (err) {
+      if (err.response?.status === 403) {
+        navigate('/pricing');
+        return;
+      }
       showToast('error', t('recycle.generationFailed'), toastPosition);
     } finally {
       setGenerating(false);

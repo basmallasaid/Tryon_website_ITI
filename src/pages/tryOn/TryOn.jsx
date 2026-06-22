@@ -513,6 +513,10 @@ export default function TryOn() {
 
       if (resultUrl) setGeneratedImageUrl(resultUrl);
     } catch (err) {
+      if (err.response?.status === 403) {
+        navigate('/pricing');
+        return;
+      }
       const errorPayload = err.response?.data || err.message || err;
       console.error(
         '❌ [TryOn] Error — model:',

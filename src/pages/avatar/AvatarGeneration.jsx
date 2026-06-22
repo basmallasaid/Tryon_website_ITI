@@ -190,6 +190,10 @@ export default function AvatarGeneration() {
         navigate('/', { replace: true, state: { openAuth: 'login' } });
         return;
       }
+      if (err.response?.status === 403) {
+        navigate('/pricing');
+        return;
+      }
       showToast('error', t('avatar.generationError'), toastPosition);
     } finally {
       setProcessing(false);
