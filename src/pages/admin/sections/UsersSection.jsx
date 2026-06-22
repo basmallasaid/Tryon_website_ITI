@@ -57,8 +57,19 @@ function getStatus(user, t) {
   return user.is_verified ? t('admin.users.active') : t('admin.users.inactive');
 }
 
-const TRYON_LIMIT = 50;
-const RECYCLE_LIMIT = 30;
+const LIMITS = {
+  normal: { tryon: 5, recycle: 4 },
+  premium_monthly: { tryon: 50, recycle: 40 },
+  premium_yearly: { tryon: 600, recycle: 480 },
+};
+
+function getUserLimits(user) {
+  if (user.subscriptionStatus === 'active') {
+    if (user.subscriptionInterval === 'year') return LIMITS.premium_yearly;
+    if (user.subscriptionInterval === 'month') return LIMITS.premium_monthly;
+  }
+  return LIMITS.normal;
+}
 
 function DeleteConfirmDialog({
   user,
@@ -164,6 +175,7 @@ export default function UsersSection({
       [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') ||
       u.email;
     const role = mapRole(u, t);
+    const limits = getUserLimits(u);
     return {
       id: u._id,
       initials: getInitials(u.profile?.first_name, u.profile?.last_name),
@@ -171,8 +183,8 @@ export default function UsersSection({
       email: u.email,
       avatarBg: getAvatarColor(name),
       role,
-      tryOn: { used: u.latestTryOn?.length || 0, total: TRYON_LIMIT },
-      recycling: { used: u.latestRecycle?.length || 0, total: RECYCLE_LIMIT },
+      tryOn: { used: u.latestTryOn?.length || 0, total: limits.tryon },
+      recycling: { used: u.latestRecycle?.length || 0, total: limits.recycle },
       status: getStatus(u, t),
       deletionNotified: u.deletionNotified || false,
     };
