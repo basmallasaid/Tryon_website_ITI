@@ -148,7 +148,17 @@ export default function StoresSection({ onAddStore, onEditStore }) {
 
   const handleDelete = async () => {
     if (selectedIds.size === 0) return;
-    if (!confirm(`Delete ${selectedIds.size} store(s)? This may also affect associated products.`)) return;
+    const result = await Swal.fire({
+      title: `Delete ${selectedIds.size} store(s)?`,
+      text: 'This may also affect associated products.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1550D3',
+      cancelButtonColor: '#6B7280',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+    });
+    if (!result.isConfirmed) return;
     try {
       await Promise.all([...selectedIds].map((id) => deleteStoreApi(id)));
       setSelectedIds(new Set());
