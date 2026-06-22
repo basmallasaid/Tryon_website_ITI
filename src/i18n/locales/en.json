@@ -352,6 +352,7 @@
     "noImageReturned": "No image was returned from the server.",
     "generationFailed": "Image generation failed. Please try again.",
     "generationError": "Error executing this action. Please try again.",
+    "limitReached": "You've reached your recycle limit. Upgrade your plan to continue.",
     "unsupportedFileType": "Unsupported file type. Accepted: {{types}}",
     "fileTooLarge": "\"{{name}}\" exceeds the 10MB size limit.",
     "selectItemsStep": "Select Items",
@@ -449,6 +450,7 @@
     "selectModelAndGenerate": "Select your model above and generate",
     "tryOnResult": "Try-on result",
     "generationError": "Error executing this action. Please try again.",
+    "limitReached": "You've reached your try-on limit. Upgrade your plan to continue.",
     "categoryConflict": "Cannot combine \"{{cat1}}\" with \"{{cat2}}\".",
     "categoryRequired": "Category Required",
     "categoryRequiredText": "Please assign a category to each uploaded image before generating."
@@ -637,6 +639,7 @@
     "noImageReturned": "No image was returned from the server.",
     "fillAllFields": "Please fill in all required fields.",
     "generationError": "Error executing this action. Please try again.",
+    "limitReached": "You've reached your avatar limit. Upgrade your plan to continue.",
     "useInTryOn": "Use in Try-On",
     "upgrade": "Upgrade to Generate More"
   },
