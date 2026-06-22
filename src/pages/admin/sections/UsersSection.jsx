@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   RotateCcw,
   Pencil,
+  User,
 } from 'lucide-react';
 import UserRow from '../components/UserRow';
 import QuotaBar from '../components/QuotaBar';
@@ -53,14 +54,24 @@ function mapRole(user, t) {
   return t('admin.users.userRole');
 }
 
+function getFilterRole(user) {
+  if (user.role === 'admin') return 'Admin';
+  if (user.subscriptionStatus === 'active') {
+    if (user.subscriptionInterval === 'month') return 'Premium (M)';
+    if (user.subscriptionInterval === 'year') return 'Premium (Y)';
+    return 'Premium';
+  }
+  return 'User';
+}
+
 function getStatus(user, t) {
   return user.is_verified ? t('admin.users.active') : t('admin.users.inactive');
 }
 
 const LIMITS = {
-  normal: { tryon: 5, recycle: 4 },
-  premium_monthly: { tryon: 50, recycle: 40 },
-  premium_yearly: { tryon: 600, recycle: 480 },
+  normal: { tryon: 5, recycle: 4, avatar: 1 },
+  premium_monthly: { tryon: 50, recycle: 40, avatar: 15 },
+  premium_yearly: { tryon: 600, recycle: 480, avatar: 180 },
 };
 
 function getUserLimits(user) {
@@ -175,6 +186,7 @@ export default function UsersSection({
       [u.profile?.first_name, u.profile?.last_name].filter(Boolean).join(' ') ||
       u.email;
     const role = mapRole(u, t);
+    const filterRole = getFilterRole(u);
     const limits = getUserLimits(u);
     return {
       id: u._id,
@@ -183,8 +195,11 @@ export default function UsersSection({
       email: u.email,
       avatarBg: getAvatarColor(name),
       role,
+      filterRole,
+      isAdmin: u.role === 'admin',
       tryOn: { used: u.latestTryOn?.length || 0, total: limits.tryon },
       recycling: { used: u.latestRecycle?.length || 0, total: limits.recycle },
+      avatar: { used: u.avatars?.length || 0, total: limits.avatar },
       status: getStatus(u, t),
       deletionNotified: u.deletionNotified || false,
     };
@@ -194,7 +209,7 @@ export default function UsersSection({
     const matchSearch =
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase());
-    const matchRole = roleFilter === 'All' || u.role === roleFilter;
+    const matchRole = roleFilter === 'All' || u.filterRole === roleFilter;
     return matchSearch && matchRole;
   });
 
@@ -412,6 +427,9 @@ export default function UsersSection({
                   {t('admin.users.recycling')}
                 </th>
                 <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
+                  {t('admin.users.avatar')}
+                </th>
+                <th className="py-2.5 px-4 text-[11px] font-semibold text-admin-text-muted uppercase tracking-[0.6px] whitespace-nowrap">
                   {t('admin.users.statusCol')}
                 </th>
               </tr>
@@ -420,7 +438,7 @@ export default function UsersSection({
               {loading ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="py-12 text-center text-sm text-admin-text-muted"
                   >
                     {t('admin.users.loadingUsers')}
@@ -438,7 +456,7 @@ export default function UsersSection({
               ) : (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className="py-12 text-center text-sm text-admin-text-muted"
                   >
                     {t('admin.users.noUsers')}

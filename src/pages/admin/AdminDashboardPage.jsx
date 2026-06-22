@@ -23,7 +23,8 @@ export default function AdminDashboardPage() {
   const getRoleOptions = () => [
     { value: 'All', label: t('admin.stores.allStatuses') },
     { value: 'Admin', label: t('admin.users.admin') },
-    { value: 'Premium', label: t('admin.users.premium') },
+    { value: 'Premium (M)', label: t('admin.users.premium') + ' (M)' },
+    { value: 'Premium (Y)', label: t('admin.users.premium') + ' (Y)' },
     { value: 'User', label: t('admin.users.userRole') },
   ];
   const [activePage, setActivePage] = useState('dashboard');
