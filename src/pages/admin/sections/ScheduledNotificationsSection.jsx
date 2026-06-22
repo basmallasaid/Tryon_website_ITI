@@ -136,7 +136,16 @@ export default function ScheduledNotificationsSection({ onBack, onAddNotificatio
   useEffect(() => { fetchScheduled(); }, []);
 
   const handleCancel = async (id) => {
-    if (!confirm('Cancel this scheduled notification?')) return;
+    const result = await Swal.fire({
+      title: 'Cancel this scheduled notification?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1550D3',
+      cancelButtonColor: '#6B7280',
+      confirmButtonText: 'Cancel Notification',
+      cancelButtonText: 'Keep',
+    });
+    if (!result.isConfirmed) return;
     try {
       await cancelScheduledNotificationApi(id);
       setNotifications((prev) => prev.filter((n) => n._id !== id));

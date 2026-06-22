@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Bell, ArrowLeft, Trash2, Zap, Clock, Filter, X } from 'lucide-react';
+import Swal from 'sweetalert2';
 import { getAllNotificationsApi, deleteNotificationApi } from '../../../api/adminApi';
 import adminI18n from '../../../i18n/admin/adminI18n';
 
@@ -133,7 +134,16 @@ export default function NotificationsSection({ onAddNotification, onAutomatedNot
     : notifications;
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this notification?')) return;
+    const result = await Swal.fire({
+      title: 'Delete this notification?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1550D3',
+      cancelButtonColor: '#6B7280',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+    });
+    if (!result.isConfirmed) return;
     try {
       await deleteNotificationApi(id);
       setNotifications((prev) => prev.filter((n) => n._id !== id));
