@@ -7,7 +7,7 @@ export default function QuickActionsPanel({ onNavigate }) {
   const actions = [
     { icon: Store, label: t('admin.dashboard.addStore'), page: 'stores' },
     { icon: Package, label: t('admin.dashboard.addProduct'), page: 'products' },
-    { icon: KeyRound, label: t('admin.dashboard.apiKey'), page: 'api' },
+    { icon: KeyRound, label: t('admin.dashboard.apiKey'), page: 'apiManagement' },
     { icon: Bell, label: t('admin.dashboard.notifyUsers'), page: 'notifications' },
   ];
 
